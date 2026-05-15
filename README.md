@@ -43,40 +43,44 @@ MovieApp/
 │   └── seeds/
 ├── .gitignore
 └── README.md
-🧠 Lưu ý về mô hình MVC (dành cho backend)
-Model – Tương tác trực tiếp với PostgreSQL (dùng thư viện pg hoặc ORM như Sequelize/Prisma).
+```
 
-View – Trong REST API, View chính là JSON response được Controller trả về.
+# 🧠 Lưu ý về mô hình MVC (dành cho backend)
 
-Controller – Nhận request, gọi Model, xử lý logic nghiệp vụ và trả dữ liệu JSON cho client.
+- **Model** – Tương tác trực tiếp với PostgreSQL (dùng thư viện `pg` hoặc ORM như Sequelize/Prisma).
+- **View** – Trong REST API, View chính là JSON response được Controller trả về.
+- **Controller** – Nhận request, gọi Model, xử lý logic nghiệp vụ và trả dữ liệu JSON cho client.
 
-Khi các bạn làm backend, hãy đặt file đúng thư mục theo cấu trúc trên để team dễ quản lý.
+> Khi các bạn làm backend, hãy đặt file đúng thư mục theo cấu trúc trên để team dễ quản lý.
 
-🛠 Hướng dẫn setup cho thành viên mới (newbie friendly)
-Tất cả thành viên đều phải làm theo các bước dưới đây theo đúng thứ tự.
+---
 
-1️⃣ Yêu cầu máy tính
-Node.js phiên bản 18 trở lên (tải tại nodejs.org)
+# 🛠 Hướng dẫn setup cho thành viên mới (newbie friendly)
 
-PostgreSQL đã cài đặt (có thể dùng Docker, pgAdmin, hoặc cài trực tiếp)
+Tất cả thành viên đều phải làm theo các bước dưới đây **theo đúng thứ tự**.
 
-Git và tài khoản GitHub
+## 1️⃣ Yêu cầu máy tính
+- **Node.js** phiên bản 18 trở lên (tải tại [nodejs.org](https://nodejs.org))
+- **PostgreSQL** đã cài đặt (có thể dùng Docker, pgAdmin, hoặc cài trực tiếp)
+- **Git** và tài khoản GitHub
 
-2️⃣ Clone dự án về máy
-bash
-git clone https://github.com/LoiTang1710/MovieApp.git
+## 2️⃣ Clone dự án về máy
+```bash
+git clone git@github.com:LoiTang1710/MovieApp.git
 cd MovieApp
-3️⃣ Cài đặt thư viện (dependencies)
+```
+## 3️⃣ Cài đặt thư viện (dependencies)
 Bạn cần cài cho cả client và server:
 
-bash
 # Cài backend
 cd server
 npm install
 
 # Cài frontend
+```bash
 cd ../client
 npm install
+```
 
 # Quay về thư mục gốc
 cd ..
