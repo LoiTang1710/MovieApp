@@ -23,4 +23,7 @@
   body {
     @apply font-[Inter]
   }
+  .backdrop-link {
+    @apply px-8 py-2 rounded-sm
+  }
 }
