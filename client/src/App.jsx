@@ -1,10 +1,11 @@
+import Home from "./pages/Home/Home"
 
 function App() {
 
 
   return (
     <div>
-      <h1 className="text-2xl font-black">Hello</h1>
+      <Home/>
     </div>
   )
 }
