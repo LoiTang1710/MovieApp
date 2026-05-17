@@ -8,16 +8,15 @@ import MovieBanner from "../../components/common/Movies/MovieBanner";
 
 const Home = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [loved, setLoved] = useState(false);
   const [moviesBanner, setMoviesBanner] = useState([]);
   useEffect(() => {
     const fetchData = async () => {
-      const tmdbkey = import.meta.env.VITE_ACCESS_TOKEN;
       try {
-        fetch("https://api.themoviedb.org/3/movie/popular", {
+        fetch(`${import.meta.env.VITE_SERVER_URL}/api/movies/popular`, {
           method: "GET",
           headers: {
             accept: "application/json",
-            Authorization: `Bearer ${tmdbkey}`,
           },
         }).then(async (res) => {
           const data = await res.json();
@@ -33,7 +32,9 @@ const Home = () => {
   return (
     <div>
       <Header />
-      {moviesBanner.length > 0 && <MovieBanner data={moviesBanner[5]} />}
+      {moviesBanner.length > 0 && (
+        <MovieBanner data={moviesBanner[3]} loved={loved} setLoved={setLoved} />
+      )}
       {isOpen && <Sidebar />}
       <Footer />
     </div>
