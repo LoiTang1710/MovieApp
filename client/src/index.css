@@ -26,4 +26,7 @@
   .backdrop-link {
     @apply px-8 py-2 rounded-sm
   }
+  .indicator-bar {
+    @apply h-2 w-18 cursor-pointer 
+  }
 }
