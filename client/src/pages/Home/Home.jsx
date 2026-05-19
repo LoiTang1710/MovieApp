@@ -10,10 +10,12 @@ const Home = () => {
   const [loved, setLoved] = useState(false);
   const [moviesBanner, setMoviesBanner] = useState([]);
   const [activeMovieId, setActiveMovieId] = useState();
+  const [movieTrailer, setMovieTrailer] = useState(null);
+
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchPopularData = async () => {
       try {
-        fetch(`${import.meta.env.VITE_SERVER_URL}/api/movies/popular`, {
+        await fetch(`${import.meta.env.VITE_SERVER_URL}/api/movies/popular`, {
           method: "GET",
           headers: {
             accept: "application/json",
@@ -26,11 +28,36 @@ const Home = () => {
           setActiveMovieId(popularMovies[0].id);
         });
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     };
-    fetchData();
+    fetchPopularData();
   }, []);
+
+  useEffect(() => {
+    if (!activeMovieId) return;
+    const fetchTrailer = async () => {
+      try {
+        await fetch(`${import.meta.env.VITE_SERVER_URL}/api/movies/trailer/${activeMovieId}`, {
+          method: 'GET',
+          headers: {
+            accept: 'application/json'
+          }
+        }).then(async (res) => {
+          const data = await res.json();
+          if (data && data.results) {
+            const trailer = data.results.find((vid) => vid.site === "YouTube" && vid.type === "Trailer") || data.results[0];
+            setMovieTrailer(trailer ? trailer.key : null);
+          } else {
+            setMovieTrailer(null);
+          }
+        })
+      } catch (error) {
+        console.error(error)
+      }
+    }
+    fetchTrailer();
+  }, [activeMovieId]);
   return (
     <div>
       <Header />
@@ -47,6 +74,7 @@ const Home = () => {
                 data={movie}
                 loved={loved}
                 setLoved={setLoved}
+                trailerKey={movieTrailer}
               />
             );
           })}
