@@ -1,18 +1,44 @@
 import { Heart } from "lucide-react";
 import PageIndicator from "./PageIndicator";
+// import { useEffect } from "react";
 
 const MovieBanner = (props) => {
   const data = props?.data || {};
+  // useEffect(() => {
+  //   const timer = setInterval(() => {
+  //     props.setActiveMovieId((currentId) => {
+  //       const currentIndex = props.movies.findIndex(
+  //         (movie) => movie.id === currentId,
+  //       );
+  //       // console.log("currentIndex: ", currentIndex)
+  //       const nextIndex = (currentIndex + 1) % props.movies.length;
+  //       return props.movies[nextIndex].id;
+  //     });
+  //   }, 3000);
+  //   return () => clearInterval(timer);
+  // }, [props]);
   if (!data.backdrop_path) return null;
-
   return (
     <div>
       <div className="relative">
-        <img
-          src={`https://image.tmdb.org/t/p/original${data.backdrop_path}`}
-          alt="backdrop-banner"
-          className="w-full max-h-96 md:max-h-128 lg:max-h-180 2xl:max-h-384 object-cover"
-        />
+        {props.trailerKey ? (
+          <div className="w-full max-h-96 md:max-h-128 lg:max-h-180 2xl:max-h-384 overflow-hidden relative" style={{ aspectRatio: '16/9' }}>
+            <iframe
+              className="absolute top-1/2 left-1/2 w-full h-[150%] -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+              src={`https://www.youtube.com/embed/${props.trailerKey}?autoplay=1&controls=0&loop=1&playlist=${props.trailerKey}&modestbranding=1&showinfo=0`}
+              title="YouTube video player"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            ></iframe>
+          </div>
+        ) : (
+          <img
+            src={`https://image.tmdb.org/t/p/original${data.backdrop_path}`}
+            alt="backdrop-banner"
+            className="w-full max-h-96 md:max-h-128 lg:max-h-180 2xl:max-h-384 object-cover"
+          />
+        )}
         <div className="w-125.25 h-100.5 absolute bottom-[5%] left-[2%] bg-black/20 backdrop-blur-xl p-8 rounded-2xl text-white flex flex-col justify-between shadow-2xl">
           <div>
             <h1 className=" text-4xl">{data.title}</h1>
@@ -30,7 +56,11 @@ const MovieBanner = (props) => {
             />
           </div>
         </div>
-        <PageIndicator movies={props.movies} activeMovieId={props.activeMovieId} setActiveMovieId={props.setActiveMovieId}/>
+        <PageIndicator
+          movies={props.movies}
+          activeMovieId={props.activeMovieId}
+          setActiveMovieId={props.setActiveMovieId}
+        />
       </div>
     </div>
   );
