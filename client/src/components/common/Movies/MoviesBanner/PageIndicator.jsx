@@ -2,7 +2,7 @@ import { useHome } from "../../../../contexts/HomeContext";
 
 const PageIndicator = () => {
   const { moviesBanner, activeMovieId, setActiveMovieId } = useHome()
-  console.log('movies: ', moviesBanner)
+  // console.log('movies: ', moviesBanner)
   return (
     <div className="absolute bottom-[5%] right-[3%]">
       <ul className="flex gap-3">

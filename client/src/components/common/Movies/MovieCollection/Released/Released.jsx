@@ -1,11 +1,11 @@
 import { useHome } from '../../../../../contexts/HomeContext'
 
-const Popular = () => {
-  const { moviesPopular } = useHome()
+const Released = () => {
+  const { moviesReleased } = useHome()
   return (
     <div>
       <div className="grid grid-cols-6 gap-3">
-        {moviesPopular.map((movie) => (
+        {moviesReleased.map((movie) => (
           <a key={movie.id} className="relative cursor-pointer">
             <img
               src={`https://image.tmdb.org/t/p/original${movie.poster_path}`}
@@ -24,4 +24,4 @@ const Popular = () => {
   )
 }
 
-export default Popular
+export default Released
