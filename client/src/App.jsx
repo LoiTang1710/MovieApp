@@ -1,11 +1,12 @@
-import Home from "./pages/Home/Home"
+import { HomeProvider } from './contexts/HomeContext'
+import Home from './pages/Home/Home'
 
 function App() {
-
-
   return (
     <div>
-      <Home/>
+      <HomeProvider>
+        <Home />
+      </HomeProvider>
     </div>
   )
 }
