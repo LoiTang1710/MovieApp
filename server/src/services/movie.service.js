@@ -1,6 +1,6 @@
 import { env } from '../config/environment.config.js'
 
-const tmdbFetch = async (endpoint,option) => {
+const tmdbFetch = async (endpoint, option) => {
   const url = `${env.TMDB_BASE_URL}${endpoint}`
   const defaultOption = {
     ...option,
@@ -8,21 +8,18 @@ const tmdbFetch = async (endpoint,option) => {
     headers: {
       accept: 'application/json',
       Authorization: `Bearer ${env.TMDB_ACCESS_TOKEN}`,
-      ...option.headers,
     },
   }
   const response = await fetch(url, defaultOption)
-   if (!response.ok) {
-     throw new Error(`TMDB API Error: ${response.status}`)
-   }
+    .then((res) => res.json())
+    .then((json) => console.log(json))
+    .catch((err) => new Error(`TMDB API Error: ${err}`))
 
-   const data = await response.json()
-   return data
+  const data = await response.json()
+  return data
 }
 
-
-
-export const getPopularMovies =  () => {
+export const getPopularMovies = () => {
   return tmdbFetch('/movie/popular?language=vi-VN')
 }
 export const getMoviesVideoTrailer = async (movieId) => {
@@ -32,6 +29,10 @@ export const getReleasedMovies = async () => {
   return tmdbFetch('/movie/now_playing?language=vi-VN')
 }
 export const getTopRatedMovies = async () => {
- return tmdbFetch('/movie/top_rated?language=vi-VN')
+  return tmdbFetch('/movie/top_rated?language=vi-VN')
 }
-
+export const getAnime = async () => {
+  return tmdbFetch(
+    '/discover/tv?&with_original_language=zh&with_genres=16&sort_by=popularity.desc&language=vi-VN',
+  )
+}
