@@ -13,7 +13,7 @@ export const HomeProvider = ({ children }) => {
   const [moviesWatching, setMoviesWatching] = useState([])
   const [moviesTopRated, setMoviesTopRated] = useState([])
   const [activeMovieId, setActiveMovieId] = useState()
-  const [movieTrailer, setMovieTrailer] = useState(null)
+  const [bannerTrailers, setBannerTrailers] = useState({})
 
   useEffect(() => {
     const fetchPopularData = async () => {
@@ -32,7 +32,7 @@ export const HomeProvider = ({ children }) => {
             },
           }),
         ])
-
+        // console.log("resPopular: ", resPopular)
         // Phòng thủ: Nếu response không thành công (ví dụ lỗi 404, 500) thì dừng lại luôn
         if (!resPopular.ok || !resReleased.ok) throw new Error(`HTTP error!`)
 
@@ -66,7 +66,7 @@ export const HomeProvider = ({ children }) => {
         setMoviesPopular(popularCardMovies)
         setMoviesReleased(dataReleased.results.slice(0, 12))
       } catch (error) {
-        console.error('Lỗi khi fetch và xử lý phim Popular:', error)
+        console.error('Lỗi khi fetch và xử lý phim:', error)
       }
     }
 
@@ -75,35 +75,58 @@ export const HomeProvider = ({ children }) => {
 
   useEffect(() => {
     if (!activeMovieId) return
-    const fetchTrailer = async () => {
+    const fetchBannerTrailers = async () => {
       try {
-        await fetch(
-          `${import.meta.env.VITE_SERVER_URL}/api/movies/trailer/${activeMovieId}`,
-          {
-            method: 'GET',
-            headers: {
-              accept: 'application/json',
+        const fetchPromiseTrailers = moviesBanner.map((movie) =>
+          fetch(
+            `${import.meta.env.VITE_SERVER_URL}/api/movies/trailer/${movie.id}`,
+            {
+              method: 'GET',
+              headers: {
+                accept: 'application/json',
+              },
             },
-          },
-        ).then(async (res) => {
-          const data = await res.json()
-          if (data && data.results) {
-            const trailer =
-              data.results.find(
+          ),
+        )
+        const response = await Promise.all(fetchPromiseTrailers)
+        console.log('response: ', response)
+
+        const data = await Promise.all(
+          response.map((res) => {
+            if (!res.ok)
+              throw new Error('Lỗi khi fetch một trong các trailer banner')
+            return res.json()
+          }),
+        )
+        // console.log("data: ", data)
+        const trailersMap = {}
+        data.forEach((item, index) => {
+          console.log('item: ', item)
+          if (item?.results && item.results.length > 0) {
+            const vids = item.results
+            const trailerOfficial =
+              vids.find(
+                (vid) =>
+                  vid.site === 'YouTube' &&
+                  vid.type === 'Trailer' &&
+                  vid.name === 'Official Trailer',
+              ) ||
+              vids.find(
                 (vid) => vid.site === 'YouTube' && vid.type === 'Trailer',
-              ) || data.results[0]
-            // console.log('trailerKey: ', trailer.key)
-            setMovieTrailer(trailer ? trailer.key : null)
+              ) ||
+              vids[0]
+            trailersMap[moviesBanner[index].id] = trailerOfficial.key
           } else {
-            setMovieTrailer(null)
+            trailersMap[moviesBanner[index].id] = null
           }
         })
+        setBannerTrailers(trailersMap)
       } catch (error) {
-        console.error(error)
+        console.log(error)
       }
     }
-    fetchTrailer()
-  }, [activeMovieId])
+    fetchBannerTrailers()
+  }, [activeMovieId, moviesBanner])
   return (
     <HomeContext.Provider
       value={{
@@ -115,14 +138,13 @@ export const HomeProvider = ({ children }) => {
         setActiveMovieId,
         loved,
         setLoved,
-        movieTrailer,
-        setMovieTrailer,
         moviesReleased,
         setMoviesReleased,
         moviesWatching,
         setMoviesWatching,
         moviesTopRated,
         setMoviesTopRated,
+        bannerTrailers,
       }}
     >
       {children}

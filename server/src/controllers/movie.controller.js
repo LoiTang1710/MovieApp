@@ -5,6 +5,9 @@ import {
 } from '../services/movie.service.js'
 import { StatusCodes } from 'http-status-codes'
 
+
+
+
 export const getPopular = async (req, res) => {
   try {
     const data = await getPopularMovies()
@@ -13,7 +16,10 @@ export const getPopular = async (req, res) => {
     console.error(error)
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json({ error: 'Internal Server Error at getPopularMovies', message: error.message })
+      .json({
+        error: 'Internal Server Error at getPopularMovies',
+        message: error.message,
+      })
   }
 }
 export const getTrailer = async (req, res) => {
@@ -25,7 +31,10 @@ export const getTrailer = async (req, res) => {
     console.error(error)
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
-      .json({ error: 'Internal Server Error at getMoviesVideoTrailer', message: error.message })
+      .json({
+        error: 'Internal Server Error at getMoviesVideoTrailer',
+        message: error.message,
+      })
   }
 }
 export const getReleased = async (req, res) => {
@@ -34,11 +43,9 @@ export const getReleased = async (req, res) => {
     res.status(StatusCodes.OK).json(data)
   } catch (error) {
     console.error(error)
-     res
-       .status(StatusCodes.INTERNAL_SERVER_ERROR)
-       .json({
-         error: 'Internal Server Error at getReleasedMovies',
-         message: error.message,
-       })
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      error: 'Internal Server Error at getReleasedMovies',
+      message: error.message,
+    })
   }
 }

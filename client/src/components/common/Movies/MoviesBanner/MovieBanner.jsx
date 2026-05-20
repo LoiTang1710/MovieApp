@@ -1,17 +1,14 @@
 import { Heart } from 'lucide-react'
 import PageIndicator from './PageIndicator'
 import { useHome } from '../../../../contexts/HomeContext'
+// import { useRef } from 'react'
 
 const MovieBanner = () => {
-  const {
-    movieTrailer,
-    activeMovieId,
-    setLoved,
-    loved,
-    moviesBanner,
-  } = useHome()
+  const { activeMovieId, setLoved, loved, moviesBanner, bannerTrailers } =
+    useHome()
   const data = moviesBanner?.find((movie) => movie.id === activeMovieId) || {}
-  const trailerKey = movieTrailer || ''
+  const trailerKey = bannerTrailers[activeMovieId] || ''
+  // const videoRefs = useRef([])
   return (
     <div>
       <div className="relative">
@@ -21,6 +18,10 @@ const MovieBanner = () => {
             style={{ aspectRatio: '16/9' }}
           >
             <iframe
+              ref={(el) => {
+                console.log(el)
+                // videoRefs.current[index]= el
+              }}
               className="absolute top-1/2 left-1/2 w-full h-full -translate-x-1/2 -translate-y-1/2 pointer-events-none"
               src={`https://www.youtube.com/embed/${trailerKey}?autoplay=1&mute=1&controls=0&loop=1&playlist=${trailerKey}&modestbranding=1&showinfo=0`}
               title="YouTube video player"
@@ -60,4 +61,3 @@ const MovieBanner = () => {
 }
 
 export default MovieBanner
-
