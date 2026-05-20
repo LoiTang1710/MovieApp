@@ -1,32 +1,29 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @theme {
-  --color-primary: #DC2626
+  --color-primary: #dc2626;
+  --color-bg-default: #2a2a2a;
 }
-
 
 @layer base {
   :root {
-    
   }
 
   .dark {
- 
   }
 }
 
 @layer base {
   * {
-
   }
 
   body {
-    @apply font-[Inter]
+    @apply font-[Inter] bg-bg-default text-white;
   }
   .backdrop-link {
-    @apply px-8 py-2 rounded-sm
+    @apply px-8 py-2 rounded-sm;
   }
   .indicator-bar {
-    @apply h-2 w-18 cursor-pointer 
+    @apply h-2 w-18 cursor-pointer;
   }
 }
