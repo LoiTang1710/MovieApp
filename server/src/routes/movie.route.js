@@ -1,5 +1,5 @@
 import express from 'express'
-import { getPopular, getReleased, getTrailer } from '../controllers/movie.controller.js'
+import { getAnime, getPopular, getReleased, getTopRated, getTrailer } from '../controllers/movie.controller.js'
 
 const Router = express.Router()
 
@@ -7,5 +7,7 @@ const Router = express.Router()
 Router.route('/popular').get(getPopular)
 Router.route('/trailer/:id').get(getTrailer)
 Router.route('/released').get(getReleased)
+Router.route('/toprated').get(getTopRated)
+Router.route('/anime').get(getAnime)
 
 export default Router

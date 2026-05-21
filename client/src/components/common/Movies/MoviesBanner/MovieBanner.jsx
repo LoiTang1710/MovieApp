@@ -18,10 +18,6 @@ const MovieBanner = () => {
             style={{ aspectRatio: '16/9' }}
           >
             <iframe
-              ref={(el) => {
-                console.log(el)
-                // videoRefs.current[index]= el
-              }}
               className="absolute top-1/2 left-1/2 w-full h-full -translate-x-1/2 -translate-y-1/2 pointer-events-none"
               src={`https://www.youtube.com/embed/${trailerKey}?autoplay=1&mute=1&controls=0&loop=1&playlist=${trailerKey}&modestbranding=1&showinfo=0`}
               title="YouTube video player"

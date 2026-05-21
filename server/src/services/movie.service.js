@@ -11,9 +11,9 @@ const tmdbFetch = async (endpoint, option) => {
     },
   }
   const response = await fetch(url, defaultOption)
-    .then((res) => res.json())
-    .then((json) => console.log(json))
-    .catch((err) => new Error(`TMDB API Error: ${err}`))
+  if(!response.ok) {
+    throw new Error(`HTTP Error: ${response.status}`)
+  }
 
   const data = await response.json()
   return data
@@ -31,7 +31,7 @@ export const getReleasedMovies = async () => {
 export const getTopRatedMovies = async () => {
   return tmdbFetch('/movie/top_rated?language=vi-VN')
 }
-export const getAnime = async () => {
+export const getAnimeMovies = async () => {
   return tmdbFetch(
     '/discover/tv?&with_original_language=zh&with_genres=16&sort_by=popularity.desc&language=vi-VN',
   )

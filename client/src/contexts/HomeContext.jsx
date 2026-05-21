@@ -12,13 +12,15 @@ export const HomeProvider = ({ children }) => {
   const [moviesReleased, setMoviesReleased] = useState([])
   const [moviesWatching, setMoviesWatching] = useState([])
   const [moviesTopRated, setMoviesTopRated] = useState([])
+  const [moviesAnime, setMoviesAnime] = useState([])
   const [activeMovieId, setActiveMovieId] = useState()
   const [bannerTrailers, setBannerTrailers] = useState({})
+  
 
   useEffect(() => {
     const fetchPopularData = async () => {
       try {
-        const [resPopular, resReleased] = await Promise.all([
+        const [resPopular, resReleased, resTopRated, resAnime] = await Promise.all([
           fetch(`${import.meta.env.VITE_SERVER_URL}/api/movies/popular`, {
             method: 'GET',
             headers: {
@@ -31,14 +33,28 @@ export const HomeProvider = ({ children }) => {
               accept: 'application/json',
             },
           }),
+          fetch(`${import.meta.env.VITE_SERVER_URL}/api/movies/toprated`, {
+            method: 'GET',
+            headers: {
+              accept: 'application/json',
+            },
+          }),
+          fetch(`${import.meta.env.VITE_SERVER_URL}/api/movies/anime`, {
+            method: 'GET',
+            headers: {
+              accept: 'application/json',
+            },
+          }),
         ])
         // console.log("resPopular: ", resPopular)
         // Phòng thủ: Nếu response không thành công (ví dụ lỗi 404, 500) thì dừng lại luôn
-        if (!resPopular.ok || !resReleased.ok) throw new Error(`HTTP error!`)
+        if (!resPopular.ok || !resReleased.ok || !resTopRated.ok || !resAnime.ok) throw new Error(`HTTP error!`)
 
-        const [dataPopular, dataReleased] = await Promise.all([
+        const [dataPopular, dataReleased, dataTopRated, dataAnime] = await Promise.all([
           resPopular.json(),
           resReleased.json(),
+          resTopRated.json(),
+          resAnime.json()
         ])
 
         // 2. Kiểm tra dữ liệu an toàn trước khi xử lý mảng để tránh crash app
@@ -65,6 +81,9 @@ export const HomeProvider = ({ children }) => {
         }
         setMoviesPopular(popularCardMovies)
         setMoviesReleased(dataReleased.results.slice(0, 12))
+        setMoviesTopRated(dataTopRated.results.slice(0,12))
+        // console.log("dataTopRated: ", dataTopRated)
+        setMoviesAnime(dataAnime.results.slice(0,12))
       } catch (error) {
         console.error('Lỗi khi fetch và xử lý phim:', error)
       }
@@ -89,7 +108,7 @@ export const HomeProvider = ({ children }) => {
           ),
         )
         const response = await Promise.all(fetchPromiseTrailers)
-        console.log('response: ', response)
+        // console.log('response: ', response)
 
         const data = await Promise.all(
           response.map((res) => {
@@ -101,7 +120,7 @@ export const HomeProvider = ({ children }) => {
         // console.log("data: ", data)
         const trailersMap = {}
         data.forEach((item, index) => {
-          console.log('item: ', item)
+          // console.log('item: ', item)
           if (item?.results && item.results.length > 0) {
             const vids = item.results
             const trailerOfficial =
@@ -145,6 +164,8 @@ export const HomeProvider = ({ children }) => {
         moviesTopRated,
         setMoviesTopRated,
         bannerTrailers,
+        moviesAnime,
+        
       }}
     >
       {children}

@@ -45,10 +45,10 @@ const MovieCollection = () => {
         const TargetComponent = collection.component
         const { id, name } = collection
         return (
-          <div key={id}>
+          <div key={id} className='mt-12'>
             <h1 className="text-3xl">{name}</h1>
             <MovieLine />
-            <div className="mt-5">
+            <div className="mt-8">
               <TargetComponent />
             </div>
           </div>
