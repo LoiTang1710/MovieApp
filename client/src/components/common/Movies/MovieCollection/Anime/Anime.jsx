@@ -14,7 +14,7 @@ const Anime = () => {
               className="w-full object-cover"
             />
             <div className="absolute left-0 bottom-0 w-full h-[25%] border-t border-white/15 bg-black/50 backdrop-blur-xs flex items-center justify-center p-2">
-              <p className="text-center text-xs md:text-md font-medium line-clamp-2">
+              <p className="text-center text-[8px] md:text-xs lg:text-md font-medium line-clamp-2">
                 {movie.name}
               </p>
             </div>
