@@ -4,28 +4,44 @@ import { useAuth } from '../../../contexts/AuthContext'
 
 const AppBar = () => {
   const { isAuthenticated: isLogged } = useAuth()
+  const navLinks = [
+    {
+      name: 'Home',
+      path: '/',
+    },
+    {
+      name: 'Movies',
+      path: '/movies',
+    },
+    {
+      name: 'TV Shows',
+      path: '/tv-shows',
+    },
+    {
+      name: 'My List',
+      path: '/my-list',
+    },
+  ]
 
   return (
     <div id="AppBar">
       <div className="flex justify-between items-center px-8 h-20 bg-black/95 backdrop-blur-sm fixed top-0 w-full z-50">
         <div className="text-title text-red-600 text-3xl font-black tracking-tighter">
-          <Link to="/">
-            <h1>CINEVIBE</h1>
+          <Link to="/" className="text-primary font-bold">
+            <h1>Cinevibe</h1>
           </Link>
         </div>
-        <div className="page-links hidden md:flex gap-8 text-white font-medium text-sm">
-          <Link to="/" className="hover:text-red-600 transition-colors">
-            Home
-          </Link>
-          <Link to="/movies" className="hover:text-red-600 transition-colors">
-            Movies
-          </Link>
-          <Link to="/tv-shows" className="hover:text-red-600 transition-colors">
-            TV Shows
-          </Link>
-          <Link to="/my-list" className="hover:text-red-600 transition-colors">
-            My List
-          </Link>
+        <div className="page-links hidden md:flex gap-8 text-white font-medium text-md">
+          {navLinks.map((link) => {
+            return (
+              <Link
+                to={`${link.path}`}
+                className="hover:text-red-600 transition-colors"
+              >
+                {link.name}
+              </Link>
+            )
+          })}
         </div>
 
         <div className="action-icons flex justify-center items-center gap-6 text-white">
