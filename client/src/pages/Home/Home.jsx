@@ -1,24 +1,24 @@
-import Header from '../../components/Layouts/Header'
-import Footer from '../../components/Layouts/Footer'
+import Header from '../../components/layouts/Header'
+import Footer from '../../components/layouts/Footer'
 import { Sidebar } from 'lucide-react'
-import MovieBanner from '../../components/common/Movies/MoviesBanner/MovieBanner'
-import MovieCollection from '../../components/common/Movies/MovieCollection/MovieCollection'
+import MediaBanner from '../../components/common/Movies/MediaBanner/MediaBanner'
+import MediaCollection from '../../components/common/Movies/MediaCollection/MediaCollection'
 import { useState } from 'react'
 import { useHome } from '../../contexts/HomeContext'
 
 const Home = () => {
   const [isOpen, setIsOpen] = useState(false)
-  const { moviesBanner, activeMovieId } = useHome()
+  const { mediaBanner, activeMediaId } = useHome()
   return (
     <div>
       <Header />
-      {moviesBanner.length > 0 &&
-        moviesBanner
-          .filter((movie) => movie.id === activeMovieId)
+      {mediaBanner.length > 0 &&
+        mediaBanner
+          .filter((movie) => movie.id === activeMediaId)
           .map((movie) => {
-            return <MovieBanner key={movie.id} />
+            return <MediaBanner key={movie.id} />
           })}
-      <MovieCollection/>
+      <MediaCollection />
       {isOpen && <Sidebar onClick={() => setIsOpen(!isOpen)} />}
       <Footer />
     </div>
