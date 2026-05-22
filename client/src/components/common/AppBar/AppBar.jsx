@@ -1,33 +1,36 @@
-import { Bell, Search, User } from 'lucide-react'
+import { Bell, Search, User } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { useAuth } from '../../../contexts/AuthContext';
 
 const AppBar = () => {
-  const isLogged = false
+  const { isAuthenticated: isLogged } = useAuth();
+
   return (
     <div id="AppBar">
-      <div className="flex justify-between items-center pl-8 pr-8 h-16 bg-black ">
-        <div className="text-title text-primary text-2xl font-bold">
-          <h1>Cinevibe</h1>
+      <div className="flex justify-between items-center px-8 h-20 bg-black/95 backdrop-blur-sm fixed top-0 w-full z-50">
+        <div className="text-title text-red-600 text-3xl font-black tracking-tighter">
+          <Link to="/"><h1>CINEVIBE</h1></Link>
         </div>
-        <div className="page-links flex gap-8 text-white ">
-          <a href="#" className="hover:text-primary">
+        <div className="page-links hidden md:flex gap-8 text-white font-medium text-sm">
+          <Link to="/" className="hover:text-red-600 transition-colors">
             Home
-          </a>
-          <a href="" className="hover:text-primary">
+          </Link>
+          <Link to="/movies" className="hover:text-red-600 transition-colors">
             Movies
-          </a>
-          <a href="" className="hover:text-primary">
+          </Link>
+          <Link to="/tv-shows" className="hover:text-red-600 transition-colors">
             TV Shows
-          </a>
-          <a href="" className="hover:text-primary">
+          </Link>
+          <Link to="/my-list" className="hover:text-red-600 transition-colors">
             My List
-          </a>
+          </Link>
         </div>
-        <div className="action-icons flex justify-center items-center gap-6 text-primary">
-          <Search />
-          <Bell  />
+        <div className="action-icons flex justify-center items-center gap-6 text-white">
+          <Search className="w-5 h-5 cursor-pointer hover:text-red-600 transition-colors" />
+          <Bell className="w-5 h-5 cursor-pointer hover:text-red-600 transition-colors" />
           {
-            isLogged ?( <User/>) : (
-              <div className='hover:underline cursor-pointer'>Login/Register</div>
+            isLogged ? (<User className="text-red-600" />) : (
+              <Link to="/login" className='hover:text-red-600 transition-colors text-sm font-medium'>Login/Register</Link>
             )
           }
         </div>
