@@ -3,12 +3,10 @@ import PageIndicator from './PageIndicator'
 import { useHome } from '../../../../contexts/HomeContext'
 // import { useRef } from 'react'
 
-const MovieBanner = () => {
-  const { activeMovieId, setLoved, loved, moviesBanner, bannerTrailers } =
-    useHome()
-  const data = moviesBanner?.find((movie) => movie.id === activeMovieId) || {}
-  const trailerKey = bannerTrailers[activeMovieId] || ''
-  // const videoRefs = useRef([])
+const MediaBanner = () => {
+  const { activeMediaId, setLoved, loved, mediaBanner, bannerTrailers } = useHome()
+  const data = mediaBanner?.find((movie) => movie.id === activeMediaId) || {}
+  const trailerKey = bannerTrailers[activeMediaId] || ''
   return (
     <div>
       <div className="relative">
@@ -33,11 +31,14 @@ const MovieBanner = () => {
             className="w-full max-h-96 md:max-h-128 lg:max-h-180 2xl:max-h-384 object-cover"
           />
         )}
-        <div className="w-125.25 h-100.5 absolute bottom-[5%] left-[2%] bg-black/20 backdrop-blur-xl p-8 rounded-2xl text-white flex flex-col justify-between shadow-2xl">
+        <div className="lg:w-125.25 lg:h-50 absolute bottom-[5%] left-[2%] bg-black/20 backdrop-blur-xl p-8 rounded-2xl text-white lg:flex lg:flex-col lg:justify-between lg:shadow-2xl">
           <div>
-            <h1 className=" text-4xl">{data.title}</h1>
-            <p className="mt-2">{data.release_date}</p>
-            <p className="mt-4">{data.overview}</p>
+            <h1 className="text-xl lg:text-4xl mb-5 lg:mb-0">
+              {data.title || data.name}
+            </h1>
+            <p className="mt-2 hidden lg:block">
+              {data.release_date || data.first_air_date}
+            </p>
           </div>
           <div className="flex items-center gap-8">
             <a className="backdrop-link bg-primary">Xem Ngay</a>
@@ -46,7 +47,7 @@ const MovieBanner = () => {
             </a>
             <Heart
               onClick={() => setLoved(!loved)}
-              className={`${loved ? 'fill-primary text-primary' : 'none'}`}
+              className={`${loved ? 'fill-primary text-primary' : 'none'} hidden lg:block`}
             />
           </div>
         </div>
@@ -56,4 +57,4 @@ const MovieBanner = () => {
   )
 }
 
-export default MovieBanner
+export default MediaBanner

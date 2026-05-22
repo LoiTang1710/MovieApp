@@ -1,5 +1,5 @@
 @import 'tailwindcss';
-
+@source "./layouts";
 @theme {
   --color-primary: #dc2626;
   --color-bg-default: #2a2a2a;
@@ -21,9 +21,18 @@
     @apply font-[Inter] bg-bg-default text-white;
   }
   .backdrop-link {
-    @apply px-8 py-2 rounded-sm;
+    @apply block px-8 py-2 rounded-sm cursor-pointer;
   }
   .indicator-bar {
     @apply h-2 w-18 cursor-pointer;
+  }
+  .dots-link {
+    @apply rounded-full bg-bg-default w-16 h-16;
+  }
+  .backdrop-text-overplay{
+    @apply absolute left-0 bottom-0 w-full h-[25%] border-t border-white/15 bg-black/50 backdrop-blur-xs flex items-center justify-center p-2
+  }
+  .movie-card-title {
+    @apply text-center text-[8px] md:text-xs lg:text-lg font-medium line-clamp-2
   }
 }

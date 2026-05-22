@@ -1,6 +1,7 @@
 import { Bell, Search, User } from 'lucide-react'
 
 const AppBar = () => {
+  const isLogged = false
   return (
     <div id="AppBar">
       <div className="flex justify-between items-center pl-8 pr-8 h-16 bg-black ">
@@ -24,7 +25,11 @@ const AppBar = () => {
         <div className="action-icons flex justify-center items-center gap-6 text-primary">
           <Search />
           <Bell  />
-          <User/>
+          {
+            isLogged ?( <User/>) : (
+              <div className='hover:underline cursor-pointer'>Login/Register</div>
+            )
+          }
         </div>
       </div>
     </div>
