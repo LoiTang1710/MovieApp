@@ -7,83 +7,74 @@ export const HomeContext = createContext({})
 
 export const HomeProvider = ({ children }) => {
   const [loved, setLoved] = useState(false)
-  const [moviesBanner, setMoviesBanner] = useState([])
-  const [moviesPopular, setMoviesPopular] = useState([])
-  const [moviesReleased, setMoviesReleased] = useState([])
-  const [moviesWatching, setMoviesWatching] = useState([])
-  const [moviesTopRated, setMoviesTopRated] = useState([])
-  const [moviesAnime, setMoviesAnime] = useState([])
-  const [activeMovieId, setActiveMovieId] = useState()
+  const [mediaBanner, setMediaBanner] = useState([])
+  const [mediasPopular, setMediasPopular] = useState([])
+  const [mediasReleased, setMediasReleased] = useState([])
+  const [mediasWatching, setMediasWatching] = useState([])
+  const [mediasTopRated, setMediasTopRated] = useState([])
+  const [mediasAnime, setMediasAnime] = useState([])
+  const [activeMediaId, setActiveMediaId] = useState()
   const [bannerTrailers, setBannerTrailers] = useState({})
-  
 
   useEffect(() => {
     const fetchPopularData = async () => {
       try {
-        const [resPopular, resReleased, resTopRated, resAnime] = await Promise.all([
-          fetch(`${import.meta.env.VITE_SERVER_URL}/api/movies/popular`, {
-            method: 'GET',
-            headers: {
-              accept: 'application/json',
-            },
-          }),
-          fetch(`${import.meta.env.VITE_SERVER_URL}/api/movies/released`, {
-            method: 'GET',
-            headers: {
-              accept: 'application/json',
-            },
-          }),
-          fetch(`${import.meta.env.VITE_SERVER_URL}/api/movies/toprated`, {
-            method: 'GET',
-            headers: {
-              accept: 'application/json',
-            },
-          }),
-          fetch(`${import.meta.env.VITE_SERVER_URL}/api/movies/anime`, {
-            method: 'GET',
-            headers: {
-              accept: 'application/json',
-            },
-          }),
-        ])
-        // console.log("resPopular: ", resPopular)
-        // Phòng thủ: Nếu response không thành công (ví dụ lỗi 404, 500) thì dừng lại luôn
-        if (!resPopular.ok || !resReleased.ok || !resTopRated.ok || !resAnime.ok) throw new Error(`HTTP error!`)
+        const server_url = import.meta.env.VITE_SERVER_URL
+        const option = {
+          method: 'GET',
+          headers: {
+            accept: 'application/json',
+          },
+        }
+        const [resPopular, resReleased, resTopRated, resAnime] =
+          await Promise.all([
+            fetch(`${server_url}/api/medias/popular`, option),
+            fetch(`${server_url}/api/medias/released`, option),
+            fetch(`${server_url}/api/medias/top_rated`, option),
+            fetch(`${server_url}/api/medias/anime`, option),
+          ])
 
-        const [dataPopular, dataReleased, dataTopRated, dataAnime] = await Promise.all([
-          resPopular.json(),
-          resReleased.json(),
-          resTopRated.json(),
-          resAnime.json()
-        ])
+        if (
+          !resPopular.ok ||
+          !resReleased.ok ||
+          !resTopRated.ok ||
+          !resAnime.ok
+        )
+          throw new Error(`HTTP error!`)
 
-        // 2. Kiểm tra dữ liệu an toàn trước khi xử lý mảng để tránh crash app
-        const popularResults = dataPopular?.results || []
-
-        const highRatedMovies = popularResults.filter(
+        const [dataPopular, dataReleased, dataTopRated, dataAnime] =
+          await Promise.all([
+            resPopular.json(),
+            resReleased.json(),
+            resTopRated.json(),
+            resAnime.json(),
+          ])
+          console.log("dataReleased: ", dataReleased)
+          console.log("dataTopRated: ", dataTopRated)
+        const popularResults = dataPopular || []
+        const highRatedMedia = popularResults.filter(
           (movie) => movie.vote_average >= 7,
         )
-        const sortedMovies = highRatedMovies.sort(
+        const sortedMedia = highRatedMedia.sort(
           (a, b) => b.vote_average - a.vote_average,
         )
-        const bannerMovies = sortedMovies.slice(0, 4)
+        const bannerMedias = sortedMedia.slice(0, 4)
+        const bannedIds = bannerMedias.map((movie) => movie.id)
 
-        // 4. Xử lý lấy danh sách Phim Phổ biến (Lọc bỏ các phim đã lên Banner, lấy 12 phim)
-        const bannedIds = bannerMovies.map((movie) => movie.id)
-        const popularCardMovies = popularResults
-          .filter((movie) => !bannedIds.includes(movie.id))
-          .sort((a, b) => b.vote_average - a.vote_average)
-          .slice(0, 12)
-
-        setMoviesBanner(bannerMovies)
-        if (bannerMovies.length > 0) {
-          setActiveMovieId(bannerMovies[0].id)
+        setMediaBanner(bannerMedias)
+        if (bannerMedias.length > 0) {
+          setActiveMediaId(bannerMedias[0].id)
         }
-        setMoviesPopular(popularCardMovies)
-        setMoviesReleased(dataReleased.results.slice(0, 12))
-        setMoviesTopRated(dataTopRated.results.slice(0,12))
-        // console.log("dataTopRated: ", dataTopRated)
-        setMoviesAnime(dataAnime.results.slice(0,12))
+        setMediasPopular(
+          popularResults
+            .filter((movie) => !bannedIds.includes(movie.id))
+            .sort((a, b) => b.vote_average - a.vote_average)
+            .slice(0, 12),
+        )
+        // console.log("dataReleased: ", dataReleased.results)
+        setMediasReleased(dataReleased.slice(0, 12))
+        setMediasTopRated(dataTopRated.slice(0, 12))
+        setMediasAnime(dataAnime.slice(0, 12))
       } catch (error) {
         console.error('Lỗi khi fetch và xử lý phim:', error)
       }
@@ -93,12 +84,18 @@ export const HomeProvider = ({ children }) => {
   }, [])
 
   useEffect(() => {
-    if (!activeMovieId) return
+    if (mediaBanner.length === 0) return
+    // Check if we already have trailers for the current banner movies
+    const missingTrailers = mediaBanner.some(
+      (movie) => bannerTrailers[movie.id] === undefined,
+    )
+    if (!missingTrailers) return
+
     const fetchBannerTrailers = async () => {
       try {
-        const fetchPromiseTrailers = moviesBanner.map((movie) =>
+        const fetchPromiseTrailers = mediaBanner.map((movie) =>
           fetch(
-            `${import.meta.env.VITE_SERVER_URL}/api/movies/trailer/${movie.id}`,
+            `${import.meta.env.VITE_SERVER_URL}/api/medias/trailer/${movie.id}?type=${movie.type}`,
             {
               method: 'GET',
               headers: {
@@ -134,9 +131,9 @@ export const HomeProvider = ({ children }) => {
                 (vid) => vid.site === 'YouTube' && vid.type === 'Trailer',
               ) ||
               vids[0]
-            trailersMap[moviesBanner[index].id] = trailerOfficial.key
+            trailersMap[mediaBanner[index].id] = trailerOfficial.key
           } else {
-            trailersMap[moviesBanner[index].id] = null
+            trailersMap[mediaBanner[index].id] = null
           }
         })
         setBannerTrailers(trailersMap)
@@ -145,27 +142,22 @@ export const HomeProvider = ({ children }) => {
       }
     }
     fetchBannerTrailers()
-  }, [activeMovieId, moviesBanner])
+  }, [mediaBanner, bannerTrailers])
   return (
     <HomeContext.Provider
       value={{
-        moviesBanner,
-        setMoviesBanner,
-        moviesPopular,
-        setMoviesPopular,
-        activeMovieId,
-        setActiveMovieId,
+        mediaBanner,
+        setMediaBanner,
+        activeMediaId,
         loved,
         setLoved,
-        moviesReleased,
-        setMoviesReleased,
-        moviesWatching,
-        setMoviesWatching,
-        moviesTopRated,
-        setMoviesTopRated,
         bannerTrailers,
-        moviesAnime,
-        
+        setMediasWatching,
+        mediasPopular,
+        mediasReleased,
+        mediasTopRated,
+        mediasAnime,
+        mediasWatching,
       }}
     >
       {children}

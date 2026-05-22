@@ -1,12 +1,12 @@
 import { useHome } from "../../../../contexts/HomeContext";
 
 const PageIndicator = () => {
-  const { moviesBanner, activeMovieId, setActiveMovieId } = useHome()
-  // console.log('movies: ', moviesBanner)
+  const { mediaBanner, activeMovieId, setActiveMovieId } = useHome()
+  // console.log('movies: ', mediaBanner)
   return (
     <div className="absolute bottom-[5%] right-[3%]">
       <ul className="flex gap-3">
-        {moviesBanner.map((movie) => {
+        {mediaBanner.map((movie) => {
           return (
             <li
               key={movie.id}

@@ -1,10 +1,10 @@
 import express from 'express'
-import movieRoutes from './movie.route.js'
 import statsRoutes from './stats.route.js'
+import mediasRoutes from './media.route.js'
 
 const apiRouter = express.Router()
 
-apiRouter.use('/movies', movieRoutes)
-apiRouter.use('/stats', statsRoutes)
+apiRouter.use('/stats', statsRoutes) 
+apiRouter.use('/medias', mediasRoutes)
 
 export default apiRouter
