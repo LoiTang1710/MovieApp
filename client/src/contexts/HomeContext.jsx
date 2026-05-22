@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useContext } from 'react'
+import { createContext, useContext, useMemo } from 'react'
 import { useEffect } from 'react'
 import { useState } from 'react'
 
@@ -15,17 +15,21 @@ export const HomeProvider = ({ children }) => {
   const [mediasAnime, setMediasAnime] = useState([])
   const [activeMediaId, setActiveMediaId] = useState()
   const [bannerTrailers, setBannerTrailers] = useState({})
+  const [bannerLogos, setBannerLogos] = useState([])
+
+  const server_url = import.meta.env.VITE_SERVER_URL
+  const option = useMemo(() => {
+    return {
+      method: 'GET',
+      headers: {
+        accept: 'application/json',
+      },
+    }
+  }, [])
 
   useEffect(() => {
     const fetchPopularData = async () => {
       try {
-        const server_url = import.meta.env.VITE_SERVER_URL
-        const option = {
-          method: 'GET',
-          headers: {
-            accept: 'application/json',
-          },
-        }
         const [resPopular, resReleased, resTopRated, resAnime] =
           await Promise.all([
             fetch(`${server_url}/api/medias/popular`, option),
@@ -49,8 +53,6 @@ export const HomeProvider = ({ children }) => {
             resTopRated.json(),
             resAnime.json(),
           ])
-          console.log("dataReleased: ", dataReleased)
-          console.log("dataTopRated: ", dataTopRated)
         const popularResults = dataPopular || []
         const highRatedMedia = popularResults.filter(
           (movie) => movie.vote_average >= 7,
@@ -71,7 +73,7 @@ export const HomeProvider = ({ children }) => {
             .sort((a, b) => b.vote_average - a.vote_average)
             .slice(0, 12),
         )
-        // console.log("dataReleased: ", dataReleased.results)
+
         setMediasReleased(dataReleased.slice(0, 12))
         setMediasTopRated(dataTopRated.slice(0, 12))
         setMediasAnime(dataAnime.slice(0, 12))
@@ -81,7 +83,7 @@ export const HomeProvider = ({ children }) => {
     }
 
     fetchPopularData()
-  }, [])
+  }, [option, server_url])
 
   useEffect(() => {
     if (mediaBanner.length === 0) return
@@ -95,18 +97,11 @@ export const HomeProvider = ({ children }) => {
       try {
         const fetchPromiseTrailers = mediaBanner.map((movie) =>
           fetch(
-            `${import.meta.env.VITE_SERVER_URL}/api/medias/trailer/${movie.id}?type=${movie.type}`,
-            {
-              method: 'GET',
-              headers: {
-                accept: 'application/json',
-              },
-            },
+            `${server_url}/api/medias/trailer/${movie.id}?type=${movie.type}`,
+            option,
           ),
         )
         const response = await Promise.all(fetchPromiseTrailers)
-        // console.log('response: ', response)
-
         const data = await Promise.all(
           response.map((res) => {
             if (!res.ok)
@@ -114,10 +109,8 @@ export const HomeProvider = ({ children }) => {
             return res.json()
           }),
         )
-        // console.log("data: ", data)
         const trailersMap = {}
         data.forEach((item, index) => {
-          // console.log('item: ', item)
           if (item?.results && item.results.length > 0) {
             const vids = item.results
             const trailerOfficial =
@@ -142,13 +135,48 @@ export const HomeProvider = ({ children }) => {
       }
     }
     fetchBannerTrailers()
-  }, [mediaBanner, bannerTrailers])
+  }, [mediaBanner, bannerTrailers, option, server_url])
+
+  useEffect(() => {
+    if (mediaBanner.length === 0) return
+    // Check if we already have trailers for the current banner movies
+    const missingTrailers = mediaBanner.some(
+      (movie) => bannerLogos[movie.id] === undefined,
+    )
+    if (!missingTrailers) return
+
+    const fetchBannerLogos = async () => {
+      try {
+        const fetchPromiseLogos = mediaBanner.map((item) => (
+          fetch(
+            `${server_url}/api/medias/images/${item.id}?type=${item.type}`,
+            option,
+          )
+        ))
+        const response = await Promise.all(fetchPromiseLogos)
+        const data = await Promise.all(response.map(res => res.json()))
+        const logosMap = {}
+        data.forEach((item,index) => {
+          if (item?.logos && item.logos.length > 0) {
+            logosMap[mediaBanner[index].id] = item.logos[0].file_path
+          } else {
+            logosMap[mediaBanner[index].id] = null
+          }
+        })
+        setBannerLogos(logosMap)
+      } catch (error) {
+        console.error(error)
+      }
+    }
+    fetchBannerLogos()
+  }, [bannerLogos, mediaBanner, server_url,option])
   return (
     <HomeContext.Provider
       value={{
         mediaBanner,
         setMediaBanner,
         activeMediaId,
+        setActiveMediaId,
         loved,
         setLoved,
         bannerTrailers,
@@ -158,6 +186,7 @@ export const HomeProvider = ({ children }) => {
         mediasTopRated,
         mediasAnime,
         mediasWatching,
+        bannerLogos
       }}
     >
       {children}

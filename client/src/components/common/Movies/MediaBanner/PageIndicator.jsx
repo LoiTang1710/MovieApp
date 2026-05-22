@@ -1,8 +1,9 @@
 import { useHome } from "../../../../contexts/HomeContext";
 
 const PageIndicator = () => {
-  const { mediaBanner, activeMovieId, setActiveMovieId } = useHome()
-  // console.log('movies: ', mediaBanner)
+  const { mediaBanner, activeMediaId, setActiveMediaId } = useHome()
+  console.log("mediaBanner: ", mediaBanner)
+
   return (
     <div className="absolute bottom-[5%] right-[3%]">
       <ul className="flex gap-3">
@@ -10,8 +11,8 @@ const PageIndicator = () => {
           return (
             <li
               key={movie.id}
-              onClick={() => setActiveMovieId(movie.id)}
-              className={`indicator-bar ${movie.id === activeMovieId ? 'bg-primary' : 'bg-white/70'}`}
+              onClick={() => setActiveMediaId(movie.id)}
+              className={`indicator-bar ${movie.id === activeMediaId ? 'bg-primary' : 'bg-white/70'}`}
             ></li>
           )
         })}

@@ -1,4 +1,5 @@
 import {
+  getImagesPopular,
   getMediasAnime,
   getMediasPopular,
   getMediasReleased,
@@ -7,6 +8,13 @@ import {
 } from '../services/media.service.js'
 import { StatusCodes } from 'http-status-codes'
 import { catchAsync } from '../utils/catchAsync.js'
+
+export const getImages = catchAsync(async(req,res) => {
+  const {id} = req.params
+  const type = req.query.type
+  const data = await getImagesPopular(type,id)
+  res.status(StatusCodes.OK).json(data)
+})
 
 export const getPopulars = catchAsync(async (req, res) => {
   const data = await getMediasPopular()

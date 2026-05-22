@@ -1,6 +1,7 @@
 import express from 'express'
 import {
   getAnimes,
+  getImages,
   getPopulars,
   getReleases,
   getTopRates,
@@ -9,9 +10,10 @@ import {
 
 const Router = express.Router()
 
-// GET /api/media/popular
-
+// GET /api/medias
+Router.route('/images/:id').get(getImages)
 Router.route('/popular').get(getPopulars)
+
 Router.route('/trailer/:id').get(getTrailers)
 Router.route('/released').get(getReleases)
 Router.route('/top_rated').get(getTopRates)
