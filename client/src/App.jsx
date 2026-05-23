@@ -7,7 +7,7 @@ import Home from './pages/Home';
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
-
+import MyList from "./pages/MyList/MyList";
 
 function App() {
   // Khởi tạo QueryClient bên trong để đảm bảo tính ổn định trong React 19
@@ -30,6 +30,7 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/my-list" element={<MyList />} />
             </Routes>
           </Router>
         </HomeProvider>
