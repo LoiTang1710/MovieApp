@@ -52,7 +52,9 @@ const AppBar = () => {
           <Search className="w-5 h-5 cursor-pointer hover:text-red-600 transition-colors" />
           <Bell className="w-5 h-5 cursor-pointer hover:text-red-600 transition-colors" />
           {isLogged ? (
-            <User className="text-red-600" />
+            <Link to="/profiles" className="hover:text-red-600 transition-colors">
+              <User className="text-red-600" />
+            </Link>
           ) : (
             <Link
               to="/login"

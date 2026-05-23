@@ -8,6 +8,8 @@ import { AuthProvider } from './providers/AuthProvider'
 import { HomeProvider } from './providers/HomeProvider'
 import { AppProvider } from './providers/AppProvider'
 import MainLayout from './components/layouts/MainLayout'
+import AuthLayout from './components/layouts/AuthLayout'
+import { ProfileSelection, ProfileManage, ProfileForm } from './pages/Profiles'
 
 const RootLayout = () => {
   return (
@@ -54,6 +56,24 @@ const router = createBrowserRouter([
       {
         path: '/forgot-password',
         element: <ForgotPassword />,
+      },
+
+      // === NHÓM 3: TRANG QUẢN LÝ HỒ SƠ (AuthLayout) ===
+      {
+        path: '/profiles',
+        element: <AuthLayout><ProfileSelection /></AuthLayout>,
+      },
+      {
+        path: '/profiles/manage',
+        element: <AuthLayout><ProfileManage /></AuthLayout>,
+      },
+      {
+        path: '/profiles/add',
+        element: <AuthLayout><ProfileForm /></AuthLayout>,
+      },
+      {
+        path: '/profiles/edit/:id',
+        element: <AuthLayout><ProfileForm /></AuthLayout>,
       },
     ],
   },

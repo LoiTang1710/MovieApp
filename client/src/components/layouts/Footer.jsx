@@ -1,3 +1,5 @@
+import { FaFacebook, FaTwitter, FaInstagram, FaYoutube } from 'react-icons/fa'
+
 const Footer = () => {
   return (
     <div className="">
@@ -10,10 +12,18 @@ const Footer = () => {
           điện ảnh đỉnh cao ngay tại nhà.
         </p>
         <div className="flex gap-5 justify-center mt-5">
-          <a href="" className="dots-link"></a>
-          <a href="" className="dots-link"></a>
-          <a href="" className="dots-link"></a>
-          <a href="" className="dots-link"></a>
+          <a href="#" className="w-14 h-14 rounded-full bg-neutral-800 flex items-center justify-center text-gray-400 hover:bg-neutral-700 hover:text-white transition">
+            <FaFacebook size={22} />
+          </a>
+          <a href="#" className="w-14 h-14 rounded-full bg-neutral-800 flex items-center justify-center text-gray-400 hover:bg-neutral-700 hover:text-white transition">
+            <FaTwitter size={22} />
+          </a>
+          <a href="#" className="w-14 h-14 rounded-full bg-neutral-800 flex items-center justify-center text-gray-400 hover:bg-neutral-700 hover:text-white transition">
+            <FaInstagram size={22} />
+          </a>
+          <a href="#" className="w-14 h-14 rounded-full bg-neutral-800 flex items-center justify-center text-gray-400 hover:bg-neutral-700 hover:text-white transition">
+            <FaYoutube size={22} />
+          </a>
         </div>
         <p className="text-center mt-4 text-[#A3A3A3]">© 2026 CINEVIBE. All rights reserved.</p>
       </div>
