@@ -42,7 +42,7 @@ const MediaBanner = () => {
         )}
 
         {/* ĐÃ ĐIỀU CHỈNH: Thu nhỏ w-[420px], giảm p-6, đổi thành flex-col */}
-        <div className="lg:w-[420px] lg:min-h-[260px] absolute bottom-[5%] left-[2%] md:left-[4%] bg-black/20 backdrop-blur-xl p-6 rounded-2xl text-white flex flex-col shadow-2xl">
+        <div className="lg:w-105 lg:min-h-65 absolute bottom-[5%] left-[2%] md:left-[4%] bg-black/20 backdrop-blur-xl p-6 rounded-2xl text-white flex flex-col shadow-2xl">
           {/* PHẦN 1: LOGO - Dùng mb-auto để đẩy các phần tử bên dưới xuống đáy */}
           <div className="mb-auto">
             {logoPath ? (

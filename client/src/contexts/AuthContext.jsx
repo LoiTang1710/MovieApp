@@ -1,20 +1,12 @@
-/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext } from 'react';
 
 // Tạo Context
-const AuthContext = createContext();
+export const AuthContext = createContext();
 
 // Tạo Provider
-const AuthProvider = ({ children }) => {
-  return (
-    <AuthContext.Provider value={{ isAuthenticated: false }}>
-      {children}
-    </AuthContext.Provider>
-  );
-};
 
 // Hook để sử dụng AuthContext
-const useAuth = () => {
+export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
     throw new Error('useAuth phải được sử dụng trong AuthProvider');
@@ -22,4 +14,3 @@ const useAuth = () => {
   return context;
 };
 
-export { AuthContext, AuthProvider, useAuth };
