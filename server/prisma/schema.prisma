@@ -1,0 +1,72 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum SubscriptionStatus {
+  PENDING
+  ACTIVE
+  EXPIRED
+  CANCELED
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  REFUNDED
+}
+
+model PremiumPlan {
+  id           String         @id @default(cuid())
+  code         String         @unique
+  name         String
+  price        Decimal        @db.Decimal(12, 2)
+  currency     String         @default("VND")
+  durationDays Int
+  isActive     Boolean        @default(true)
+  subscriptions Subscription[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+}
+
+model Subscription {
+  id        String             @id @default(cuid())
+  userId    String
+  planId    String
+  plan      PremiumPlan        @relation(fields: [planId], references: [id])
+  status    SubscriptionStatus @default(PENDING)
+  startAt   DateTime?
+  endAt     DateTime?
+  autoRenew Boolean            @default(false)
+  payments  Payment[]
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+
+  @@index([userId])
+  @@index([status, endAt])
+}
+
+model Payment {
+  id                    String        @id @default(cuid())
+  userId                String
+  subscriptionId        String?
+  subscription          Subscription? @relation(fields: [subscriptionId], references: [id])
+  provider              String
+  providerTransactionId String?
+  amount                Decimal       @db.Decimal(12, 2)
+  currency              String        @default("VND")
+  status                PaymentStatus @default(PENDING)
+  paidAt                DateTime?
+  metadata              Json?
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+
+  @@index([userId])
+  @@index([subscriptionId])
+  @@index([status, createdAt])
+  @@unique([provider, providerTransactionId])
+}
