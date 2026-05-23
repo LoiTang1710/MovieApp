@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export const axiosClient = axios.create({
+export const authClient = axios.create({
   baseURL: import.meta.env.VITE_SERVER_URL, // Thay bằng URL Backend thực tế của bạn
   withCredentials: true, // BẮT BUỘC để dùng Session Auth
   headers: {
