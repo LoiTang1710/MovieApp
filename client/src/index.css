@@ -3,6 +3,7 @@
 @theme {
   --color-primary: #dc2626;
   --color-bg-default: #2a2a2a;
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
 }
 
 @layer base {
@@ -18,7 +19,8 @@
   }
 
   body {
-    @apply font-[Inter] bg-bg-default text-white;
+    font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    @apply bg-bg-default text-white;
   }
   .backdrop-link {
     @apply block px-8 py-2 rounded-sm cursor-pointer;
