@@ -12,8 +12,11 @@ const tmdbFetchAll = async (movie_endpoint, tv_endpoint, option) => {
   const combinedData = [...(movies || []), ...(tvs || [])]
   return combinedData.sort((a, b) => b.popularity - a.popularity)
 }
-export const getImagesPopular = async (type,id) => {
+export const getImagesPopular = async (type, id) => {
   return tmdbFetch(`/${type}/${id}/images?include_image_language=vi-VN,en-US`)
+}
+export const getMediaDetail = async (id, type) => {
+  return tmdbFetch(`/${type}/${id}?language=vi-VN&append_to_response=credits`)
 }
 export const getMediasPopular = async () => {
   return tmdbFetchAll(

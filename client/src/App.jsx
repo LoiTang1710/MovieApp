@@ -8,6 +8,7 @@ import { AuthProvider } from './providers/AuthProvider'
 import { HomeProvider } from './providers/HomeProvider'
 import { AppProvider } from './providers/AppProvider'
 import MainLayout from './components/layouts/MainLayout'
+import MediaDetails from './pages/MediaDetails/MediaDetails'
 
 const RootLayout = () => {
   return (
@@ -34,6 +35,12 @@ const router = createBrowserRouter([
                 <Home />
               </HomeProvider>
             ),
+          },
+          {
+            path: '/movie/:slug',
+            element: (
+              <MediaDetails/>
+            )
           },
           {
             path: '/my-list',

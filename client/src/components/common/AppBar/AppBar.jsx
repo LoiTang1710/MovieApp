@@ -29,7 +29,7 @@ const AppBar = () => {
 
   return (
     <div id="AppBar">
-      <div className="flex justify-between items-center px-8 h-15 bg-black/95 backdrop-blur-sm top-0 w-full z-50">
+      <div className="flex border-b border-white/10 justify-between items-center px-8 h-15 bg-black/95 backdrop-blur-sm top-0 w-full z-50">
         <div className="text-title text-red-600 text-3xl font-black tracking-tighter">
           <Link to="/" className="text-primary font-bold">
             <h1>Cinevibe</h1>

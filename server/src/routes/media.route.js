@@ -1,6 +1,7 @@
 import express from 'express'
 import {
   getAnimes,
+  getDetail,
   getImages,
   getPopulars,
   getReleases,
@@ -19,4 +20,5 @@ Router.route('/released').get(getReleases)
 Router.route('/top_rated').get(getTopRates)
 Router.route('/anime').get(getAnimes)
 
+Router.route('/detail/:id').get(getDetail)
 export default Router
