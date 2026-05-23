@@ -6,18 +6,22 @@ const AppBar = () => {
   const { isAuthenticated: isLogged } = useAuth()
   const navLinks = [
     {
+      id: crypto.randomUUID(),
       name: 'Home',
       path: '/',
     },
     {
+      id: crypto.randomUUID(),
       name: 'Movies',
       path: '/movies',
     },
     {
+      id: crypto.randomUUID(),
       name: 'TV Shows',
       path: '/tv-shows',
     },
     {
+      id: crypto.randomUUID(),
       name: 'My List',
       path: '/my-list',
     },
@@ -35,6 +39,7 @@ const AppBar = () => {
           {navLinks.map((link) => {
             return (
               <Link
+                key={link.id}
                 to={`${link.path}`}
                 className="hover:text-red-600 transition-colors"
               >
@@ -43,7 +48,6 @@ const AppBar = () => {
             )
           })}
         </div>
-
         <div className="action-icons flex justify-center items-center gap-6 text-white">
           <Search className="w-5 h-5 cursor-pointer hover:text-red-600 transition-colors" />
           <Bell className="w-5 h-5 cursor-pointer hover:text-red-600 transition-colors" />
