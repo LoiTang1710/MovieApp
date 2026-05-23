@@ -1,5 +1,3 @@
-import Header from '../../components/layouts/Header'
-import Footer from '../../components/layouts/Footer'
 import { Sidebar } from 'lucide-react'
 import MediaBanner from '../../components/common/Movies/MediaBanner/MediaBanner'
 import MediaCollection from '../../components/common/Movies/MediaCollection/MediaCollection'
@@ -11,7 +9,6 @@ const Home = () => {
   const { mediaBanner, activeMediaId } = useHome()
   return (
     <div>
-      <Header />
       {mediaBanner.length > 0 &&
         mediaBanner
           .filter((movie) => movie.id === activeMediaId)
@@ -20,7 +17,6 @@ const Home = () => {
           })}
       <MediaCollection />
       {isOpen && <Sidebar onClick={() => setIsOpen(!isOpen)} />}
-      <Footer />
     </div>
   )
 }
