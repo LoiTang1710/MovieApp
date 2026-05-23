@@ -71,3 +71,78 @@ model Payment {
   @@index([status, createdAt])
   @@unique([provider, providerTransactionId])
 }
+//=================ADMIN=====================
+// --- ENUMS ---
+enum Role {
+  USER
+  ADMIN
+}
+
+enum ProfileType {
+  KID
+  ADULT
+}
+
+enum MovieStatus {
+  AVAILABLE
+  HIDDEN
+}
+
+// --- MODELS ---
+
+// UC01 & UC08: Đăng ký, Đăng nhập & Quản lý người dùng
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String?  // Có thể null nếu đăng nhập bằng Google/Facebook
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Quan hệ 1-N: Một User có thể có tối đa 5 Profiles (theo mục 3.1.2.a)
+  profiles  Profile[]
+}
+
+// UC02: Quản lý hồ sơ người dùng (Profiles)
+model Profile {
+  id        String      @id @default(uuid())
+  name      String
+  avatarUrl String?
+  type      ProfileType @default(ADULT)
+  
+  // Khóa ngoại liên kết với User
+  userId    String
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+}
+
+// UC09 & UC03: Quản lý phim & Duyệt phim
+model Movie {
+  id          String      @id @default(uuid())
+  title       String
+  description String      @db.Text
+  releaseYear Int
+  country     String?
+  duration    Int?        // Thời lượng tính bằng phút
+  posterUrl   String?     // Ảnh bìa
+  trailerUrl  String?     // Link trailer
+  videoUrl    String?     // Link file video chính
+  status      MovieStatus @default(AVAILABLE) // Trạng thái chiếu phim
+  views       Int         @default(0)         // Lượt xem (phục vụ UC11 - Thống kê)
+  rating      Float       @default(0.0)       // Điểm đánh giá trung bình
+  
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  // Quan hệ N-N với Thể loại phim
+  genres      Genre[]
+}
+
+// Hỗ trợ lọc phim theo thể loại (Mục 3.1.3.c)
+model Genre {
+  id     Int     @id @default(autoincrement())
+  name   String  @unique
+  movies Movie[]
+}
