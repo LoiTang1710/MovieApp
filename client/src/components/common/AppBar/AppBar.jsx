@@ -54,12 +54,21 @@ const AppBar = () => {
           {isLogged ? (
             <User className="text-red-600" />
           ) : (
-            <Link
-              to="/login"
-              className="hover:text-red-600 transition-colors text-sm font-medium"
-            >
-              Login/Register
-            </Link>
+            <div className='flex items-center justify-center'>
+              <Link
+                to={'/login'}
+                className="hover:text-red-600 transition-colors text-sm font-medium"
+              >
+                Login
+              </Link>
+              <p>/</p>
+              <Link
+                to={'/register'}
+                className="hover:text-red-600 transition-colors text-sm font-medium"
+              >
+                Register
+              </Link>
+            </div>
           )}
         </div>
       </div>
