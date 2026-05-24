@@ -18,6 +18,9 @@ export const getImagesPopular = async (type, id) => {
 export const getMediaDetail = async (id, type) => {
   return tmdbFetch(`/${type}/${id}?language=vi-VN&append_to_response=credits`)
 }
+export const getDetailEpisodes = async(id, type, seasonNumber = 1) => {
+  return tmdbFetch(`/tv/${id}/season/${seasonNumber}?language=vi-VN`)
+}
 export const getMediasPopular = async () => {
   return tmdbFetchAll(
     '/movie/popular?language=vi-VN',
