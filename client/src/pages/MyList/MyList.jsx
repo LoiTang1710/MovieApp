@@ -1,50 +1,58 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import {
+  Clock, Heart, Flame, Star, ThumbsUp, Ticket, Video,
+  Trash2, Plus, LogOut, Zap, Grid2X2, List, SlidersHorizontal,
+  Share2, X, Film, Play, Link, MoreVertical, 
+} from "lucide-react";
 
+import { useMyList } from "../../hooks/useMyList";
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Constants
+// ─────────────────────────────────────────────────────────────────────────────
+const ICON_MAP = {
+  clock:   <Clock size={15} />,
+  heart:   <Heart size={15} />,
+  flame:   <Flame size={15} />,
+  star:    <Star size={15} />,
+  thumbs:  <ThumbsUp size={15} />,
+  ticket:  <Ticket size={15} />,
+  video:   <Video size={15} />,
+};
 
-const danhSachPhim = [
-  { id: 1, title: "Nữ Hoàng Băng Giá 3", rating: 9.0, daThich: true, nam: 2027, poster: "" },
-  { id: 2, title: "Hành Trình Của Moana", rating: 9.6, daThich: true, nam: 2027, poster: "" },
-  { id: 3, title: "Minions & Quái Vật", rating: 9.5, daThich: false, nam: 2027, poster: "" },
-  { id: 4, title: "Chàng Mèo Mang Mũ", rating: 9.0, daThich: false, nam: 2027, poster: "" },
-  { id: 5, title: "Kung Fu Panda 4", rating: 9.1, daThich: false, nam: 2027, poster: "" },
-  { id: 6, title: "Mufasa: Vua Sư Tử", rating: 8.9, daThich: true, nam: 2027, poster: "" },
-  { id: 7, title: "Lọ Lem", rating: 9.6, daThich: false, nam: 2027, poster: "" },
-  { id: 8, title: "Công Chúa Mononoke", rating: 9.0, daThich: false, nam: 2027, poster: "" },
+const ICON_OPTIONS = [
+  { key: "heart",  icon: <Heart size={20} /> },
+  { key: "star",   icon: <Star size={20} /> },
+  { key: "video",  icon: <Video size={20} /> },
+  { key: "thumbs", icon: <ThumbsUp size={20} /> },
+  { key: "flame",  icon: <Flame size={20} /> },
+  { key: "ticket", icon: <Ticket size={20} /> },
 ];
 
-const danhSachBanDau = [
-  { id: 1, ten: "Xem Sau", soPhim: 8, icon: "", laMacDinh: true },
-  { id: 2, ten: "Phim Hành Động", soPhim: 8, icon: "", laMacDinh: false },
-  { id: 3, ten: "Phim Hoạt Hình", soPhim: 0, icon: "", laMacDinh: false },
+const SORT_OPTIONS = [
+  { value: "all",    label: "Tất Cả" },
+  { value: "newest", label: "Mới Thêm" },
+  { value: "az",     label: "A - Z" },
 ];
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Reusable Modal wrapper
+// ─────────────────────────────────────────────────────────────────────────────
+function Modal({ onClose, children }) {
+  useEffect(() => {
+    const handleKey = (e) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [onClose]);
 
-
-function Modal({ children, onDong }) {
   return (
     <div
-      onClick={onDong}
-      style={{
-        position: "fixed",
-        inset: 0,
-        background: "rgba(0,0,0,0.75)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        zIndex: 1000,
-      }}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
+      onClick={onClose}
     >
       <div
+        className="relative bg-[#242424] rounded-2xl p-8 w-full max-w-md mx-4 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
-        style={{
-          background: "#2a2a2a",
-          borderRadius: 16,
-          padding: "32px 28px",
-          width: "90%",
-          maxWidth: 460,
-          position: "relative",
-        }}
       >
         {children}
       </div>
@@ -52,83 +60,58 @@ function Modal({ children, onDong }) {
   );
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Create Collection Modal
+// ─────────────────────────────────────────────────────────────────────────────
+function CreateCollectionModal({ onClose, onCreate }) {
+  const [name, setName] = useState("");
+  const [selectedIconKey, setSelectedIconKey] = useState("heart");
 
-
-function ModalTaoMoi({ onDong, onTao }) {
-  const [ten, setTen] = useState("");
-  const [iconDaChon, setIconDaChon] = useState("");
-
-  const danhSachIcon = ["", "", "", "", "", ""];
-
-  function handleTao() {
-    if (ten.trim() === "") return;
-    onTao(ten.trim(), iconDaChon);
-    onDong();
+  function handleSubmit() {
+    if (!name.trim()) return;
+    onCreate(name.trim(), selectedIconKey);
+    onClose();
   }
 
   return (
-    <Modal onDong={onDong}>
-      <button
-        onClick={onDong}
-        style={{ position: "absolute", top: 16, right: 16, background: "none", border: "none", color: "#aaa", fontSize: 20, cursor: "pointer" }}
-      >
-        ✕
+    <Modal onClose={onClose}>
+      <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors">
+        <X size={20} />
       </button>
 
-      <h2 style={{ margin: "0 0 24px", color: "#fff", fontSize: 22 }}>Tạo Danh Sách Mới</h2>
+      <h2 className="text-xl font-bold text-white mb-6">Tạo Danh Sách Mới</h2>
 
-      <div style={{ display: "flex", gap: 10, marginBottom: 24 }}>
-        {danhSachIcon.map((icon) => (
+      {/* Icon picker */}
+      <div className="flex gap-3 mb-6">
+        {ICON_OPTIONS.map(({ key, icon }) => (
           <button
-            key={icon}
-            onClick={() => setIconDaChon(icon)}
-            style={{
-              width: 52,
-              height: 52,
-              borderRadius: 12,
-              border: "none",
-              background: iconDaChon === icon ? "#e53935" : "#3a3a3a",
-              fontSize: 22,
-              cursor: "pointer",
-            }}
+            key={key}
+            onClick={() => setSelectedIconKey(key)}
+            className={`w-12 h-12 rounded-xl flex items-center justify-center transition-colors ${
+              selectedIconKey === key
+                ? "bg-red-600 text-white"
+                : "bg-[#333] text-gray-300 hover:bg-[#444]"
+            }`}
           >
             {icon}
           </button>
         ))}
       </div>
 
-      <p style={{ margin: "0 0 8px", color: "#ccc", fontSize: 14 }}>Tên Danh Sách</p>
+      {/* Name input */}
+      <label className="block text-sm text-gray-400 mb-2">Tên Danh Sách</label>
       <input
-        value={ten}
-        onChange={(e) => setTen(e.target.value)}
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
         placeholder="Nhập tên bộ sưu tập ..."
-        style={{
-          width: "100%",
-          padding: "14px 16px",
-          borderRadius: 10,
-          border: "1px solid #444",
-          background: "#1e1e1e",
-          color: "#fff",
-          fontSize: 14,
-          outline: "none",
-          boxSizing: "border-box",
-          marginBottom: 24,
-        }}
+        className="w-full bg-[#1a1a1a] border border-[#444] rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 outline-none focus:border-red-600 transition-colors mb-6"
       />
 
       <button
-        onClick={handleTao}
-        style={{
-          width: "100%",
-          padding: 14,
-          borderRadius: 10,
-          border: "none",
-          background: ten.trim() ? "#e53935" : "#555",
-          color: "#fff",
-          fontWeight: 700,
-          fontSize: 15,
-          cursor: ten.trim() ? "pointer" : "not-allowed",
-        }}
+        onClick={handleSubmit}
+        disabled={!name.trim()}
+        className="w-full py-3 rounded-xl font-bold text-white bg-red-600 hover:bg-red-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
       >
         Tạo Danh Sách
       </button>
@@ -136,28 +119,34 @@ function ModalTaoMoi({ onDong, onTao }) {
   );
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Delete Confirm Modal
+// ─────────────────────────────────────────────────────────────────────────────
+function DeleteConfirmModal({ collection, onClose, onConfirm }) {
+  function handleConfirm() {
+    onConfirm(collection.id);
+    onClose();
+  }
 
-
-function ModalXoa({ ten, onDong, onXacNhan }) {
   return (
-    <Modal onDong={onDong}>
-      <div style={{ textAlign: "center" }}>
-        <div style={{ fontSize: 52, marginBottom: 16 }}></div>
-        <h2 style={{ margin: "0 0 12px", color: "#fff", fontSize: 20 }}>Xóa Danh Sách ?</h2>
-        <p style={{ margin: "0 0 28px", color: "#bbb", fontSize: 14, lineHeight: 1.6 }}>
-          Bạn có chắc muốn xóa <strong style={{ color: "#fff" }}>{ten}</strong> ?<br />
+    <Modal onClose={onClose}>
+      <div className="flex flex-col items-center text-center">
+        <Trash2 size={52} className="text-gray-500 mb-4" />
+        <h2 className="text-xl font-bold text-white mb-3">Xóa Danh Sách ?</h2>
+        <p className="text-sm text-gray-400 leading-relaxed mb-7">
+          Bạn có chắc muốn xóa <strong className="text-white">{collection.displayName}</strong> ?<br />
           Hành động này không thể hoàn tác.
         </p>
-        <div style={{ display: "flex", gap: 12 }}>
+        <div className="flex gap-3 w-full">
           <button
-            onClick={onDong}
-            style={{ flex: 1, padding: 12, borderRadius: 10, border: "none", background: "#3a3a3a", color: "#fff", fontWeight: 700, fontSize: 15, cursor: "pointer" }}
+            onClick={onClose}
+            className="flex-1 py-3 rounded-xl font-bold text-white bg-[#3a3a3a] hover:bg-[#444] transition-colors"
           >
             Hủy
           </button>
           <button
-            onClick={() => { onXacNhan(); onDong(); }}
-            style={{ flex: 1, padding: 12, borderRadius: 10, border: "none", background: "#e53935", color: "#fff", fontWeight: 700, fontSize: 15, cursor: "pointer" }}
+            onClick={handleConfirm}
+            className="flex-1 py-3 rounded-xl font-bold text-white bg-red-600 hover:bg-red-700 transition-colors"
           >
             Xóa ngay
           </button>
@@ -167,111 +156,85 @@ function ModalXoa({ ten, onDong, onXacNhan }) {
   );
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Share Modal
+// ─────────────────────────────────────────────────────────────────────────────
+function ShareModal({ onClose }) {
+  const [copied, setCopied] = useState(false);
 
-
-function ModalChiaSe({ onDong }) {
-  const [daSaoCHep, setDaSaoChep] = useState(false);
-
-  const mangMangXaHoi = [
-    { ten: "Facebook", icon: "f" },
-    { ten: "Twitter", icon: "𝕏" },
-    { ten: "Instagram", icon: "" },
-    { ten: "Sao Chép", icon: "" },
-  ];
-
-  function handleSaoChep() {
-    setDaSaoChep(true);
-    setTimeout(() => setDaSaoChep(false), 2000);
+  function handleCopyLink() {
+    navigator.clipboard.writeText(window.location.href).catch(() => {});
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   }
 
+  const shareOptions = [
+    // { label: "Facebook",  icon: <Facebook size={28} />,  action: () => {} },
+    // { label: "Twitter",   icon: <Twitter size={28} />,   action: () => {} },
+    // { label: "Instagram", icon: <Instagram size={28} />, action: () => {} },
+    { label: copied ? "Đã sao chép!" : "Sao Chép", icon: <Link size={28} />, action: handleCopyLink },
+  ];
+
   return (
-    <Modal onDong={onDong}>
-      <button
-        onClick={onDong}
-        style={{ position: "absolute", top: 16, right: 16, background: "none", border: "none", color: "#aaa", fontSize: 20, cursor: "pointer" }}
-      >
-        ✕
+    <Modal onClose={onClose}>
+      <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors">
+        <X size={20} />
       </button>
-
-      <h2 style={{ margin: "0 0 28px", color: "#fff", fontSize: 22, textAlign: "center" }}>Chia Sẻ Danh Sách</h2>
-
-      <div style={{ display: "flex", justifyContent: "center", gap: 24 }}>
-        {mangMangXaHoi.map((mxh) => (
-          <div
-            key={mxh.ten}
-            onClick={mxh.ten === "Sao Chép" ? handleSaoChep : undefined}
-            style={{ textAlign: "center", cursor: "pointer" }}
-          >
-            <div style={{
-              width: 64,
-              height: 64,
-              borderRadius: 16,
-              background: "#3a3a3a",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: 24,
-              marginBottom: 8,
-              color: daSaoCHep && mxh.ten === "Sao Chép" ? "#4caf50" : "#fff",
-            }}>
-              {mxh.icon}
+      <h2 className="text-xl font-bold text-white text-center mb-8">Chia Sẻ Danh Sách</h2>
+      <div className="flex justify-center gap-6">
+        {shareOptions.map(({ label, icon, action }) => (
+          <button key={label} onClick={action} className="flex flex-col items-center gap-2 group">
+            <div className="w-16 h-16 rounded-2xl bg-[#333] flex items-center justify-center text-white group-hover:bg-[#444] transition-colors">
+              {icon}
             </div>
-            <p style={{ margin: 0, fontSize: 12, color: "#aaa" }}>
-              {mxh.ten === "Sao Chép" && daSaoCHep ? "Đã sao chép!" : mxh.ten}
-            </p>
-          </div>
+            <span className="text-xs text-gray-400">{label}</span>
+          </button>
         ))}
       </div>
     </Modal>
   );
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Filter Dropdown
+// ─────────────────────────────────────────────────────────────────────────────
+function FilterDropdown({ currentSort, onApply, onClose }) {
+  const [selected, setSelected] = useState(currentSort);
+  const ref = useRef(null);
 
-
-function DropdownBoLoc({ locHienTai, onApDung, onDong }) {
-  const [locDaChon, setLocDaChon] = useState(locHienTai);
-  const cacLua = ["Tất Cả", "Mới Thêm", "A - Z"];
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (ref.current && !ref.current.contains(e.target)) onClose();
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [onClose]);
 
   return (
-    <div style={{
-      position: "absolute",
-      top: "calc(100% + 8px)",
-      right: 0,
-      background: "#2a2a2a",
-      borderRadius: 14,
-      padding: 20,
-      zIndex: 200,
-      minWidth: 260,
-      boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
-    }}>
-      <p style={{ margin: "0 0 12px", color: "#fff", fontWeight: 600, fontSize: 15 }}>Phân Loại</p>
-
-      <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>
-        {cacLua.map((lua) => (
+    <div
+      ref={ref}
+      className="absolute top-full right-0 mt-2 z-30 bg-[#2a2a2a] rounded-2xl p-5 shadow-2xl min-w-[260px]"
+    >
+      <p className="text-sm font-semibold text-white mb-3">Phân Loại</p>
+      <div className="flex gap-2 mb-5">
+        {SORT_OPTIONS.map(({ value, label }) => (
           <button
-            key={lua}
-            onClick={() => setLocDaChon(lua)}
-            style={{
-              padding: "8px 16px",
-              borderRadius: 20,
-              border: "none",
-              background: locDaChon === lua ? "#e53935" : "#3a3a3a",
-              color: "#fff",
-              fontWeight: 600,
-              fontSize: 13,
-              cursor: "pointer",
-            }}
+            key={value}
+            onClick={() => setSelected(value)}
+            className={`px-4 py-2 rounded-full text-sm font-semibold transition-colors ${
+              selected === value
+                ? "bg-red-600 text-white"
+                : "bg-[#3a3a3a] text-gray-300 hover:bg-[#444]"
+            }`}
           >
-            {lua}
+            {label}
           </button>
         ))}
       </div>
-
-      <hr style={{ border: "none", borderTop: "1px solid #3a3a3a", margin: "0 0 16px" }} />
-
+      <hr className="border-[#3a3a3a] mb-4" />
       <button
-        onClick={() => { onApDung(locDaChon); onDong(); }}
-        style={{ padding: "10px 24px", borderRadius: 20, border: "none", background: "#e53935", color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer" }}
+        onClick={() => onApply(selected)}
+        className="px-6 py-2 rounded-full bg-red-600 text-white text-sm font-bold hover:bg-red-700 transition-colors"
       >
         Áp Dụng
       </button>
@@ -279,404 +242,288 @@ function DropdownBoLoc({ locHienTai, onApDung, onDong }) {
   );
 }
 
-
-
-function ThePhimLuoi({ phim, onThichPhim }) {
-  const [dangHover, setDangHover] = useState(false);
-
+// ─────────────────────────────────────────────────────────────────────────────
+// Empty State
+// ─────────────────────────────────────────────────────────────────────────────
+function EmptyState() {
   return (
-    <div>
-      <div
-        onMouseEnter={() => setDangHover(true)}
-        onMouseLeave={() => setDangHover(false)}
-        style={{
-          position: "relative",
-          borderRadius: 10,
-          overflow: "hidden",
-          cursor: "pointer",
-          aspectRatio: "2/3",
-          transform: dangHover ? "scale(1.04)" : "scale(1)",
-          transition: "transform 0.2s",
-          boxShadow: dangHover ? "0 12px 36px rgba(0,0,0,0.7)" : "0 4px 16px rgba(0,0,0,0.4)",
-        }}
-      >
+    <div className="flex flex-col items-center justify-center py-20 text-center">
+      <Film size={80} className="text-[#444] mb-6" />
+      <h2 className="text-2xl font-bold text-white mb-2">Danh Sách Phim Còn Trống</h2>
+      <p className="text-gray-500 text-sm mb-8">Hãy thêm những bộ phim yêu thích của bạn vào đây</p>
+      <button className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-bold px-7 py-3 rounded-full transition-colors">
+        Khám Phá Ngay <Play size={16} fill="white" />
+      </button>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Movie Card (grid view)
+// ─────────────────────────────────────────────────────────────────────────────
+function MovieCard({ movie, onToggleLike }) {
+  return (
+    <div className="group">
+      <div className="relative rounded-xl overflow-hidden aspect-[2/3] cursor-pointer transition-transform duration-200 group-hover:scale-[1.04] group-hover:shadow-2xl">
         <img
-          src={phim.poster}
-          alt={phim.title}
-          style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+          src={movie.poster}
+          alt={movie.title}
+          className="w-full h-full object-cover"
+          onError={(e) => { e.target.style.display = "none"; }}
         />
-
-        {dangHover && (
-          <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.3)" }} />
-        )}
-
+        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-200" />
         <button
-          onClick={() => onThichPhim(phim.id)}
-          style={{
-            position: "absolute",
-            top: 10,
-            right: 10,
-            background: "rgba(0,0,0,0.6)",
-            border: "none",
-            borderRadius: "50%",
-            width: 32,
-            height: 32,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            cursor: "pointer",
-            fontSize: 15,
-            color: phim.daThich ? "#e53935" : "#fff",
-          }}
+          onClick={() => onToggleLike(movie.id)}
+          className={`absolute top-2 right-2 w-8 h-8 rounded-full flex items-center justify-center bg-black/50 transition-transform hover:scale-110 ${
+            movie.liked ? "text-red-500" : "text-white"
+          }`}
         >
-          {phim.daThich ? "♥" : "♡"}
+          <Heart size={15} fill={movie.liked ? "currentColor" : "none"} />
         </button>
       </div>
-
-      <p style={{ margin: "8px 0 2px", fontSize: 13, fontWeight: 600, color: "#f0f0f0" }}>{phim.title}</p>
-      <p style={{ margin: 0, fontSize: 12, color: "#bbb" }}>⭐ {phim.rating}</p>
+      <p className="mt-2 text-sm font-semibold text-gray-100 leading-snug">{movie.title}</p>
+      <p className="mt-1 text-xs text-gray-400 flex items-center gap-1">
+        <Star size={11} fill="#f5c518" className="text-yellow-400" /> {movie.rating}
+      </p>
     </div>
   );
 }
 
-
-
-function HangPhimDanhSach({ phim, onThichPhim }) {
+// ─────────────────────────────────────────────────────────────────────────────
+// Movie Row (list view)
+// ─────────────────────────────────────────────────────────────────────────────
+function MovieRow({ movie, onToggleLike }) {
   return (
-    <div style={{
-      display: "flex",
-      alignItems: "center",
-      gap: 16,
-      background: "#1a1a1a",
-      borderRadius: 12,
-      padding: "12px 16px",
-    }}>
+    <div className="flex items-center gap-4 bg-[#1a1a1a] rounded-xl px-4 py-3 hover:bg-[#222] transition-colors">
       <img
-        src={phim.poster}
-        alt={phim.title}
-        style={{ width: 52, height: 72, borderRadius: 8, objectFit: "cover", flexShrink: 0 }}
+        src={movie.poster}
+        alt={movie.title}
+        className="w-12 h-[72px] rounded-lg object-cover flex-shrink-0"
+        onError={(e) => { e.target.style.background = "#333"; }}
       />
-
-      <p style={{ flex: 1, margin: 0, fontWeight: 600, fontSize: 15, color: "#fff" }}>{phim.title}</p>
-
-      <p style={{ margin: 0, fontSize: 13, color: "#777", flexShrink: 0 }}>{phim.nam}</p>
-
-      <p style={{ margin: 0, fontSize: 13, color: "#bbb", flexShrink: 0 }}>⭐ {phim.rating}</p>
-
+      <p className="flex-1 text-sm font-semibold text-white truncate">{movie.title}</p>
+      <span className="text-sm text-gray-500 flex-shrink-0">{movie.year}</span>
+      <span className="text-sm text-gray-400 flex items-center gap-1 flex-shrink-0 w-12">
+        <Star size={12} fill="#f5c518" className="text-yellow-400" /> {movie.rating}
+      </span>
       <button
-        onClick={() => onThichPhim(phim.id)}
-        style={{ background: "none", border: "none", cursor: "pointer", fontSize: 20, color: phim.daThich ? "#e53935" : "#555", flexShrink: 0 }}
+        onClick={() => onToggleLike(movie.id)}
+        className={`flex-shrink-0 transition-colors ${movie.liked ? "text-red-500" : "text-gray-600 hover:text-gray-400"}`}
       >
-        {phim.daThich ? "♥" : "♡"}
+        <Heart size={18} fill={movie.liked ? "currentColor" : "none"} />
+      </button>
+      <button className="flex-shrink-0 text-gray-600 hover:text-gray-400 transition-colors">
+        <MoreVertical size={18} />
       </button>
     </div>
   );
 }
 
-
-
-function ManHinhRong() {
-  return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "80px 20px", textAlign: "center" }}>
-      <div style={{ fontSize: 80, marginBottom: 24, opacity: 0.3 }}></div>
-      <h2 style={{ margin: "0 0 10px", fontSize: 26, fontWeight: 700, color: "#fff" }}>Danh Sách Phim Còn Trống</h2>
-      <p style={{ margin: "0 0 32px", fontSize: 15, color: "#666" }}>Hãy thêm những bộ phim yêu thích của bạn vào đây</p>
-      <button style={{
-        background: "#e53935",
-        color: "#fff",
-        border: "none",
-        borderRadius: 30,
-        padding: "13px 28px",
-        fontWeight: 700,
-        fontSize: 15,
-        cursor: "pointer",
-      }}>
-        ▶ Khám Phá Ngay
-      </button>
-    </div>
-  );
-}
-
-
-
+// ─────────────────────────────────────────────────────────────────────────────
+// Main Page
+// ─────────────────────────────────────────────────────────────────────────────
 export default function MyList() {
-  const [danhSach, setDanhSach] = useState(danhSachBanDau);
-  const [idDangChon, setIdDangChon] = useState(1);
-  const [phim, setPhim] = useState(danhSachPhim);
-  const [xemLuoi, setXemLuoi] = useState(true);
-  const [locHienTai, setLocHienTai] = useState("Tất Cả");
-
-  const [hienModalTao, setHienModalTao] = useState(false);
-  const [xoaMucTieu, setXoaMucTieu] = useState(null);
-  const [hienModalChiaSe, setHienModalChiaSe] = useState(false);
-  const [hienDropdownLoc, setHienDropdownLoc] = useState(false);
-
-  const boSuuTapHienTai = danhSach.find((d) => d.id === idDangChon);
-
-  const phimHienThi = boSuuTapHienTai?.soPhim === 0
-    ? []
-    : [...phim].sort((a, b) => {
-        if (locHienTai === "A - Z") return a.title.localeCompare(b.title, "vi");
-        if (locHienTai === "Mới Thêm") return b.id - a.id;
-        return 0;
-      });
-
-  function handleThichPhim(id) {
-    setPhim(phim.map((p) => p.id === id ? { ...p, daThich: !p.daThich } : p));
-  }
-
-  function handleTaoMoi(ten, icon) {
-    const moi = { id: Date.now(), ten, soPhim: 0, icon, laMacDinh: false };
-    setDanhSach([...danhSach, moi]);
-  }
-
-  function handleXoa(id) {
-    setDanhSach(danhSach.filter((d) => d.id !== id));
-    if (idDangChon === id) setIdDangChon(1);
-  }
+  const {
+    collections, activeCollection, activeCollectionId,
+    displayedMovies, isGridView, sortFilter,
+    isCreateModalOpen, deleteTarget, isShareModalOpen, isFilterOpen,
+    setActiveCollectionId, setIsGridView, setIsFilterOpen,
+    setIsShareModalOpen, setIsCreateModalOpen, setDeleteTarget,
+    toggleLike, createCollection, deleteCollection, applySortFilter,
+  } = useMyList();
 
   return (
-    <div style={{ minHeight: "100vh", background: "#111", color: "#fff", fontFamily: "'Segoe UI', sans-serif" }}>
+    <div className="min-h-screen bg-[#111] text-white font-sans">
 
-      {}
-      <header style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        padding: "0 40px",
-        height: 64,
-        borderBottom: "1px solid #1e1e1e",
-        position: "sticky",
-        top: 0,
-        background: "#111",
-        zIndex: 100,
-      }}>
-        <span style={{ fontSize: 22, fontWeight: 900, color: "#e53935" }}>CINEVIBE</span>
-
-        <nav style={{ display: "flex", gap: 32 }}>
+      {/* ── Header ── */}
+      <header className="sticky top-0 z-20 flex items-center justify-between px-10 h-16 bg-[#111] border-b border-[#1e1e1e]">
+        <span className="text-xl font-black text-red-600 tracking-tight">CINEVIBE</span>
+        <nav className="flex gap-8">
           {["Home", "Movies", "TV Shows", "My List"].map((item) => (
-            <a key={item} href="#" style={{
-              color: item === "My List" ? "#e53935" : "#ccc",
-              textDecoration: "none",
-              fontSize: 14,
-              fontWeight: item === "My List" ? 700 : 400,
-              borderBottom: item === "My List" ? "2px solid #e53935" : "none",
-              paddingBottom: 2,
-            }}>
+            <a
+              key={item}
+              href="#"
+              className={`text-sm transition-colors ${
+                item === "My List"
+                  ? "text-red-600 font-bold border-b-2 border-red-600 pb-0.5"
+                  : "text-gray-400 hover:text-white"
+              }`}
+            >
               {item}
             </a>
           ))}
         </nav>
-
-        <div style={{ display: "flex", gap: 20, fontSize: 20, color: "#ccc" }}>
-          <span style={{ cursor: "pointer" }}></span>
-          <span style={{ cursor: "pointer" }}></span>
-          <span style={{ cursor: "pointer" }}></span>
+        <div className="flex gap-5 text-gray-400">
+          {/* <SlidersHorizontal size={20} className="cursor-pointer hover:text-white transition-colors" />
+          <Share2 size={20} className="cursor-pointer hover:text-white transition-colors" />
+          <Zap size={20} className="cursor-pointer hover:text-white transition-colors" /> */}
         </div>
       </header>
+    
+      {/* ── Body ── */}
+      <div className="flex gap-6 px-10 py-7 max-w-[1100px] mx-auto">
 
-      {}
-      <div style={{ display: "flex", gap: 24, padding: "28px 40px", maxWidth: 1100, margin: "0 auto" }}>
+        {/* ── Sidebar ── */}
+        <aside className="w-56 flex-shrink-0 bg-[#1a1a1a] rounded-2xl p-5 flex flex-col gap-1.5 self-start">
+          <p className="text-[10px] font-bold text-gray-600 uppercase tracking-widest mb-2">Bộ Sưu Tập</p>
 
-        {}
-        <div style={{
-          width: 230,
-          flexShrink: 0,
-          background: "#1a1a1a",
-          borderRadius: 14,
-          padding: "24px 16px",
-          alignSelf: "flex-start",
-        }}>
-          <p style={{ margin: "0 0 12px", fontSize: 11, fontWeight: 700, color: "#666", letterSpacing: 1.5, textTransform: "uppercase" }}>
-            Bộ Sưu Tập
-          </p>
-
-          {danhSach.map((ds) => (
+          {collections.map((col) => (
             <div
-              key={ds.id}
-              onClick={() => setIdDangChon(ds.id)}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                padding: "10px 12px",
-                borderRadius: 10,
-                cursor: "pointer",
-                background: idDangChon === ds.id ? "#e53935" : "transparent",
-                marginBottom: 4,
-              }}
+              key={col.id}
+              onClick={() => setActiveCollectionId(col.id)}
+              className={`flex items-center justify-between px-3 py-2.5 rounded-xl cursor-pointer transition-colors ${
+                activeCollectionId === col.id ? "bg-red-600" : "hover:bg-[#252525]"
+              }`}
             >
-              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <span>{ds.icon}</span>
+              <div className="flex items-center gap-2.5">
+                <span className={activeCollectionId === col.id ? "text-white" : "text-gray-400"}>
+                  {ICON_MAP[col.iconKey]}
+                </span>
                 <div>
-                  <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: idDangChon === ds.id ? "#fff" : "#ddd" }}>
-                    {ds.ten}
+                  <p className={`text-sm font-semibold ${activeCollectionId === col.id ? "text-white" : "text-gray-300"}`}>
+                    {col.displayName}
                   </p>
-                  <p style={{ margin: 0, fontSize: 11, color: idDangChon === ds.id ? "#ffcdd2" : "#777" }}>
-                    {ds.soPhim} phim {ds.laMacDinh ? "· Mặc định" : ""}
+                  <p className={`text-[11px] ${activeCollectionId === col.id ? "text-red-200" : "text-gray-600"}`}>
+                    {col.count} phim{col.isDefault ? " · Mặc định" : ""}
                   </p>
                 </div>
               </div>
-
-              {!ds.laMacDinh && (
+              {!col.isDefault && (
                 <button
-                  onClick={(e) => { e.stopPropagation(); setXoaMucTieu(ds); }}
-                  style={{ background: "none", border: "none", cursor: "pointer", color: "#888", fontSize: 16 }}
+                  onClick={(e) => { e.stopPropagation(); setDeleteTarget(col); }}
+                  className="text-gray-600 hover:text-gray-300 transition-colors p-0.5"
                 >
-                  🗑
+                  <Trash2 size={14} />
                 </button>
               )}
             </div>
           ))}
 
           <button
-            onClick={() => setHienModalTao(true)}
-            style={{
-              width: "100%",
-              marginTop: 12,
-              padding: "11px 0",
-              borderRadius: 10,
-              border: "none",
-              background: "#e53935",
-              color: "#fff",
-              fontWeight: 700,
-              fontSize: 13,
-              cursor: "pointer",
-            }}
+            onClick={() => setIsCreateModalOpen(true)}
+            className="mt-2 flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white text-sm font-bold py-2.5 rounded-xl transition-colors"
           >
-            + Tạo Danh Sách Mới
+            <Plus size={15} /> Tạo Danh Sách Mới
           </button>
 
-          <div style={{ marginTop: 32 }}>
-            <button style={{
-              width: "100%",
-              padding: "11px 0",
-              borderRadius: 10,
-              border: "none",
-              background: "#e53935",
-              color: "#fff",
-              fontWeight: 700,
-              fontSize: 13,
-              cursor: "pointer",
-              marginBottom: 12,
-            }}>
-               Nâng Cấp Lên PRO
+          <div className="mt-auto pt-8 flex flex-col gap-2">
+            <button className="flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white text-sm font-bold py-2.5 rounded-xl transition-colors">
+              <Zap size={14} /> Nâng Cấp Lên PRO
             </button>
-
-            <button style={{ background: "none", border: "none", color: "#aaa", cursor: "pointer", fontSize: 13 }}>
-              ↩ Đăng Xuất
+            <button className="flex items-center gap-2 text-gray-500 hover:text-gray-300 text-sm transition-colors px-1 py-1">
+              <LogOut size={14} /> Đăng Xuất
             </button>
           </div>
-        </div>
+        </aside>
 
-        {}
-        <div style={{ flex: 1, minWidth: 0 }}>
-
-          {}
-          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 24 }}>
+        {/* ── Main content ── */}
+        <main className="flex-1 min-w-0">
+          {/* Title + toolbar */}
+          <div className="flex items-start justify-between mb-6">
             <div>
-              <h1 style={{ margin: 0, fontSize: 28, fontWeight: 800 }}>{boSuuTapHienTai?.ten}</h1>
-              <p style={{ margin: "6px 0 0", fontSize: 13, color: "#888" }}>
-                Chào mừng chở lại! Bạn có {boSuuTapHienTai?.soPhim} phim đang chờ.
+              <h1 className="text-2xl font-extrabold">{activeCollection?.displayName}</h1>
+              <p className="text-sm text-gray-500 mt-1">
+                Chào mừng chở lại! Bạn có {activeCollection?.count} phim đang chờ.
               </p>
             </div>
 
-            <div style={{ display: "flex", gap: 10, flexShrink: 0 }}>
-
-              {}
-              <div style={{ position: "relative" }}>
+            <div className="flex items-center gap-2 flex-shrink-0">
+              {/* Filter button + dropdown */}
+              <div className="relative">
                 <button
-                  onClick={() => { setHienDropdownLoc(!hienDropdownLoc); setHienModalChiaSe(false); }}
-                  style={{ background: "#1e1e1e", border: "1px solid #333", color: "#ccc", borderRadius: 8, padding: "8px 14px", fontSize: 13, cursor: "pointer" }}
+                  onClick={() => setIsFilterOpen(!isFilterOpen)}
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#1e1e1e] border border-[#333] text-gray-400 hover:text-white text-sm transition-colors"
                 >
-                  ⚙ Bộ Lọc
+                  <SlidersHorizontal size={14} /> Bộ Lọc
                 </button>
-                {hienDropdownLoc && (
-                  <DropdownBoLoc
-                    locHienTai={locHienTai}
-                    onApDung={setLocHienTai}
-                    onDong={() => setHienDropdownLoc(false)}
+                {isFilterOpen && (
+                  <FilterDropdown
+                    currentSort={sortFilter}
+                    onApply={applySortFilter}
+                    onClose={() => setIsFilterOpen(false)}
                   />
                 )}
               </div>
 
-              {}
+              {/* Share button */}
               <button
-                onClick={() => { setHienModalChiaSe(true); setHienDropdownLoc(false); }}
-                style={{ background: "#1e1e1e", border: "1px solid #333", color: "#ccc", borderRadius: 8, padding: "8px 14px", fontSize: 13, cursor: "pointer" }}
+                onClick={() => setIsShareModalOpen(true)}
+                className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#1e1e1e] border border-[#333] text-gray-400 hover:text-white text-sm transition-colors"
               >
-                ↗ Chia Sẻ
+                <Share2 size={14} /> Chia Sẻ
               </button>
 
-              {}
+              {/* View toggle */}
               <button
-                onClick={() => setXemLuoi(true)}
-                style={{ width: 36, height: 36, border: "none", borderRadius: 8, background: xemLuoi ? "#e53935" : "#222", color: "#fff", cursor: "pointer", fontSize: 16 }}
+                onClick={() => setIsGridView(true)}
+                className={`w-9 h-9 flex items-center justify-center rounded-lg transition-colors ${
+                  isGridView ? "bg-red-600 text-white" : "bg-[#1e1e1e] text-gray-400 hover:text-white"
+                }`}
               >
-                ⊞
+                <Grid2X2 size={16} />
               </button>
               <button
-                onClick={() => setXemLuoi(false)}
-                style={{ width: 36, height: 36, border: "none", borderRadius: 8, background: !xemLuoi ? "#e53935" : "#222", color: "#fff", cursor: "pointer", fontSize: 16 }}
+                onClick={() => setIsGridView(false)}
+                className={`w-9 h-9 flex items-center justify-center rounded-lg transition-colors ${
+                  !isGridView ? "bg-red-600 text-white" : "bg-[#1e1e1e] text-gray-400 hover:text-white"
+                }`}
               >
-                ≡
+                <List size={16} />
               </button>
             </div>
           </div>
 
-          {}
-          {phimHienThi.length === 0 ? (
-            <ManHinhRong />
-          ) : xemLuoi ? (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: 20 }}>
-              {phimHienThi.map((p) => (
-                <ThePhimLuoi key={p.id} phim={p} onThichPhim={handleThichPhim} />
+          {/* Movie grid / list / empty */}
+          {displayedMovies.length === 0 ? (
+            <EmptyState />
+          ) : isGridView ? (
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-5">
+              {displayedMovies.map((movie) => (
+                <MovieCard key={movie.id} movie={movie} onToggleLike={toggleLike} />
               ))}
             </div>
           ) : (
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {phimHienThi.map((p) => (
-                <HangPhimDanhSach key={p.id} phim={p} onThichPhim={handleThichPhim} />
+            <div className="flex flex-col gap-2.5">
+              {displayedMovies.map((movie) => (
+                <MovieRow key={movie.id} movie={movie} onToggleLike={toggleLike} />
               ))}
             </div>
           )}
-        </div>
+        </main>
       </div>
 
-      {}
-      <footer style={{ textAlign: "center", padding: "40px 20px 28px", borderTop: "1px solid #1e1e1e", marginTop: 40 }}>
-        <p style={{ fontSize: 20, fontWeight: 900, color: "#e53935", margin: "0 0 10px" }}>CINEVIBE</p>
-        <p style={{ fontSize: 12, color: "#555", margin: "0 0 16px" }}>
+      {/* ── Footer ── */}
+      <footer className="text-center border-t border-[#1e1e1e] mt-10 py-10 px-5">
+        <p className="text-xl font-black text-red-600 mb-2">CINEVIBE</p>
+        <p className="text-xs text-gray-600 mb-4">
           Nền tảng xem phim trực tuyến hàng đầu Việt Nam. Trải nghiệm điện ảnh đỉnh cao ngay tại nhà.
         </p>
-        <div style={{ display: "flex", justifyContent: "center", gap: 16, marginBottom: 16 }}>
-          {["f", "𝕏", "", "▶"].map((icon, i) => (
-            <div key={i} style={{
-              width: 34, height: 34, borderRadius: "50%",
-              border: "1px solid #333",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              cursor: "pointer", color: "#666", fontSize: 14,
-            }}>
-              {icon}
+        <div className="flex justify-center gap-4 mb-4">
+          {/* {[Facebook, Twitter, Instagram, Play].map((Icon, i) => (
+            <div key={i} className="w-8 h-8 rounded-full border border-[#333] flex items-center justify-center text-gray-600 hover:text-white hover:border-gray-500 cursor-pointer transition-colors">
+              <Icon size={13} />
             </div>
-          ))}
+          ))} */}
         </div>
-        <p style={{ fontSize: 11, color: "#444" }}>© 2026 CINEVIBE. All rights reserved.</p>
+        <p className="text-[11px] text-gray-700">© 2026 CINEVIBE. All rights reserved.</p>
       </footer>
-
-      {}
-      {hienModalTao && (
-        <ModalTaoMoi onDong={() => setHienModalTao(false)} onTao={handleTaoMoi} />
-      )}
-      {xoaMucTieu && (
-        <ModalXoa
-          ten={xoaMucTieu.ten}
-          onDong={() => setXoaMucTieu(null)}
-          onXacNhan={() => handleXoa(xoaMucTieu.id)}
+      
+      {/* ── Modals ── */}
+      {isCreateModalOpen && (
+        <CreateCollectionModal
+          onClose={() => setIsCreateModalOpen(false)}
+          onCreate={createCollection}
         />
       )}
-      {hienModalChiaSe && (
-        <ModalChiaSe onDong={() => setHienModalChiaSe(false)} />
+      {deleteTarget && (
+        <DeleteConfirmModal
+          collection={deleteTarget}
+          onClose={() => setDeleteTarget(null)}
+          onConfirm={deleteCollection}
+        />
+      )}
+      {isShareModalOpen && (
+        <ShareModal onClose={() => setIsShareModalOpen(false)} />
       )}
     </div>
   );
