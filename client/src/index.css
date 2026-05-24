@@ -1,6 +1,8 @@
 @import 'tailwindcss';
 @import '@fontsource/inter';
 @import '@fontsource/inter/200.css';
+@import '@fontsource/inter/700.css';
+@import '@fontsource/inter/900.css';
 
 @source "./layouts";
 @theme {
@@ -49,7 +51,7 @@
     @apply flex gap-3 items-end;
   }
   .detail-button {
-    @apply  bg-primary mt-3 rounded-xs hover:bg-primary/70 shadow-primary shadow-[0_0_5px] hover:shadow-none;
+    @apply  bg-primary mt-3 rounded-md hover:bg-primary/70 shadow-primary shadow-[0_0_5px] hover:shadow-none;
   }
   .icon-block {
     @apply flex flex-col justify-center items-center gap-2
