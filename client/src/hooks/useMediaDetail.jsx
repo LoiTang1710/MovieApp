@@ -14,6 +14,5 @@ export function useMediaDetails(mediaId, type) {
       return res.data
     },
     enabled: !!mediaId && !!type,
-    staleTime: 60 * 1000,
   })
 }
