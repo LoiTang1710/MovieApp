@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
-import AuthLayout from '../../components/layouts/AuthLayout';
-
+import AuthLayout from "../../../components/layouts/AuthLayout";
 export default function ForgotPassword() {
   const [formData, setFormData] = useState({
     identifier: '', newPassword: '', confirmNewPassword: '', code: ''
@@ -22,10 +21,10 @@ export default function ForgotPassword() {
 
   return (
     <AuthLayout>
-      <div className="w-full max-w-md bg-black/40 backdrop-blur-xl border border-white/10 p-10 rounded-2xl shadow-[0_0_50px_rgba(220,38,38,0.1)] mt-24 transform transition-all hover:border-white/20">
+      <div className="w-full max-w-md bg-black/40 backdrop-blur-xl border border-white/10 py-16 px-10 rounded-2xl shadow-[0_0_50px_rgba(220,38,38,0.1)] mt-24 transform transition-all hover:border-white/20">
         <h1 className="text-3xl font-black text-center mb-10 text-white tracking-tight uppercase">Khôi phục mật khẩu</h1>
         
-        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-10">
           <input 
             type="text" placeholder="Email/SĐT" required
             className="w-full bg-black/50 text-sm text-gray-200 px-5 py-4 rounded-lg outline-none border border-white/5 focus:border-red-600/50 focus:bg-black/70 transition-all"

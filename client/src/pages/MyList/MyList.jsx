@@ -23,31 +23,7 @@ export default function MyList() {
 
   return (
     <div className="min-h-screen bg-[#111] text-white font-sans">
-
-      {/* ── Header ── */}
-      <header className="sticky top-0 z-20 flex items-center justify-between px-10 h-16 bg-[#111] border-b border-[#1e1e1e]">
-        <span className="text-xl font-black text-red-600 tracking-tight">CINEVIBE</span>
-        <nav className="flex gap-8">
-          {["Home", "Movies", "TV Shows", "My List"].map((item) => (
-            <a
-              key={item}
-              href="#"
-              className={`text-sm transition-colors ${
-                item === "My List"
-                  ? "text-red-600 font-bold border-b-2 border-red-600 pb-0.5"
-                  : "text-gray-400 hover:text-white"
-              }`}
-            >
-              {item}
-            </a>
-          ))}
-        </nav>
-        <div className="flex gap-5 text-gray-400">
-          {/* <SlidersHorizontal size={20} className="cursor-pointer hover:text-white transition-colors" />
-          <Share2 size={20} className="cursor-pointer hover:text-white transition-colors" /> */}
-        </div>
-      </header>
-      {/* <Header /> */}
+    
       {/* ── Body ── */}
       <div className="flex gap-6 px-10 py-7 max-w-[1100px] mx-auto">
         <Sidebar
@@ -134,24 +110,7 @@ export default function MyList() {
       </div>
 
       {/* ── Footer ── */}
-      <footer className="text-center border-t border-[#1e1e1e] mt-10 py-10 px-5">
-        <p className="text-xl font-black text-red-600 mb-2">CINEVIBE</p>
-        <p className="text-xs text-gray-600 mb-4">
-          Nền tảng xem phim trực tuyến hàng đầu Việt Nam. Trải nghiệm điện ảnh đỉnh cao ngay tại nhà.
-        </p>
-        <div className="flex justify-center gap-4 mb-4">
-          {[/*Facebook, Twitter, Instagram, */ Play].map((Icon, i) => (
-            <div
-              key={i}
-              className="w-8 h-8 rounded-full border border-[#333] flex items-center justify-center text-gray-600 hover:text-white hover:border-gray-500 cursor-pointer transition-colors"
-            >
-              <Icon size={13} />
-            </div>
-          ))}
-        </div>
-        <p className="text-[11px] text-gray-700">© 2026 CINEVIBE. All rights reserved.</p>
-      </footer>
-      {/* <Footer /> */}
+      
       {/* ── Modals ── */}
       {isCreateModalOpen && (
         <CreateModal onClose={() => setIsCreateModalOpen(false)} onCreate={createCollection} />

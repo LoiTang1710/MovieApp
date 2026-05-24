@@ -1,42 +1,73 @@
-import { useMemo } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { HomeProvider } from './contexts/HomeContext';
-import { AuthProvider } from './contexts/AuthContext';
-import Home from './pages/Home';
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import ForgotPassword from "./pages/ForgotPassword";
-import MyList from "./pages/MyList/MyList";
+import { Outlet, createBrowserRouter, RouterProvider } from 'react-router-dom'
+import Home from './pages/Home'
+import Login from './pages/Auth/Login/Login' 
+import Register from './pages/Auth/Register/Register' 
+import ForgotPassword from './pages/Auth/ForgotPassword/ForgotPassword' 
+import MyList from './pages/MyList/MyList'
+import { AuthProvider } from './providers/AuthProvider'
+import { HomeProvider } from './providers/HomeProvider'
+import { AppProvider } from './providers/AppProvider'
+import MainLayout from './components/layouts/MainLayout'
+import MediaDetails from './pages/MediaDetails/MediaDetails'
 
-function App() {
-  // Khởi tạo QueryClient bên trong để đảm bảo tính ổn định trong React 19
-  const queryClient = useMemo(() => new QueryClient({
-    defaultOptions: {
-      queries: {
-        staleTime: 1000 * 60 * 5, // 5 phút
-        retry: 1,
-      },
-    },
-  }), []);
-
+const RootLayout = () => {
   return (
-    <QueryClientProvider client={queryClient}>
+    <AppProvider>
       <AuthProvider>
-        <HomeProvider>
-          <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/forgot-password" element={<ForgotPassword />} />
-              <Route path="/my-list" element={<MyList />} />
-            </Routes>
-          </Router>
-        </HomeProvider>
+        <Outlet />
       </AuthProvider>
-    </QueryClientProvider>
+    </AppProvider>
   )
+}
+const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <RootLayout />,
+    children: [
+      // === NHÓM 1: CÁC TRANG CÓ NAVBAR & FOOTER ===
+      {
+        element: <MainLayout />, // Đặt khung Layout ở đây
+        children: [
+          {
+            path: '/',
+            element: (
+              <HomeProvider>
+                <Home />
+              </HomeProvider>
+            ),
+          },
+          {
+            path: '/movie/:slug',
+            element: (
+              <MediaDetails/>
+            )
+          },
+          {
+            path: '/my-list',
+            element: <MyList />,
+          },
+        ],
+      },
+
+      // === NHÓM 2: CÁC TRANG ĐỘC LẬP (KHÔNG CÓ NAVBAR/FOOTER) ===
+      {
+        path: '/login',
+        element: <Login />,
+      },
+      {
+        path: '/register',
+        element: <Register />,
+      },
+      {
+        path: '/forgot-password',
+        element: <ForgotPassword />,
+      },
+    ],
+  },
+])
+
+const App = () => {
+  return <RouterProvider router={router} />
 }
 
 export default App
