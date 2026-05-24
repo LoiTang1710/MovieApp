@@ -32,7 +32,7 @@ const ProtectedRoute = ({ children, requiredRole = null }) => {
   }
 
   // Kiểm tra role nếu cần
-  if (requiredRole && user?.role !== requiredRole) {
+  if (requiredRole && user?.role?.toString().toLowerCase() !== requiredRole.toLowerCase()) {
     return <Navigate to="/403" replace />
   }
 
