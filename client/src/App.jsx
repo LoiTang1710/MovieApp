@@ -12,6 +12,7 @@ import MediaDetails from './pages/MediaDetails/MediaDetails'
 import DetailProvider from './providers/DetailProvider'
 import ProtectedRoute from './ProtectedRoute'
 import AdminLayout from './components/layouts/AdminLayout'
+import MediaPlayer from './pages/MediaPlayer/MediaPlayer'
 
 const RootLayout = () => {
   return (
@@ -46,6 +47,12 @@ const router = createBrowserRouter([
                 <MediaDetails />
               </DetailProvider>
             ),
+          },
+          {
+            path: '/video/:slug',
+            element: (
+              <MediaPlayer/>
+            )
           },
           {
             path: '/my-list',

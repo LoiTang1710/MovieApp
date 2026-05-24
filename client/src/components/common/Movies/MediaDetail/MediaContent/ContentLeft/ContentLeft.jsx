@@ -1,6 +1,6 @@
 import { useDetail } from '../../../../../../contexts/DetailContext'
 
-const ContentRight = () => {
+const ContentLeft = () => {
   const {
     type,
     poster_path,
@@ -60,4 +60,4 @@ const ContentRight = () => {
   )
 }
 
-export default ContentRight
+export default ContentLeft

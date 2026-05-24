@@ -1,6 +1,7 @@
 import { Navigate, useLocation } from 'react-router-dom'
 import { DetailContext } from '../contexts/DetailContext'
 import { useMediaDetails } from '../hooks/useMediaDetail'
+import { useState } from 'react'
 // import { useState } from 'react'
 
 const DetailProvider = ({ children }) => {
@@ -12,6 +13,11 @@ const DetailProvider = ({ children }) => {
     isLoading,
     isError,
   } = useMediaDetails(mediaId, type)
+
+  const [activeTab, setActiveTab] = useState('episodes')
+  const [activeSeason, setActiveSeason] = useState(1)
+  const seasonList = mediaDetail?.seasons.filter((s) => s.season_number > 0)
+  console.log('seasonList: ', seasonList)
   if (!mediaId || !type) {
     return <Navigate to="/" replace />
   }
@@ -38,7 +44,6 @@ const DetailProvider = ({ children }) => {
       value={{
         mediaId,
         type,
-        seasons: mediaDetail.seasons || [],
         casts: mediaDetail.credits?.cast || [],
         genres: mediaDetail.genres || [],
         backdrop_path: mediaDetail.backdrop_path,
@@ -49,6 +54,11 @@ const DetailProvider = ({ children }) => {
           mediaDetail?.runtime || mediaDetail?.episode_run_time?.[0] || [],
         country: mediaDetail.origin_country,
         poster_path: mediaDetail.poster_path,
+        activeTab,
+        setActiveTab,
+        seasonList,
+        activeSeason,
+        setActiveSeason,
       }}
     >
       {children}
