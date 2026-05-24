@@ -2,9 +2,11 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import AuthLayout from "../../../components/layouts/AuthLayout";
-
+import { useAuth } from '../../../contexts/AuthContext'; // Import useAuth
 export default function Login() {
   const navigate = useNavigate();
+  const { login } = useAuth(); // Lấy hàm login từ context
+
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -12,13 +14,21 @@ export default function Login() {
 
   const loginMutation = useMutation({
     mutationFn: async (data) => {
-      console.log('Logging in user:', data);
-      // Giả lập gọi API đăng nhập
-      return new Promise((resolve) => setTimeout(resolve, 1000));
+      // Trong thực tế, bạn sẽ gọi API ở đây: axios.post('/login', data)
+      // Giả lập trả về user có role ADMIN từ database của bạn
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      return { email: data.email, role: 'ADMIN', token: 'fake-jwt-token' };
     },
-    onSuccess: () => {
+    onSuccess: (userData) => {
+      login(userData); // 1. Cập nhật user vào AuthContext/LocalStorage
       alert('Đăng nhập thành công!');
-      navigate('/');
+      
+      // 2. Kiểm tra role để chuyển hướng đúng
+      if (userData?.role?.toUpperCase() === 'ADMIN') {
+        navigate('/admin/dashboard');
+      } else {
+        navigate('/');
+      }
     },
     onError: (error) => {
       alert('Đăng nhập thất bại: ' + error.message);
