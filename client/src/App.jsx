@@ -13,6 +13,7 @@ import DetailProvider from './providers/DetailProvider'
 import ProtectedRoute from './ProtectedRoute'
 import AdminLayout from './components/layouts/AdminLayout'
 import MediaPlayer from './pages/MediaPlayer/MediaPlayer'
+import PremiumCheckout from './pages/PremiumCheckout/PremiumCheckout'
 
 const RootLayout = () => {
   return (
@@ -59,6 +60,10 @@ const router = createBrowserRouter([
           {
             path: '/my-list',
             element: <MyList />,
+          },
+          {
+            path: '/premium',
+            element: <PremiumCheckout />,
           },
         ],
       },

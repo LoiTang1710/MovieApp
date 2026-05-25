@@ -18,7 +18,7 @@ export const verifyToken = (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET)
     req.user = decoded
     next()
-  } catch (error) {
+  } catch {
     return res.status(StatusCodes.UNAUTHORIZED).json({
       message: 'Phiên làm việc hết hạn hoặc Token không hợp lệ.',
     })
