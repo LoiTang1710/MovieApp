@@ -91,7 +91,6 @@ export function useMedias() {
       })
       return logosMap
     },
-    staleTime: 60 * 1000,
   })
   return {
     mediasCollection: MediasCollectionQuery.data || {},

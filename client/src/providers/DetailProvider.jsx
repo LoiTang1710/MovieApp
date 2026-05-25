@@ -16,6 +16,7 @@ const DetailProvider = ({ children }) => {
 
   const [activeTab, setActiveTab] = useState('episodes')
   const [activeSeason, setActiveSeason] = useState(1)
+  const [activeEpisode, setActiveEpisode] = useState(1)
   const seasonList = mediaDetail?.seasons.filter((s) => s.season_number > 0)
   console.log('seasonList: ', seasonList)
   if (!mediaId || !type) {
@@ -59,6 +60,8 @@ const DetailProvider = ({ children }) => {
         seasonList,
         activeSeason,
         setActiveSeason,
+        activeEpisode,
+        setActiveEpisode
       }}
     >
       {children}
