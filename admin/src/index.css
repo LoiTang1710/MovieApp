@@ -1,0 +1,62 @@
+@import 'tailwindcss';
+@import '@fontsource/inter';
+@import '@fontsource/inter/200.css';
+@import '@fontsource/inter/700.css';
+@import '@fontsource/inter/900.css';
+
+@source "./layouts";
+@theme {
+  --color-primary: #dc2626;
+  --color-bg-default: #2a2a2a;
+  --color-bg-secondary: #1c1b1b;
+}
+
+@layer base {
+  :root {
+  }
+
+  .dark {
+  }
+}
+
+@layer base {
+  * {
+  }
+
+  body {
+    @apply font-["Inter"] bg-bg-default text-white;
+  }
+  .backdrop-link {
+    @apply block px-8 py-2 rounded-sm cursor-pointer;
+  }
+  .indicator-bar {
+    @apply h-2 w-18 cursor-pointer;
+  }
+  .dots-link {
+    @apply rounded-full bg-bg-default w-16 h-16;
+  }
+  .backdrop-text-overplay {
+    @apply absolute left-0 bottom-0 w-full h-[25%] border-t border-white/15 bg-black/50 backdrop-blur-xs flex items-center justify-center p-2;
+  }
+  .movie-card-title {
+    @apply text-center text-[8px] md:text-xs lg:text-lg font-medium line-clamp-2;
+  }
+  .info-detail {
+    @apply font-extralight text-xs mt-2 text-white/60;
+  }
+  .info-title {
+    @apply text-xs;
+  }
+  .detail-horizontal {
+    @apply flex gap-3 items-end;
+  }
+  .detail-button {
+    @apply  bg-primary mt-3 rounded-md hover:bg-primary/70 shadow-primary shadow-[0_0_5px] hover:shadow-none;
+  }
+  .icon-block {
+    @apply flex flex-col justify-center items-center gap-2
+  }
+  .button-tab {
+    @apply w-32 text-xl font-bold pb-3 transition-colors duration-300 z-10
+  }
+}

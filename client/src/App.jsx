@@ -10,8 +10,6 @@ import { AppProvider } from './providers/AppProvider'
 import MainLayout from './components/layouts/MainLayout'
 import MediaDetails from './pages/MediaDetails/MediaDetails'
 import DetailProvider from './providers/DetailProvider'
-import ProtectedRoute from './ProtectedRoute'
-import AdminLayout from './components/layouts/AdminLayout'
 import MediaPlayer from './pages/MediaPlayer/MediaPlayer'
 
 const RootLayout = () => {
@@ -75,50 +73,6 @@ const router = createBrowserRouter([
       {
         path: '/forgot-password',
         element: <ForgotPassword />,
-      },
-
-      // === NHÓM 3: KHU VỰC QUẢN TRỊ (ADMIN) ===
-      {
-        path: '/admin',
-        element: (
-          <ProtectedRoute requiredRole="admin">
-            <AdminLayout />
-          </ProtectedRoute>
-        ),
-        children: [
-          {
-            path: 'dashboard',
-            element: (
-              <div className="p-8 text-white text-2xl">
-                Admin Dashboard Overview
-              </div>
-            ),
-          },
-          {
-            path: 'movies',
-            element: (
-              <div className="p-8 text-white text-2xl">Quản lý Phim</div>
-            ),
-          },
-          {
-            path: 'users',
-            element: (
-              <div className="p-8 text-white text-2xl">Quản lý Người dùng</div>
-            ),
-          },
-          {
-            path: 'promotions',
-            element: (
-              <div className="p-8 text-white text-2xl">Quản lý Khuyến mãi</div>
-            ),
-          },
-          {
-            path: 'stats',
-            element: (
-              <div className="p-8 text-white text-2xl">Thống kê & Báo cáo</div>
-            ),
-          },
-        ],
       },
     ],
   },

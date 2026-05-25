@@ -14,13 +14,34 @@ export default function Login() {
 
   const loginMutation = useMutation({
     mutationFn: async (data) => {
-      console.log('Logging in user:', data);
-      // Giả lập gọi API đăng nhập
-      return new Promise((resolve) => setTimeout(resolve, 1000));
+      // CÁCH 1: Giả lập kiểm tra tài khoản (Để test khi chưa có Backend)
+      await new Promise((resolve) => setTimeout(resolve, 800));
+      if (data.email === 'admin@gmail.com' && data.password === '123456') {
+        return { email: data.email, role: 'ADMIN', token: 'fake-jwt-token' };
+      }
+      throw new Error('Email hoặc mật khẩu admin không đúng!');
+
+      /* 
+      // CÁCH 2: Gọi API thật từ Backend (Nên dùng cách này khi đã xong Backend)
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      if (!response.ok) throw new Error('Đăng nhập thất bại');
+      return response.json();
+      */
     },
-    onSuccess: () => {
+    onSuccess: (userData) => {
+      login(userData); // 1. Cập nhật user vào AuthContext/LocalStorage
       alert('Đăng nhập thành công!');
-      navigate('/');
+      
+      // 2. Kiểm tra role để chuyển hướng đúng
+      if (userData?.role?.toUpperCase() === 'ADMIN') {
+        navigate('/admin/dashboard');
+      } else {
+        navigate('/');
+      }
     },
     onError: (error) => {
       alert('Đăng nhập thất bại: ' + error.message);
