@@ -51,8 +51,10 @@ const router = createBrowserRouter([
           {
             path: '/video/:slug',
             element: (
-              <MediaPlayer/>
-            )
+              <DetailProvider>
+                <MediaPlayer />
+              </DetailProvider>
+            ),
           },
           {
             path: '/my-list',
@@ -86,23 +88,35 @@ const router = createBrowserRouter([
         children: [
           {
             path: 'dashboard',
-            element: <div className="p-8 text-white text-2xl">Admin Dashboard Overview</div>,
+            element: (
+              <div className="p-8 text-white text-2xl">
+                Admin Dashboard Overview
+              </div>
+            ),
           },
           {
             path: 'movies',
-            element: <div className="p-8 text-white text-2xl">Quản lý Phim</div>,
+            element: (
+              <div className="p-8 text-white text-2xl">Quản lý Phim</div>
+            ),
           },
           {
             path: 'users',
-            element: <div className="p-8 text-white text-2xl">Quản lý Người dùng</div>,
+            element: (
+              <div className="p-8 text-white text-2xl">Quản lý Người dùng</div>
+            ),
           },
           {
             path: 'promotions',
-            element: <div className="p-8 text-white text-2xl">Quản lý Khuyến mãi</div>,
+            element: (
+              <div className="p-8 text-white text-2xl">Quản lý Khuyến mãi</div>
+            ),
           },
           {
             path: 'stats',
-            element: <div className="p-8 text-white text-2xl">Thống kê & Báo cáo</div>,
+            element: (
+              <div className="p-8 text-white text-2xl">Thống kê & Báo cáo</div>
+            ),
           },
         ],
       },

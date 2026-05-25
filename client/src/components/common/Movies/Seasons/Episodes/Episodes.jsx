@@ -47,7 +47,7 @@ const Episodes = () => {
       {/* Fetch va render episode */}
       <div className="mt-5">
         {activeTab === 'episodes' && (
-          <div className="max-h-70 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-bg-default/10 [&::-webkit-scrollbar-thumb]:bg-stone-300 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500 pr-6">
+          <div className="">
             {type === 'tv' && isLoading ? (
               <div>Đang tải tập phim</div>
             ) : (
