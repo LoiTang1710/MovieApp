@@ -32,9 +32,10 @@ export function useMedias() {
         mediasAnime: resAnime.data.slice(0, 12),
       }
     },
+    staleTime: 60 * 1000,
   })
   const mediaBanner = MediasCollectionQuery.data?.mediaBanner || []
-  const MediaTrailers = useQuery({
+  const MediaTrailersQuery = useQuery({
     queryKey: ['medias', 'trailers', mediaBanner.map((m) => m.id)],
     queryFn: async () => {
       const response = await Promise.all(
@@ -67,8 +68,9 @@ export function useMedias() {
       })
       return trailersMap
     },
+    staleTime: 60 * 1000,
   })
-  const MediaLogos = useQuery({
+  const MediaLogosQuery = useQuery({
     queryKey: ['medias', 'logos', mediaBanner.map((m) => m.id)],
     queryFn: async () => {
       const response = await Promise.all(
@@ -92,7 +94,7 @@ export function useMedias() {
   })
   return {
     mediasCollection: MediasCollectionQuery.data || {},
-    bannerTrailers: MediaTrailers.data || {},
-    bannerLogos: MediaLogos.data || []
+    bannerTrailers: MediaTrailersQuery.data || {},
+    bannerLogos: MediaLogosQuery.data || [],
   }
 }
