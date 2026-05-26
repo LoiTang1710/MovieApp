@@ -12,7 +12,7 @@ import {
 
 
 const AdminLayout = () => {
-  const { logout } = useAuth()
+  const { logout, user } = useAuth()
   const navigate = useNavigate()
 
   const handleLogout = () => {
@@ -81,11 +81,11 @@ const AdminLayout = () => {
         <header className="h-16 border-b border-gray-800 flex items-center justify-between px-8 bg-[#000000]">
           <h2 className="text-xl font-semibold">Hệ Thống Quản Trị</h2>
           <div className="flex items-center gap-4">
-             <span className="text-sm text-gray-400 italic">Hi!, Admin</span>
+             <span className="text-sm text-gray-400">{user?.email || 'Hi!,Admin'}</span>
           </div>
         </header>
         
-        <section className="flex-1 overflow-y-auto p-8 custom-scrollbar">
+        <section className="flex-1 overflow-y-auto p-6 md:p-8 custom-scrollbar">
           <Outlet />
         </section>
       </main>
