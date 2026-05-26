@@ -4,7 +4,7 @@ import Login from './pages/Auth/Login/Login'
 import Register from './pages/Auth/Register/Register'
 import ForgotPassword from './pages/Auth/ForgotPassword/ForgotPassword'
 import MyList from './pages/MyList/MyList'
-import { AuthProvider } from './contexts/AuthContext'
+
 import { HomeProvider } from './providers/HomeProvider'
 import { AppProvider } from './providers/AppProvider'
 import MainLayout from './components/layouts/MainLayout'
@@ -13,6 +13,7 @@ import DetailProvider from './providers/DetailProvider'
 import MediaPlayer from './pages/MediaPlayer/MediaPlayer'
 import ScrollToTop from './utils/scrollToTop'
 import PremiumCheckout from './pages/PremiumCheckout/PremiumCheckout'
+import { AuthProvider } from './providers/AuthProvider'
 
 const RootLayout = () => {
   return (
