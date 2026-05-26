@@ -1,4 +1,5 @@
-import { prisma } from '../src/config/database.config.js'
+import prisma from "../src/config/database.config.js"
+
 
 const premiumPlans = [
   {

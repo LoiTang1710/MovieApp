@@ -29,6 +29,11 @@ Không thêm tùy chọn `-v` trừ khi bạn thực sự muốn xóa dữ liệ
 
 Từ thư mục `server`, cài đặt dependencies, áp dụng migration hiện có và tạo dữ liệu gói premium mặc định:
 
+**Chạy lệnh sau npm install**
+```bash
+npx prisma generate
+```
+
 ```powershell
 npm install
 npm run db:migrate

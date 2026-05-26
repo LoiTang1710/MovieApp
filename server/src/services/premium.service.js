@@ -1,4 +1,5 @@
-import { prisma } from '../config/database.config.js'
+import prisma from "../config/database.config.js"
+
 
 export const getActivePremiumPlans = async () => {
   const plans = await prisma.premiumPlan.findMany({
