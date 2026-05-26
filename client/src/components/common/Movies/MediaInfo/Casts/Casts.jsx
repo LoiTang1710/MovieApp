@@ -1,4 +1,5 @@
-import { useDetail } from "../../../../contexts/DetailContext"
+import { useDetail } from "../../../../../contexts/DetailContext"
+
 
 const Casts = () => {
     const {activeTab,casts} = useDetail()

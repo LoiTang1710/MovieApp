@@ -96,5 +96,6 @@ export function useMedias() {
     mediasCollection: MediasCollectionQuery.data || {},
     bannerTrailers: MediaTrailersQuery.data || {},
     bannerLogos: MediaLogosQuery.data || [],
+    isLoading: MediasCollectionQuery.isLoading
   }
 }
