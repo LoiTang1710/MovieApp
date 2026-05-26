@@ -2,6 +2,7 @@ import { Navigate, useLocation } from 'react-router-dom'
 import { DetailContext } from '../contexts/DetailContext'
 import { useMediaDetails } from '../hooks/useMediaDetail'
 import { useState } from 'react'
+import MediaDetailSkeleton from '../pages/MediaDetails/MediaDetailSkeleton'
 // import { useState } from 'react'
 
 const DetailProvider = ({ children }) => {
@@ -24,11 +25,7 @@ const DetailProvider = ({ children }) => {
   }
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#111] text-white flex justify-center items-center">
-        <h2 className="text-2xl font-bold animate-pulse text-red-600">
-          Đang tải dữ liệu phim...
-        </h2>
-      </div>
+      <MediaDetailSkeleton/>
     )
   }
   if (isError || !mediaDetail) {

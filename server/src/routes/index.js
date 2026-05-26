@@ -4,6 +4,7 @@ import statsRoutes from './stats.route.js'
 import mediasRoutes from './media.route.js'
 import premiumRoutes from './premium.route.js'
 import adminRoutes from './admin.route.js'
+import authRoutes from './auth.route.js'
 
 const apiRouter = express.Router()
 

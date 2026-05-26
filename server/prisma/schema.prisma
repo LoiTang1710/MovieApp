@@ -82,6 +82,12 @@ enum ProfileType {
   ADULT
 }
 
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
 enum MovieStatus {
   AVAILABLE
   HIDDEN
@@ -148,4 +154,25 @@ model Genre {
   id     Int     @id @default(autoincrement())
   name   String  @unique
   movies Movie[]
+}
+
+enum PromotionStatus {
+  ACTIVE
+  INACTIVE
+  EXPIRED
+}
+
+model Promotion {
+  id              String          @id @default(uuid())
+  code            String          @unique
+  name            String
+  description     String?
+  discountPercent Int
+  maxUses         Int?
+  usedCount       Int             @default(0)
+  status          PromotionStatus @default(ACTIVE)
+  startAt         DateTime
+  endAt           DateTime
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
 }

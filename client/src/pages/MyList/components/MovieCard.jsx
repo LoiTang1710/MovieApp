@@ -3,7 +3,7 @@ import { Heart, Star } from "lucide-react";
 export default function MovieCard({ movie, onToggleLike }) {
   return (
     <div className="group">
-      <div className="relative rounded-xl overflow-hidden aspect-[2/3] cursor-pointer transition-transform duration-200 group-hover:scale-[1.04] group-hover:shadow-2xl">
+      <div className="relative rounded overflow-hidden aspect-2/3 cursor-pointer transition-transform duration-200 group-hover:scale-[1.04] group-hover:shadow-2xl">
         <img
           src={movie.poster}
           alt={movie.title}

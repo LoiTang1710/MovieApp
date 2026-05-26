@@ -22,6 +22,8 @@ Router.route('/movies/:id')
   .put(manageMovies.update)
   .delete(manageMovies.remove)
 
+Router.post('/upload/avatar', uploadAvatar.single('avatar'), uploadAvatarImage)
+
 // 2. Quản lý người dùng
 Router.route('/users')
   .get(manageUsers.list)
