@@ -1,8 +1,8 @@
 import { Outlet, createBrowserRouter, RouterProvider } from 'react-router-dom'
 import Home from './pages/Home'
-import Login from './pages/Auth/Login/Login' 
-import Register from './pages/Auth/Register/Register' 
-import ForgotPassword from './pages/Auth/ForgotPassword/ForgotPassword' 
+import Login from './pages/Auth/Login/Login'
+import Register from './pages/Auth/Register/Register'
+import ForgotPassword from './pages/Auth/ForgotPassword/ForgotPassword'
 import MyList from './pages/MyList/MyList'
 import { AuthProvider } from './contexts/AuthContext'
 import { HomeProvider } from './providers/HomeProvider'
@@ -13,11 +13,13 @@ import DetailProvider from './providers/DetailProvider'
 import ProtectedRoute from './ProtectedRoute'
 import AdminLayout from './components/layouts/AdminLayout'
 import MediaPlayer from './pages/MediaPlayer/MediaPlayer'
+import ScrollToTop from './utils/scrollToTop'
 
 const RootLayout = () => {
   return (
     <AppProvider>
       <AuthProvider>
+        <ScrollToTop />
         <Outlet />
       </AuthProvider>
     </AppProvider>
@@ -125,7 +127,11 @@ const router = createBrowserRouter([
 ])
 
 const App = () => {
-  return <RouterProvider router={router} />
+  return (
+    <>
+      <RouterProvider router={router} />
+    </>
+  )
 }
 
 export default App

@@ -1,19 +1,20 @@
 import ActionButton from '../../../../ActionButton/ActionButton'
-import Casts from '../../../Casts/Casts'
-import Episodes from '../../../Seasons/Episodes/Episodes'
-import Seasons from '../../../Seasons/Seasons'
+import Casts from '../../../MediaInfo/Casts/Casts'
+
+import Episodes from '../../../MediaInfo/Seasons/Episodes/Episodes'
+import Seasons from '../../../MediaInfo/Seasons/Seasons'
 
 const ContentRight = () => {
   return (
     <div className="w-full ml-2 p-10 bg-linear-to-b from-black/40 to-black/40 rounded-tl-4xl rounded-bl-4xl rounded-tr-lg rounded-br-lg ">
       {/* Button Action */}
-      <ActionButton/>
+      <ActionButton />
       {/* Episode List */}
       <Seasons />
       {/* Episodes */}
-      <Episodes/>
+      <Episodes />
       {/* Cast */}
-      <Casts/>
+      <Casts />
 
       {/* Rate and Comment */}
       <div></div>
