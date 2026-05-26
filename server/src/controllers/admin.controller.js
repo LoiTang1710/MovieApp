@@ -61,16 +61,35 @@ export const managePromotions = {
 // 5. Logic Quản lý Thống kê
 export const manageStats = {
   getOverview: async (req, res) => {
-    // Logic: Lấy tổng quan số người dùng mới, doanh thu và phim phổ biến
-    // Thường sử dụng các câu lệnh COUNT, SUM và GROUP BY trong PostgreSQL
-    res.status(StatusCodes.OK).json({
-      message: 'Lấy dữ liệu tổng quan thành công',
-      data: {
-        newUsers: 0, 
-        totalRevenue: 0,
-        popularMovies: []
+    try {
+      // Mock dữ liệu đúng cấu trúc để Frontend không bị crash
+      // Sau này bạn sẽ thay bằng các câu lệnh SQL SUM/COUNT thực tế
+      const dashboardData = {
+        monthlyViews: "1,240",
+        totalRevenue: 45200,
+        newUsersCount: 150,
+        activeMovies: 85,
+        trends: {
+          views: "+12.5%",
+          revenue: "+8.2%",
+          users: "+15.3%"
+        },
+        monthlyChartData: [
+          { name: 'Tháng 1', revenue: 4000, views: 2400 },
+          { name: 'Tháng 2', revenue: 3000, views: 1398 },
+          { name: 'Tháng 3', revenue: 2000, views: 9800 },
+        ],
+        popularMovies: [],
+        dailyUsersData: []
       }
-    })
+
+      res.status(StatusCodes.OK).json({
+        message: 'Lấy dữ liệu tổng quan thành công',
+        data: dashboardData
+      })
+    } catch (error) {
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: error.message })
+    }
   },
   getViewsReport: async (req, res) => {
     const { type } = req.query // 'by_movie' hoặc 'by_day'

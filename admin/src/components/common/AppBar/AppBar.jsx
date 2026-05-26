@@ -25,11 +25,6 @@ const AppBar = () => {
       name: 'My List',
       path: '/my-list',
     },
-    {
-      id: crypto.randomUUID(),
-      name: 'Premium',
-      path: '/premium',
-    },
   ]
 
   return (
