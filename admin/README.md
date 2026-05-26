@@ -1,18 +1,27 @@
-# React + Vite
+# MovieApp Admin Panel
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Giao diện quản trị cho MovieApp: Dashboard, phim, người dùng, khuyến mãi, thống kê.
 
-Currently, two official plugins are available:
+## Chạy nhanh
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+1. Khởi động PostgreSQL (`database/docker compose up -d`)
+2. Backend: `cd server` → `npm run dev`
+3. Seed (lần đầu): `npm run db:seed`
+4. Admin: `cd admin` → copy `.env.example` → `.env` → `npm install` → `npm run dev`
 
-## React Compiler
+## Đăng nhập
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+- Email: `admin@cinevibe.com`
+- Mật khẩu: `admin123`
 
-Note: This will impact Vite dev & build performances.
+## Các trang
 
-## Expanding the ESLint configuration
+| Route | Chức năng |
+|-------|-----------|
+| `/admin/dashboard` | Tổng quan, biểu đồ |
+| `/admin/movies` | CRUD phim nội bộ |
+| `/admin/users` | CRUD tài khoản |
+| `/admin/promotions` | CRUD mã khuyến mãi |
+| `/admin/stats` | Báo cáo, xuất CSV |
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+`VITE_SERVER_URL` phải trùng port backend (mặc định trong repo: `http://localhost:3000`).

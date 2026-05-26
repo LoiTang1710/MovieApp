@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 
-const AuthContext = createContext();
+export const AuthContext = createContext(null);
 
 /**
  * Hook tùy chỉnh để sử dụng AuthContext nhanh hơn

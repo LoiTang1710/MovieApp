@@ -1,32 +1,69 @@
-import axios from 'axios';
+import axios from 'axios'
 
-// Lấy URL từ file .env
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_URL = `${import.meta.env.VITE_SERVER_URL || 'http://localhost:5000'}/api`
 
-// Tạo instance axios để dùng chung (có thể cấu hình interceptors cho Token ở đây)
 const adminApi = axios.create({
   baseURL: API_URL,
-  withCredentials: true // Để gửi kèm cookie nếu cần
-});
+  headers: { 'Content-Type': 'application/json' },
+})
 
-// Thêm interceptor để tự động đính kèm Token vào Header của mọi request
 adminApi.interceptors.request.use((config) => {
-  // Lấy thông tin user từ LocalStorage (nơi AuthContext đã lưu)
-  const user = JSON.parse(localStorage.getItem('user'));
-  const token = user?.token;
-
+  const token = localStorage.getItem('token')
   if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+    config.headers.Authorization = `Bearer ${token}`
   }
-  return config;
-}, (error) => {
-  return Promise.reject(error);
-});
+  return config
+})
 
-export const fetchAdminOverview = async () => {
-  const response = await adminApi.get('/admin/stats/overview');
-  // Theo cấu trúc backend của bạn: { message: "...", data: { ... } }
-  return response.data.data;
-};
+const unwrap = (res) => res.data.data
 
-export default adminApi;
+export const fetchAdminOverview = (params) =>
+  adminApi.get('/admin/stats/overview', { params }).then(unwrap)
+
+export const fetchViewsReport = (type = 'by_movie') =>
+  adminApi.get('/admin/stats/views', { params: { type } }).then(unwrap)
+
+export const exportReport = async () => {
+  const res = await adminApi.get('/admin/stats/export', { responseType: 'blob' })
+  const url = window.URL.createObjectURL(new Blob([res.data]))
+  const link = document.createElement('a')
+  link.href = url
+  link.setAttribute('download', 'movieapp-report.csv')
+  document.body.appendChild(link)
+  link.click()
+  link.remove()
+  window.URL.revokeObjectURL(url)
+}
+
+export const moviesApi = {
+  list: (params) => adminApi.get('/admin/movies', { params }).then(unwrap),
+  create: (body) => adminApi.post('/admin/movies', body).then(unwrap),
+  update: (id, body) => adminApi.put(`/admin/movies/${id}`, body).then(unwrap),
+  remove: (id) => adminApi.delete(`/admin/movies/${id}`),
+}
+
+export const uploadAvatar = (file) => {
+  const formData = new FormData()
+  formData.append('avatar', file)
+  return adminApi
+    .post('/admin/upload/avatar', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    })
+    .then(unwrap)
+}
+
+export const usersApi = {
+  list: (params) => adminApi.get('/admin/users', { params }).then(unwrap),
+  create: (body) => adminApi.post('/admin/users', body).then(unwrap),
+  update: (id, body) => adminApi.put(`/admin/users/${id}`, body).then(unwrap),
+  remove: (id) => adminApi.delete(`/admin/users/${id}`),
+}
+
+export const promotionsApi = {
+  list: (params) => adminApi.get('/admin/promotions', { params }).then(unwrap),
+  create: (body) => adminApi.post('/admin/promotions', body).then(unwrap),
+  update: (id, body) => adminApi.put(`/admin/promotions/${id}`, body).then(unwrap),
+  remove: (id) => adminApi.delete(`/admin/promotions/${id}`),
+}
+
+export default adminApi

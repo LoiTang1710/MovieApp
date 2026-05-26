@@ -1,5 +1,7 @@
 import express from 'express'
 import { verifyToken, verifyAdmin } from '../middlewares/auth.middleware.js'
+import { uploadAvatar } from '../middlewares/upload.middleware.js'
+import { uploadAvatarImage } from '../controllers/upload.controller.js'
 import {
   manageMovies,
   manageUsers,
@@ -21,6 +23,8 @@ Router.route('/movies')
 Router.route('/movies/:id')
   .put(manageMovies.update)
   .delete(manageMovies.remove)
+
+Router.post('/upload/avatar', uploadAvatar.single('avatar'), uploadAvatarImage)
 
 // 2. Quản lý người dùng
 Router.route('/users')

@@ -1,102 +1,81 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useMutation } from '@tanstack/react-query';
-import AuthLayout from "../../../components/layouts/AuthLayout";
-import { useAuth } from '../../../contexts/AuthContext'; // Import useAuth
-export default function Login() {
-  const navigate = useNavigate();
-  const { login } = useAuth(); // Lấy hàm login từ context
+import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { useMutation } from '@tanstack/react-query'
+import AuthLayout from '../../../components/layouts/AuthLayout'
+import { useAuth } from '../../../contexts/AuthContext'
+import { loginApi } from '../../../apis/auth.api'
 
-  const [formData, setFormData] = useState({
-    email: '',
-    password: ''
-  });
+export default function Login() {
+  const navigate = useNavigate()
+  const { login } = useAuth()
+
+  const [formData, setFormData] = useState({ email: '', password: '' })
 
   const loginMutation = useMutation({
-    mutationFn: async (data) => {
-      // CÁCH 1: Giả lập kiểm tra tài khoản (Để test khi chưa có Backend)
-      await new Promise((resolve) => setTimeout(resolve, 800));
-      if (data.email === 'admin@gmail.com' && data.password === '123456') {
-        return { email: data.email, role: 'ADMIN', token: 'fake-jwt-token' };
-      }
-      throw new Error('Email hoặc mật khẩu admin không đúng!');
-
-      /* 
-      // CÁCH 2: Gọi API thật từ Backend (Nên dùng cách này khi đã xong Backend)
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      });
-      if (!response.ok) throw new Error('Đăng nhập thất bại');
-      return response.json();
-      */
-    },
+    mutationFn: loginApi,
     onSuccess: (userData) => {
-      login(userData); // 1. Cập nhật user vào AuthContext/LocalStorage
-      alert('Đăng nhập thành công!');
-      
-      // 2. Kiểm tra role để chuyển hướng đúng
-      if (userData?.role?.toUpperCase() === 'ADMIN') {
-        navigate('/admin/dashboard');
-      } else {
-        navigate('/');
+      if (userData.role?.toUpperCase() !== 'ADMIN') {
+        alert('Tài khoản không có quyền admin')
+        return
       }
+      login(userData)
+      navigate('/admin/dashboard')
     },
     onError: (error) => {
-      alert('Đăng nhập thất bại: ' + error.message);
-    }
-  });
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
+      alert(error.response?.data?.message || 'Đăng nhập thất bại')
+    },
+  })
 
   const handleSubmit = (e) => {
-    e.preventDefault();
-    loginMutation.mutate(formData);
-  };
+    e.preventDefault()
+    loginMutation.mutate(formData)
+  }
 
   return (
     <AuthLayout>
       <div className="w-full max-w-md mt-24">
-        <h1 className="text-4xl font-bold text-center mb-10 text-white/60 tracking-tight">Đăng nhập</h1>
+        <h1 className="text-4xl font-bold text-center mb-2 text-white/80 tracking-tight">
+          Admin Panel
+        </h1>
+        <p className="text-center text-gray-500 text-sm mb-8">Đăng nhập để quản trị hệ thống</p>
 
-        <div className="bg-black/60 backdrop-blur-2xl border border-white/20 py-14 px-10 rounded-md shadow-2xl">
-        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-          <input 
-            type="text" name="email" placeholder="Email/SĐT" required
-            className="w-full bg-[#0f0f0f] text-sm text-gray-200 px-5 py-4 rounded-md outline-none border border-white/15 focus:border-white/30 transition-all placeholder:text-gray-500"
-            onChange={handleChange}
-          />
-
-          <div className="flex flex-col gap-4">
-            <input 
-              type="password" name="password" placeholder="Nhập mật khẩu" required
-              className="w-full bg-[#0f0f0f] text-sm text-gray-200 px-5 py-4 rounded-md outline-none border border-white/15 focus:border-white/30 transition-all placeholder:text-gray-500"
-              onChange={handleChange}
+        <div className="bg-black/60 backdrop-blur-2xl border border-white/20 py-10 px-8 rounded-md shadow-2xl">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+            <input
+              type="email"
+              name="email"
+              placeholder="admin@cinevibe.com"
+              required
+              className="w-full bg-[#0f0f0f] text-sm text-gray-200 px-5 py-4 rounded-md outline-none border border-white/15 focus:border-white/30"
+              onChange={(e) => setFormData((p) => ({ ...p, email: e.target.value }))}
             />
-            <div className="flex justify-start">
-              <Link to="/forgot-password" university-offset-4 className="text-xs text-red-600 hover:text-red-500 font-bold transition-all">
-                Quên mật khẩu ?
-              </Link>
-            </div>
-          </div>
+            <input
+              type="password"
+              name="password"
+              placeholder="Mật khẩu"
+              required
+              className="w-full bg-[#0f0f0f] text-sm text-gray-200 px-5 py-4 rounded-md outline-none border border-white/15 focus:border-white/30"
+              onChange={(e) => setFormData((p) => ({ ...p, password: e.target.value }))}
+            />
+            <button
+              type="submit"
+              disabled={loginMutation.isPending}
+              className="w-full bg-[#e50914] hover:bg-[#ff0f1a] text-white font-bold py-4 rounded-md mt-2 disabled:opacity-50 uppercase text-sm"
+            >
+              {loginMutation.isPending ? 'Đang xử lý...' : 'Đăng nhập'}
+            </button>
+          </form>
+          <p className="text-xs text-gray-600 mt-4 text-center">
+            Demo: admin@cinevibe.com / admin123 (sau khi chạy seed)
+          </p>
+        </div>
 
-          <button 
-            type="submit" disabled={loginMutation.isPending}
-            className="w-full bg-[#e50914] hover:bg-[#ff0f1a] text-white font-bold py-4 rounded-md mt-6 transition-all active:scale-[0.98] disabled:opacity-50 uppercase tracking-wider text-sm shadow-lg shadow-red-900/20"
-          >
-            {loginMutation.isPending ? 'Đang xử lý...' : 'ĐĂNG NHẬP'}
-          </button>
-        </form>
-      </div>
-
-      <p className="text-center text-sm text-gray-400 mt-8">
-        Bạn chưa có tài khoản ? <Link to="/register" className="text-red-600 hover:text-red-500 font-black transition-all ml-1 underline decoration-red-600/30 underline-offset-4">Đăng ký</Link>
-      </p>
+        <p className="text-center text-sm text-gray-400 mt-6">
+          <Link to="/" className="text-red-600 hover:text-red-500 font-bold">
+            ← Về trang chủ
+          </Link>
+        </p>
       </div>
     </AuthLayout>
-  );
+  )
 }

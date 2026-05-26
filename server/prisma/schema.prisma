@@ -82,6 +82,12 @@ enum ProfileType {
   ADULT
 }
 
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
 enum MovieStatus {
   AVAILABLE
   HIDDEN
@@ -91,15 +97,19 @@ enum MovieStatus {
 
 // UC01 & UC08: Đăng ký, Đăng nhập & Quản lý người dùng
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String?  // Có thể null nếu đăng nhập bằng Google/Facebook
-  role      Role     @default(USER)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String    @id @default(uuid())
+  email       String    @unique
+  password    String?
+  fullName    String?
+  phone       String?
+  dateOfBirth DateTime?
+  gender      Gender?
+  avatarUrl   String?
+  role        Role      @default(USER)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
-  // Quan hệ 1-N: Một User có thể có tối đa 5 Profiles (theo mục 3.1.2.a)
-  profiles  Profile[]
+  profiles    Profile[]
 }
 
 // UC02: Quản lý hồ sơ người dùng (Profiles)
@@ -144,4 +154,25 @@ model Genre {
   id     Int     @id @default(autoincrement())
   name   String  @unique
   movies Movie[]
+}
+
+enum PromotionStatus {
+  ACTIVE
+  INACTIVE
+  EXPIRED
+}
+
+model Promotion {
+  id              String          @id @default(uuid())
+  code            String          @unique
+  name            String
+  description     String?
+  discountPercent Int
+  maxUses         Int?
+  usedCount       Int             @default(0)
+  status          PromotionStatus @default(ACTIVE)
+  startAt         DateTime
+  endAt           DateTime
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
 }

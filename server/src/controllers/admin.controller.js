@@ -1,109 +1,133 @@
 import { StatusCodes } from 'http-status-codes'
+import { catchAsync } from '../utils/catchAsync.js'
+import { hashPassword } from '../services/auth.service.js'
+import {
+  adminMovieService,
+  adminUserService,
+  adminPromotionService,
+  adminStatsService,
+} from '../services/admin.service.js'
 
-// Logic Quản lý Phim
+const handleError = (res, error) => {
+  const status = error.statusCode || StatusCodes.INTERNAL_SERVER_ERROR
+  if (error.code === 'P2025') {
+    return res.status(StatusCodes.NOT_FOUND).json({ message: 'Không tìm thấy dữ liệu' })
+  }
+  if (error.code === 'P2002') {
+    return res.status(StatusCodes.CONFLICT).json({ message: 'Dữ liệu đã tồn tại' })
+  }
+  return res.status(status).json({ message: error.message || 'Lỗi máy chủ' })
+}
+
 export const manageMovies = {
-  list: async (req, res) => {
-    // Logic lấy danh sách phim từ Model
-    res.status(StatusCodes.OK).json({ message: 'Lấy danh sách phim thành công' })
-  },
-  create: async (req, res) => {
-    // Nhận dữ liệu từ req.body và files từ multer (req.files)
-    // Lưu vào database thông qua Movie Model
-    res.status(StatusCodes.CREATED).json({ message: 'Thêm phim mới thành công' })
-  },
-  update: async (req, res) => {
-    const { id } = req.params
-    res.status(StatusCodes.OK).json({ message: `Cập nhật phim ${id} thành công` })
-  },
-  remove: async (req, res) => {
-    const { id } = req.params
-    res.status(StatusCodes.OK).json({ message: `Xóa phim ${id} thành công` })
-  }
-}
-
-// Logic Quản lý Người dùng
-export const manageUsers = {
-  list: async (req, res) => {
-    res.status(StatusCodes.OK).json({ message: 'Lấy danh sách người dùng' })
-  },
-  create: async (req, res) => {
-    res.status(StatusCodes.CREATED).json({ message: 'Tạo người dùng mới thành công' })
-  },
-  update: async (req, res) => {
-    const { id } = req.params
-    res.status(StatusCodes.OK).json({ message: `Cập nhật người dùng ${id}` })
-  },
-  remove: async (req, res) => {
-    const { id } = req.params
-    res.status(StatusCodes.OK).json({ message: `Xóa người dùng ${id}` })
-  }
-}
-
-// Logic Quản lý Khuyến mãi
-export const managePromotions = {
-  list: async (req, res) => {
-    res.status(StatusCodes.OK).json({ message: 'Lấy danh sách khuyến mãi' })
-  },
-  create: async (req, res) => {
-    res.status(StatusCodes.CREATED).json({ message: 'Thêm khuyến mãi mới' })
-  },
-  update: async (req, res) => {
-    const { id } = req.params
-    // Cập nhật trạng thái khuyến mãi (Active/Inactive)
-    res.status(StatusCodes.OK).json({ message: `Cập nhật khuyến mãi ${id}` })
-  },
-  remove: async (req, res) => {
-    const { id } = req.params
-    res.status(StatusCodes.OK).json({ message: `Hủy khuyến mãi ${id}` })
-  }
-}
-
-// 5. Logic Quản lý Thống kê
-export const manageStats = {
-  getOverview: async (req, res) => {
+  list: catchAsync(async (req, res) => {
+    const data = await adminMovieService.list(req.query)
+    res.status(StatusCodes.OK).json({ message: 'Lấy danh sách phim thành công', data })
+  }),
+  create: catchAsync(async (req, res) => {
+    const movie = await adminMovieService.create(req.body)
+    res.status(StatusCodes.CREATED).json({ message: 'Thêm phim mới thành công', data: movie })
+  }),
+  update: catchAsync(async (req, res) => {
     try {
-      // Mock dữ liệu đúng cấu trúc để Frontend không bị crash
-      // Sau này bạn sẽ thay bằng các câu lệnh SQL SUM/COUNT thực tế
-      const dashboardData = {
-        monthlyViews: "1,240",
-        totalRevenue: 45200,
-        newUsersCount: 150,
-        activeMovies: 85,
-        trends: {
-          views: "+12.5%",
-          revenue: "+8.2%",
-          users: "+15.3%"
-        },
-        monthlyChartData: [
-          { name: 'Tháng 1', revenue: 4000, views: 2400 },
-          { name: 'Tháng 2', revenue: 3000, views: 1398 },
-          { name: 'Tháng 3', revenue: 2000, views: 9800 },
-        ],
-        popularMovies: [],
-        dailyUsersData: []
-      }
-
-      res.status(StatusCodes.OK).json({
-        message: 'Lấy dữ liệu tổng quan thành công',
-        data: dashboardData
-      })
-    } catch (error) {
-      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: error.message })
+      const movie = await adminMovieService.update(req.params.id, req.body)
+      res.status(StatusCodes.OK).json({ message: 'Cập nhật phim thành công', data: movie })
+    } catch (e) {
+      handleError(res, e)
     }
-  },
-  getViewsReport: async (req, res) => {
-    const { type } = req.query // 'by_movie' hoặc 'by_day'
-    // Logic: Truy vấn bảng logs hoặc bảng views để đếm lượt xem
+  }),
+  remove: catchAsync(async (req, res) => {
+    try {
+      await adminMovieService.remove(req.params.id)
+      res.status(StatusCodes.OK).json({ message: 'Xóa phim thành công' })
+    } catch (e) {
+      handleError(res, e)
+    }
+  }),
+}
+
+export const manageUsers = {
+  list: catchAsync(async (req, res) => {
+    const data = await adminUserService.list(req.query)
+    res.status(StatusCodes.OK).json({ message: 'Lấy danh sách người dùng', data })
+  }),
+  create: catchAsync(async (req, res) => {
+    try {
+      const user = await adminUserService.create(req.body, hashPassword)
+      res.status(StatusCodes.CREATED).json({ message: 'Tạo người dùng mới thành công', data: user })
+    } catch (e) {
+      handleError(res, e)
+    }
+  }),
+  update: catchAsync(async (req, res) => {
+    try {
+      const user = await adminUserService.update(req.params.id, req.body, hashPassword)
+      res.status(StatusCodes.OK).json({ message: 'Cập nhật người dùng thành công', data: user })
+    } catch (e) {
+      handleError(res, e)
+    }
+  }),
+  remove: catchAsync(async (req, res) => {
+    try {
+      await adminUserService.remove(req.params.id)
+      res.status(StatusCodes.OK).json({ message: 'Xóa người dùng thành công' })
+    } catch (e) {
+      handleError(res, e)
+    }
+  }),
+}
+
+export const managePromotions = {
+  list: catchAsync(async (req, res) => {
+    const data = await adminPromotionService.list(req.query)
+    res.status(StatusCodes.OK).json({ message: 'Lấy danh sách khuyến mãi', data })
+  }),
+  create: catchAsync(async (req, res) => {
+    try {
+      const promo = await adminPromotionService.create(req.body)
+      res.status(StatusCodes.CREATED).json({ message: 'Thêm khuyến mãi mới', data: promo })
+    } catch (e) {
+      handleError(res, e)
+    }
+  }),
+  update: catchAsync(async (req, res) => {
+    try {
+      const promo = await adminPromotionService.update(req.params.id, req.body)
+      res.status(StatusCodes.OK).json({ message: 'Cập nhật khuyến mãi thành công', data: promo })
+    } catch (e) {
+      handleError(res, e)
+    }
+  }),
+  remove: catchAsync(async (req, res) => {
+    try {
+      await adminPromotionService.remove(req.params.id)
+      res.status(StatusCodes.OK).json({ message: 'Hủy khuyến mãi thành công' })
+    } catch (e) {
+      handleError(res, e)
+    }
+  }),
+}
+
+export const manageStats = {
+  getOverview: catchAsync(async (req, res) => {
+    const dashboardData = await adminStatsService.getOverview(req.query)
     res.status(StatusCodes.OK).json({
-      message: `Lấy báo cáo lượt xem theo ${type === 'by_movie' ? 'phim' : 'ngày'} thành công`,
-      data: []
+      message: 'Lấy dữ liệu tổng quan thành công',
+      data: dashboardData,
     })
-  },
-  exportReport: async (req, res) => {
-    // Logic: Sử dụng các thư viện như exceljs hoặc json2csv để tạo file
-    // Sau đó set header Content-Type và trả về stream file cho browser download
+  }),
+  getViewsReport: catchAsync(async (req, res) => {
+    const { type = 'by_movie' } = req.query
+    const data = await adminStatsService.getViewsReport(type)
     res.status(StatusCodes.OK).json({
-      message: 'Đang khởi tạo quá trình xuất báo cáo...'
+      message: `Lấy báo cáo lượt xem thành công`,
+      data,
     })
-  }
+  }),
+  exportReport: catchAsync(async (req, res) => {
+    const csv = await adminStatsService.exportReport()
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8')
+    res.setHeader('Content-Disposition', 'attachment; filename="movieapp-report.csv"')
+    res.status(StatusCodes.OK).send('\uFEFF' + csv)
+  }),
 }

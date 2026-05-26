@@ -1,52 +1,46 @@
+import { lazy, Suspense } from 'react'
 import { Outlet, createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom'
-import Dashboard from './pages/Dashboard/Dashboard'
-import Login from './pages/Auth/Login/Login' 
-import Register from './pages/Auth/Register/Register' 
-import ForgotPassword from './pages/Auth/ForgotPassword/ForgotPassword' 
+import Login from './pages/Auth/Login/Login'
+import Register from './pages/Auth/Register/Register'
+import ForgotPassword from './pages/Auth/ForgotPassword/ForgotPassword'
 import { AuthProvider } from './contexts/AuthContext'
 import { AppProvider } from './providers/AppProvider'
 import ProtectedRoute from './ProtectedRoute'
 import AdminLayout from './components/layouts/AdminLayout'
+import ErrorBoundary from './components/common/ErrorBoundary'
 
-/**
- * RootLayout: Cấu trúc bọc ngoài cùng chứa các Provider toàn cục (Auth, App, etc.)
- * Outlet sẽ render các component con dựa trên URL hiện tại.
- */
-const RootLayout = () => {
-  return (
-    <AppProvider>
-      <AuthProvider>
-        <Outlet />
-      </AuthProvider>
-    </AppProvider>
-  )
-}
+const Dashboard = lazy(() => import('./pages/Dashboard/Dashboard'))
+const Movies = lazy(() => import('./pages/Movies/Movies'))
+const Users = lazy(() => import('./pages/Users/Users'))
+const Promotions = lazy(() => import('./pages/Promotions/Promotions'))
+const Stats = lazy(() => import('./pages/Stats/Stats'))
+
+const PageLoader = () => (
+  <div className="flex items-center justify-center min-h-[40vh] text-gray-400">
+    Đang tải...
+  </div>
+)
+
+const RootLayout = () => (
+  <AppProvider>
+    <AuthProvider>
+      <Outlet />
+    </AuthProvider>
+  </AppProvider>
+)
 
 const router = createBrowserRouter([
   {
     path: '/',
     element: <RootLayout />,
     children: [
-      // Khi chạy ứng dụng, mặc định chuyển hướng vào khu vực Admin
       {
         index: true,
-        element: <Navigate to="/admin/dashboard" replace />,
+        element: <Navigate to="/login" replace />,
       },
-      // === NHÓM 1: CÁC TRANG XÁC THỰC ===
-      {
-        path: 'login',
-        element: <Login />,
-      },
-      {
-        path: 'register',
-        element: <Register />,
-      },
-      {
-        path: 'forgot-password',
-        element: <ForgotPassword />,
-      },
-
-      // === NHÓM 2: KHU VỰC QUẢN TRỊ (Cần đăng nhập) ===
+      { path: 'login', element: <Login /> },
+      { path: 'register', element: <Register /> },
+      { path: 'forgot-password', element: <ForgotPassword /> },
       {
         path: 'admin',
         element: (
@@ -56,49 +50,63 @@ const router = createBrowserRouter([
         ),
         children: [
           {
+            index: true,
+            element: <Navigate to="/admin/dashboard" replace />,
+          },
+          {
             path: 'dashboard',
-            element: <Dashboard />,
+            element: (
+              <Suspense fallback={<PageLoader />}>
+                <Dashboard />
+              </Suspense>
+            ),
           },
           {
             path: 'movies',
             element: (
-              <div className="p-8 text-white text-2xl">Quản lý Phim</div>
+              <Suspense fallback={<PageLoader />}>
+                <Movies />
+              </Suspense>
             ),
           },
           {
             path: 'users',
             element: (
-              <div className="p-8 text-white text-2xl">Quản lý Người dùng</div>
+              <Suspense fallback={<PageLoader />}>
+                <Users />
+              </Suspense>
             ),
           },
           {
             path: 'promotions',
             element: (
-              <div className="p-8 text-white text-2xl">Quản lý Khuyến mãi</div>
+              <Suspense fallback={<PageLoader />}>
+                <Promotions />
+              </Suspense>
             ),
           },
           {
             path: 'stats',
             element: (
-              <div className="p-8 text-white text-2xl">Thống kê & Báo cáo</div>
+              <Suspense fallback={<PageLoader />}>
+                <Stats />
+              </Suspense>
             ),
           },
         ],
       },
-
-      // === NHÓM 3: CÁC TRANG LỖI & PHÂN QUYỀN ===
       {
         path: '403',
         element: (
-          <div className="min-h-screen bg-bg-default flex items-center justify-center text-white text-2xl font-bold">
-            403 - Bạn không có quyền truy cập trang này
+          <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center text-white text-2xl font-bold">
+            403 - Bạn không có quyền truy cập
           </div>
         ),
       },
       {
         path: '*',
         element: (
-          <div className="min-h-screen bg-bg-default flex items-center justify-center text-white text-2xl font-bold">
+          <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center text-white text-2xl font-bold">
             404 - Trang không tồn tại
           </div>
         ),
@@ -107,8 +115,10 @@ const router = createBrowserRouter([
   },
 ])
 
-const App = () => {
-  return <RouterProvider router={router} />
-}
+const App = () => (
+  <ErrorBoundary>
+    <RouterProvider router={router} />
+  </ErrorBoundary>
+)
 
 export default App
