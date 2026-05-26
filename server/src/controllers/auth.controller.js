@@ -18,12 +18,12 @@ export const sendOtp = async (req, res) => {
     // Sinh mã ngẫu nhiên 6 chữ số
     const code = Math.floor(100000 + Math.random() * 900000).toString()
     
-    // Lưu OTP vào session (hết hạn sau 5 phút)
-    req.session.otp = {
+    // Lưu OTP vào session thay vì database
+    req.session.otpData = {
       email,
       code,
       type,
-      expiresAt: Date.now() + 5 * 60 * 1000
+      expiresAt: Date.now() + 5 * 60 * 1000 // 5 phút
     }
 
     // Gửi email OTP
@@ -47,20 +47,17 @@ export const register = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Vui lòng điền đầy đủ các thông tin bắt buộc' })
     }
 
-    // Kiểm tra mã OTP trong session
-    const sessionOtp = req.session.otp
-    if (
-      !sessionOtp ||
-      sessionOtp.email !== email ||
-      sessionOtp.code !== code ||
-      sessionOtp.type !== 'register' ||
-      Date.now() > sessionOtp.expiresAt
-    ) {
-      return res.status(400).json({ success: false, message: 'Mã xác nhận không hợp lệ hoặc đã hết hạn.' })
+    // Xác thực OTP từ session
+    const otpData = req.session.otpData
+    if (!otpData || otpData.email !== email || otpData.code !== code || otpData.type !== 'register') {
+      return res.status(400).json({ success: false, message: 'Mã xác nhận không hợp lệ' })
     }
-
-    // Mã OTP hợp lệ, tiến hành đăng ký và xóa OTP khỏi session
-    req.session.otp = null
+    if (Date.now() > otpData.expiresAt) {
+      delete req.session.otpData
+      return res.status(400).json({ success: false, message: 'Mã xác nhận đã hết hạn' })
+    }
+    // Xóa OTP khỏi session sau khi xác thực
+    delete req.session.otpData
 
     const user = await AuthService.register(email, password, username)
     
@@ -121,20 +118,17 @@ export const forgotPassword = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Vui lòng điền đầy đủ các thông tin bắt buộc' })
     }
 
-    // Kiểm tra mã OTP trong session
-    const sessionOtp = req.session.otp
-    if (
-      !sessionOtp ||
-      sessionOtp.email !== email ||
-      sessionOtp.code !== code ||
-      sessionOtp.type !== 'forgot-password' ||
-      Date.now() > sessionOtp.expiresAt
-    ) {
-      return res.status(400).json({ success: false, message: 'Mã xác nhận không hợp lệ hoặc đã hết hạn.' })
+    // Xác thực OTP từ session
+    const otpData = req.session.otpData
+    if (!otpData || otpData.email !== email || otpData.code !== code || otpData.type !== 'forgot-password') {
+      return res.status(400).json({ success: false, message: 'Mã xác nhận không hợp lệ' })
     }
-
-    // Mã OTP hợp lệ, tiến hành đổi mật khẩu và xóa OTP khỏi session
-    req.session.otp = null
+    if (Date.now() > otpData.expiresAt) {
+      delete req.session.otpData
+      return res.status(400).json({ success: false, message: 'Mã xác nhận đã hết hạn' })
+    }
+    // Xóa OTP khỏi session sau khi xác thực
+    delete req.session.otpData
 
     await AuthService.forgotPassword(email, newPassword)
     res.status(200).json({ success: true, message: 'Đặt lại mật khẩu thành công' })

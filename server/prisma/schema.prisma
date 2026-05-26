@@ -104,6 +104,8 @@ model User {
   @@map("users")
 }
 
+
+
 // UC02: Quản lý hồ sơ người dùng (Profiles)
 model Profile {
   id        String      @id @default(uuid())

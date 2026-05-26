@@ -24,3 +24,36 @@ export const updatePassword = async (email, hashedPassword) => {
     data: { password: hashedPassword }
   })
 }
+
+export const createOtp = async (email, code, type, expiresAt) => {
+  return await prisma.otp.create({
+    data: {
+      email,
+      code,
+      type,
+      expiresAt
+    }
+  })
+}
+
+export const findValidOtp = async (email, code, type) => {
+  return await prisma.otp.findFirst({
+    where: {
+      email,
+      code,
+      type,
+      expiresAt: {
+        gt: new Date()
+      }
+    }
+  })
+}
+
+export const deleteOtpsByEmailAndType = async (email, type) => {
+  return await prisma.otp.deleteMany({
+    where: {
+      email,
+      type
+    }
+  })
+}

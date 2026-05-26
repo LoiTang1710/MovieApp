@@ -81,7 +81,7 @@ export default function Login() {
       </div>
 
       <p className="text-center text-sm text-gray-400 mt-8">
-        Bạn chưa có tài khoản ? <Link to="/register" className="text-red-600 hover:text-red-500 font-black transition-all ml-1 underline decoration-red-600/30 underline-offset-4">Đăng nhập</Link>
+        Bạn chưa có tài khoản ? <Link to="/register" className="text-red-600 hover:text-red-500 font-black transition-all ml-1 underline decoration-red-600/30 underline-offset-4">Đăng ký</Link>
       </p>
       </div>
     </AuthLayout>
