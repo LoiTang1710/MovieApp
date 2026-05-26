@@ -10,6 +10,7 @@ import {
   Home
 } from 'lucide-react'
 
+
 const AdminLayout = () => {
   const { logout } = useAuth()
   const navigate = useNavigate()
@@ -28,16 +29,16 @@ const AdminLayout = () => {
   ]
 
   return (
-    <div className="flex h-screen bg-[#0d0000] text-white overflow-hidden">
+    <div className="flex h-screen bg-[#000000] text-white overflow-hidden">
       {/* Sidebar */}
-      <aside className="w-64 bg-[#1a0000] border-r border-gray-800 flex flex-col">
-        <div className="p-6 border-b border-gray-800">
+      <aside className="w-64 bg-[#000000] border-r border-gray-800 flex flex-col">
+        <div className="h-16 border-b border-gray-800 flex items-center px-6">
           <Link to="/" className="text-2xl font-bold text-red-600 tracking-tighter flex items-center gap-2">
-            MOVIE<span className="text-white">APP</span>
+            Cinevibe
             <span className="text-[10px] bg-red-600 text-white px-1 rounded ml-1">ADMIN</span>
           </Link>
         </div>
-
+      
         <nav className="flex-1 p-4 space-y-2 mt-4">
           {navItems.map((item) => (
             <NavLink
@@ -77,10 +78,10 @@ const AdminLayout = () => {
 
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col overflow-hidden">
-        <header className="h-16 border-b border-gray-800 flex items-center justify-between px-8 bg-[#140000]">
-          <h2 className="text-xl font-semibold">Hệ thống Quản trị</h2>
+        <header className="h-16 border-b border-gray-800 flex items-center justify-between px-8 bg-[#000000]">
+          <h2 className="text-xl font-semibold">Hệ Thống Quản Trị</h2>
           <div className="flex items-center gap-4">
-             <span className="text-sm text-gray-400 italic">Chào, Admin</span>
+             <span className="text-sm text-gray-400 italic">Hi!, Admin</span>
           </div>
         </header>
         
