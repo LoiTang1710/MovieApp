@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
+import { authClient } from '../../../api/axiosClient';
 import AuthLayout from "../../../components/layouts/AuthLayout";
-import { useAuth } from '../../../contexts/AuthContext'; // Import useAuth
+import { useAuth } from '../../../contexts/AuthContext';
+
 export default function Login() {
   const navigate = useNavigate();
-  const { login } = useAuth(); // Lấy hàm login từ context
+  const { login } = useAuth();
 
   const [formData, setFormData] = useState({
     email: '',
@@ -14,16 +16,13 @@ export default function Login() {
 
   const loginMutation = useMutation({
     mutationFn: async (data) => {
-      // Trong thực tế, bạn sẽ gọi API ở đây: axios.post('/login', data)
-      // Giả lập trả về user có role ADMIN từ database của bạn
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      return { email: data.email, role: 'ADMIN', token: 'fake-jwt-token' };
+      const response = await authClient.post('/auth/login', data);
+      return response.data.user;
     },
     onSuccess: (userData) => {
-      login(userData); // 1. Cập nhật user vào AuthContext/LocalStorage
+      login(userData);
       alert('Đăng nhập thành công!');
       
-      // 2. Kiểm tra role để chuyển hướng đúng
       if (userData?.role?.toUpperCase() === 'ADMIN') {
         navigate('/admin/dashboard');
       } else {
@@ -31,7 +30,8 @@ export default function Login() {
       }
     },
     onError: (error) => {
-      alert('Đăng nhập thất bại: ' + error.message);
+      const errorMessage = error.response?.data?.message || error.message;
+      alert('Đăng nhập thất bại: ' + errorMessage);
     }
   });
 
@@ -65,7 +65,7 @@ export default function Login() {
               onChange={handleChange}
             />
             <div className="flex justify-start">
-              <Link to="/forgot-password" university-offset-4 className="text-xs text-red-600 hover:text-red-500 font-bold transition-all">
+              <Link to="/forgot-password"  className="text-xs text-red-600 hover:text-red-500 font-bold transition-all underline underline-offset-4">
                 Quên mật khẩu ?
               </Link>
             </div>
@@ -81,7 +81,7 @@ export default function Login() {
       </div>
 
       <p className="text-center text-sm text-gray-400 mt-8">
-        Bạn chưa có tài khoản ? <Link to="/register" className="text-red-600 hover:text-red-500 font-black transition-all ml-1 underline decoration-red-600/30 underline-offset-4">Đăng ký</Link>
+        Bạn chưa có tài khoản ? <Link to="/register" className="text-red-600 hover:text-red-500 font-black transition-all ml-1 underline decoration-red-600/30 underline-offset-4">Đăng nhập</Link>
       </p>
       </div>
     </AuthLayout>

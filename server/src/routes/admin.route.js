@@ -1,5 +1,5 @@
 import express from 'express'
-import { verifyToken, verifyAdmin } from '../middlewares/auth.middleware.js'
+import { isAuthenticated, verifyAdmin } from '../middlewares/auth.middleware.js'
 import {
   manageMovies,
   manageUsers,
@@ -10,8 +10,8 @@ import {
 const Router = express.Router()
 
 // Áp dụng middleware verifyAdmin cho tất cả các route bên dưới
-// Phải chạy verifyToken trước để lấy thông tin user từ JWT
-Router.use(verifyToken, verifyAdmin)
+// Phải chạy isAuthenticated trước để lấy thông tin user từ session
+Router.use(isAuthenticated, verifyAdmin)
 
 // 1. Quản lý phim
 Router.route('/movies')

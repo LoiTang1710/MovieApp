@@ -1,4 +1,4 @@
-import { Grid2X2, List, SlidersHorizontal, Share2, /*Facebook, Twitter, Instagram, */Play } from "lucide-react";
+import { Grid2X2, List, SlidersHorizontal, Share2 /*Facebook, Twitter, Instagram*/ } from "lucide-react";
 import { useMyList } from "../../hooks/useMyList";
 import Sidebar from "./components/Sidebar";
 import MovieCard from "./components/MovieCard";

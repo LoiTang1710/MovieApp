@@ -5,6 +5,7 @@ const AuthContext = createContext();
 /**
  * Hook tùy chỉnh để sử dụng AuthContext nhanh hơn
  */
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
