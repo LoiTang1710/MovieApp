@@ -4,6 +4,8 @@ import session from 'express-session'
 import { env } from './config/environment.config.js'
 import apiRouter from './routes/index.js'
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+
 const START_SERVER = () => {
   const app = express()
   

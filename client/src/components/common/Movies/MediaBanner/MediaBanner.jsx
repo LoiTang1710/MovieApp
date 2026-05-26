@@ -1,6 +1,8 @@
 import { Heart } from 'lucide-react'
 import PageIndicator from './PageIndicator'
 import { useHome } from '../../../../contexts/HomeContext'
+import { Link } from 'react-router-dom'
+import { createSlug } from '../../../../utils/formatters'
 
 const MediaBanner = () => {
   const {
@@ -10,12 +12,14 @@ const MediaBanner = () => {
     mediaBanner,
     bannerTrailers,
     bannerLogos,
+    // name
   } = useHome()
-
   const data = mediaBanner?.find((movie) => movie.id === activeMediaId) || {}
   const trailerKey = bannerTrailers[activeMediaId] || ''
   const logoPath = bannerLogos[activeMediaId]
-
+  const mediaType = data.type || (data.first_air_date ? 'tv' : 'movie')
+  const detailURL = `/movie/${createSlug(data.title || data.name || 'phim')}`
+  const videoURL = `/video/${createSlug(data.title || data.name || 'phim')}.${data.id}`
   return (
     <div>
       <div className="relative">
@@ -78,12 +82,32 @@ const MediaBanner = () => {
 
           {/* PHẦN 3: Nút bấm - Dùng mt-8 để cách phần IMDb chuẩn khoảng cách 8 */}
           <div className="flex items-center gap-8 mt-8">
-            <a className="backdrop-link bg-primary cursor-pointer hover:bg-primary/80 transition">
+            <Link
+              to={videoURL}
+              state={{
+                mediaId: data.id,
+                type: mediaType,
+                name: data.title || data.name,
+                poster_path: data.poster_path,
+                vote_average: data.vote_average || 0,
+                overview: data.overview,
+                season: 1,
+                episode: 1,
+              }}
+              className="backdrop-link bg-primary cursor-pointer hover:bg-primary/80 transition"
+            >
               Xem Ngay
-            </a>
-            <a className="backdrop-link border border-white/30 backdrop-blur-xs cursor-pointer hover:bg-white/10 transition">
+            </Link>
+            <Link
+              to={detailURL}
+              state={{
+                mediaId: data.id,
+                type: mediaType,
+              }}
+              className="backdrop-link border border-white/30 backdrop-blur-xs cursor-pointer hover:bg-white/10 transition"
+            >
               Thông tin
-            </a>
+            </Link>
             <Heart
               onClick={() => setLoved(!loved)}
               className={`${loved ? 'fill-primary text-primary' : ''} hidden lg:block cursor-pointer transition-transform hover:scale-110`}
