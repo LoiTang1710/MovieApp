@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken'
+import { env } from '../config/environment.config.js'
 
 /** Gắn req.user nếu có token hợp lệ; không có token vẫn cho qua. */
 export const optionalVerifyToken = (req, res, next) => {
@@ -10,7 +11,7 @@ export const optionalVerifyToken = (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET)
+    const decoded = jwt.verify(token, env.JWT_SECRET)
     req.user = decoded
   } catch {
     // Token không hợp lệ — bỏ qua, coi như khách

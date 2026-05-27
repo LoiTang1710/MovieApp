@@ -1,3 +1,5 @@
+import { resolveServerUrl } from './env.js'
+
 export function getApiErrorMessage(error, fallback = 'Đã xảy ra lỗi.') {
   if (!error) return fallback
 
@@ -6,7 +8,7 @@ export function getApiErrorMessage(error, fallback = 'Đã xảy ra lỗi.') {
   }
 
   if (error.code === 'ERR_NETWORK' || !error.response) {
-    const base = import.meta.env.VITE_SERVER_URL || '(proxy /api)'
+    const base = resolveServerUrl() || '(proxy /api)'
     return `Không kết nối được server (${base}). Hãy chạy "npm run dev" trong thư mục server.`
   }
 

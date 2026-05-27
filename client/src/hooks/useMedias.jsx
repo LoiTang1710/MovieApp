@@ -13,24 +13,32 @@ export function useMedias() {
           mediaClient.get('/api/medias/top_rated'),
           mediaClient.get('/api/medias/anime'),
         ])
-      const popularResults = resPopular.data || []
+      const popularResults = Array.isArray(resPopular.data) ? resPopular.data : []
+      const released = Array.isArray(resReleased.data) ? resReleased.data : []
+      const topRated = Array.isArray(resTopRated.data) ? resTopRated.data : []
+      const anime = Array.isArray(resAnime.data) ? resAnime.data : []
+
       const highRatedMedia = popularResults.filter(
-        (movie) => movie.vote_average >= 7,
+        (movie) => (movie.vote_average ?? 0) >= 7,
       )
-      const sortedMedia = highRatedMedia.sort(
-        (a, b) => b.vote_average - a.vote_average,
+      const sortedMedia = [...highRatedMedia].sort(
+        (a, b) => (b.vote_average ?? 0) - (a.vote_average ?? 0),
       )
-      const mediaBanner = sortedMedia.slice(0, 4)
+      const mediaBanner = sortedMedia.length > 0
+        ? sortedMedia.slice(0, 4)
+        : [...popularResults]
+            .sort((a, b) => (b.popularity ?? 0) - (a.popularity ?? 0))
+            .slice(0, 4)
       const bannedIds = mediaBanner.map((movie) => movie.id)
       return {
         mediaBanner,
         mediasPopular: popularResults
           .filter((movie) => !bannedIds.includes(movie.id))
-          .sort((a, b) => b.vote_average - a.vote_average)
+          .sort((a, b) => (b.vote_average ?? 0) - (a.vote_average ?? 0))
           .slice(0, 12),
-        mediasReleased: resReleased.data.slice(0, 12),
-        mediasTopRated: resTopRated.data.slice(0, 12),
-        mediasAnime: resAnime.data.slice(0, 12),
+        mediasReleased: released.slice(0, 12),
+        mediasTopRated: topRated.slice(0, 12),
+        mediasAnime: anime.slice(0, 12),
       }
     },
     staleTime: 60 * 1000,

@@ -1,14 +1,15 @@
-import axios from 'axios';
+import axios from 'axios'
+import { resolveServerUrl } from '../utils/env.js'
 
-/** Dev: dùng proxy Vite (baseURL rỗng). Prod: set VITE_SERVER_URL trong .env */
-const API_BASE = import.meta.env.VITE_SERVER_URL || ''
+/** baseURL rỗng = dùng Vite proxy /api; có URL = gọi thẳng backend */
+const API_BASE = resolveServerUrl()
 
 export const authClient = axios.create({
   baseURL: API_BASE,
   headers: {
     'Content-Type': 'application/json',
   },
-});
+})
 
 authClient.interceptors.request.use((config) => {
   const token = localStorage.getItem('token')

@@ -54,7 +54,16 @@ npm run db:migrate
 npm run db:seed
 ```
 
+Tài khoản dev (khớp nút trên UI):
+
+| Email | Mật khẩu | Vai trò |
+|-------|----------|---------|
+| `user@test.com` | `dev123` | USER |
+| `admin@test.com` | `dev123` | ADMIN |
+
+Admin panel (seed riêng): `admin@cinevibe.com` / `admin123`
+
 ## Frontend (dev)
 
-- Chưa login: dùng banner **User** / **Admin** trong mục Cộng đồng.
+- Chưa login: dùng **Đăng nhập User** / **Đăng nhập Admin** ở cột trái trang chi tiết phim.
 - Admin đăng nhập dev sẽ thấy nút **Xóa** trên từng bình luận (gọi `DELETE /api/admin/comments/:id`).

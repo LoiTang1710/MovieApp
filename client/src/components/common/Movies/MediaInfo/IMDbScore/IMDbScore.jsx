@@ -1,6 +1,11 @@
 
 
-const IMDbScore = ({vote_average}) => {
+const IMDbScore = ({ vote_average }) => {
+  const score =
+    vote_average != null && !Number.isNaN(Number(vote_average))
+      ? Number(vote_average).toFixed(1)
+      : 'N/A'
+
   return (
     <div className="flex items-center gap-2">
       <img
@@ -8,7 +13,7 @@ const IMDbScore = ({vote_average}) => {
         alt="IMDb-logo"
         className="w-10"
       />
-      <p>{vote_average.toFixed(1)}/10</p>
+      <p>{score}/10</p>
     </div>
   )
 }

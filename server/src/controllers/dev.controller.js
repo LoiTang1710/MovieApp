@@ -1,12 +1,13 @@
 import jwt from 'jsonwebtoken'
 import { StatusCodes } from 'http-status-codes'
 import prisma from '../config/database.config.js'
+import { env } from '../config/environment.config.js'
 import { catchAsync } from '../utils/catchAsync.js'
 import { AppError } from '../utils/AppError.js'
 
 /** Chỉ dùng khi login chưa xong — tạo JWT cho user test trong DB */
 export const getDevToken = catchAsync(async (req, res) => {
-  if (process.env.ALLOW_DEV_AUTH !== 'true') {
+  if (env.ALLOW_DEV_AUTH !== 'true') {
     throw new AppError(
       'Dev auth bị tắt. Đặt ALLOW_DEV_AUTH=true trong server/.env',
       StatusCodes.FORBIDDEN,
@@ -27,7 +28,7 @@ export const getDevToken = catchAsync(async (req, res) => {
 
   const token = jwt.sign(
     { id: user.id, email: user.email, role: user.role },
-    process.env.JWT_SECRET,
+    env.JWT_SECRET,
     { expiresIn: '7d' },
   )
 

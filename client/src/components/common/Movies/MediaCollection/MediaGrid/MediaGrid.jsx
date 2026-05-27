@@ -1,6 +1,10 @@
 import MediaCard from './MediaCard.jsx/MediaCard'
 
-const MediaGrid = ({ items }) => {
+const MediaGrid = ({ items = [] }) => {
+  if (!items.length) {
+    return <p className="text-sm text-white/40 py-4">Chưa có phim trong mục này.</p>
+  }
+
   return (
     <div className="grid grid-cols-6 gap-3">
       {items.map((item) => {
