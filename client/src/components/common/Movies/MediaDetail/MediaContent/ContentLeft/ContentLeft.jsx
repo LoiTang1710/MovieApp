@@ -36,7 +36,7 @@ const ContentLeft = () => {
         <h3 className="info-title">Quốc gia:</h3>
         <p className="info-detail">{country?.join(', ') || 'N/A'}</p>
       </div>
-      <a href="" className="detail-button px-8 py-3 flex justify-center ">
+      <a href="" className="detail-button px-6 lg:px-8 py-3 flex justify-center ">
         Đánh giá ngay
       </a>
     </div>

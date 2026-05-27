@@ -5,7 +5,7 @@ const CommentButton = () => {
   return (
     <div className="icon-block">
       <MessageSquareMore />
-      <p>Bình luận</p>
+      <p className="action-subtitle">Bình luận</p>
     </div>
   )
 }
