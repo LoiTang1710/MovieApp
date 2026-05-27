@@ -23,6 +23,7 @@ export default function FilterDropdown({ currentSort, onApply, onClose }) {
       <div className="flex gap-2 mb-5">
         {SORT_OPTIONS.map(({ value, label }) => (
           <button
+          type="button"
             key={value}
             onClick={() => setSelected(value)}
             className={`px-4 py-2 rounded-full text-sm font-semibold transition-colors ${
@@ -39,6 +40,7 @@ export default function FilterDropdown({ currentSort, onApply, onClose }) {
       <hr className="border-[#3a3a3a] mb-4" />
 
       <button
+      type="button"
         onClick={() => onApply(selected)}
         className="px-6 py-2 rounded-full bg-red-600 text-white text-sm font-bold hover:bg-red-700 transition-colors"
       >

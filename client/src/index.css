@@ -59,4 +59,7 @@
   .button-tab {
     @apply w-32 text-xl font-bold pb-3 transition-colors duration-300 z-10
   }
+  .action-subtitle {
+    @apply sm:text-[14px] md:text-sm lg:text-lg
+  }
 }

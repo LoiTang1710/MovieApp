@@ -2,7 +2,7 @@
 
 const Genres = ({genres}) => {
   return (
-    <div className="flex flex-wrap max-w-100 gap-2">
+    <div className="flex flex-wrap lg:max-w-100 gap-2">
       {genres.map((genre) => {
         return (
           <div

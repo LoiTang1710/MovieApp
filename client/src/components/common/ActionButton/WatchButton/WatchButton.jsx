@@ -20,7 +20,7 @@ const WatchButton = () => {
           overview,
           mediaId,
         }}
-        className="detail-button px-16 py-4"
+        className="detail-button md:text-md lg:text-lg px-8 md:px-16 py-4"
       >
         ▶ Xem ngay
       </Link>

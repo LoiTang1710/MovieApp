@@ -15,14 +15,15 @@ export default function MovieRow({ movie, onToggleLike }) {
         <Star size={12} fill="#f5c518" className="text-yellow-400" /> {movie.rating}
       </span>
       <button
+      type="button"
         onClick={() => onToggleLike(movie.id)}
-        className={`flex-shrink-0 transition-colors ${
+        className={`shrink-0 transition-colors ${
           movie.liked ? "text-red-500" : "text-gray-600 hover:text-gray-400"
         }`}
       >
         <Heart size={18} fill={movie.liked ? "currentColor" : "none"} />
       </button>
-      <button className="flex-shrink-0 text-gray-600 hover:text-gray-400 transition-colors">
+      <button type="button" className="shrink-0 text-gray-600 hover:text-gray-400 transition-colors">
         <MoreVertical size={18} />
       </button>
     </div>

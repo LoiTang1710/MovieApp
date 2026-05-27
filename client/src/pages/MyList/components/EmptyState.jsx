@@ -8,7 +8,7 @@ export default function EmptyState() {
       <p className="text-gray-500 text-sm mb-8">
         Hãy thêm những bộ phim yêu thích của bạn vào đây
       </p>
-      <button className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-bold px-7 py-3 rounded-full transition-colors">
+      <button type="button" className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-bold px-7 py-3 rounded-full transition-colors">
         Khám Phá Ngay <Play size={16} fill="white" />
       </button>
     </div>

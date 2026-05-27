@@ -1,7 +1,7 @@
 const Title = ({name}) => {
   return (
     <div>
-      <p className="flex max-w-120 flex-wrap text-xl font-bold ">{name}</p>
+      <p className="flex max-w-120 flex-wrap text-md lg:text-xl font-bold ">{name}</p>
     </div>
   )
 }

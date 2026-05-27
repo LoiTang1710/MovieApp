@@ -12,6 +12,7 @@ export default function MovieCard({ movie, onToggleLike }) {
         />
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-200" />
         <button
+        type="button"
           onClick={() => onToggleLike(movie.id)}
           className={`absolute top-2 right-2 w-8 h-8 rounded-full flex items-center justify-center bg-black/50 transition-transform hover:scale-110 ${
             movie.liked ? "text-red-500" : "text-white"
