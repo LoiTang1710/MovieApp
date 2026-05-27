@@ -4,7 +4,7 @@ const SendButton = () => {
   return (
     <div className="icon-block">
       <Send />
-      <p>Chia sẻ ngay</p>
+      <p className="action-subtitle">Chia sẻ ngay</p>
     </div>
   )
 }

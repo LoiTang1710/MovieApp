@@ -69,6 +69,7 @@ export default function MyList() {
               {/* Filter */}
               <div className="relative">
                 <button
+                  type="button"
                   onClick={() => setIsFilterOpen(!isFilterOpen)}
                   className="flex items-center gap-2 px-3 py-2 rounded bg-[#1e1e1e] border border-[#333] text-gray-400 hover:text-white text-sm transition-colors"
                 >
@@ -85,6 +86,7 @@ export default function MyList() {
 
               {/* Share */}
               <button
+                type="button"
                 onClick={() => setIsShareModalOpen(true)}
                 className="flex items-center gap-2 px-3 py-2 rounded bg-[#1e1e1e] border border-[#333] text-gray-400 hover:text-white text-sm transition-colors"
               >
@@ -97,6 +99,7 @@ export default function MyList() {
                 { grid: false, Icon: List },
               ].map(({ grid, Icon }) => (
                 <button
+                  type="button"
                   key={String(grid)}
                   onClick={() => setIsGridView(grid)}
                   className={`w-9 h-9 flex items-center justify-center rounded transition-colors ${

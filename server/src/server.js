@@ -23,6 +23,8 @@ const START_SERVER = () => {
   app.use('/api', apiRouter)
   app.use(errorHandler)
 
+// 2. Hàm start server chỉ làm nhiệm vụ lắng nghe cổng (listen)
+const START_SERVER = () => {
   app.listen(env.APP_PORT, () => {
     console.log(`Server is running on port ${env.APP_PORT}`)
     console.log('Reviews: /api/reviews | Comments: /api/comments')
@@ -31,9 +33,11 @@ const START_SERVER = () => {
     }
   })
 }
+
 ;(async () => {
   try {
     console.log(`1. Connecting to Database`)
+    // Chỗ này bạn có thể thêm logic connect DB thực tế nếu cần
     console.log(`2. Connected to Database`)
     START_SERVER()
   } catch (error) {
@@ -41,3 +45,6 @@ const START_SERVER = () => {
     process.exit(0)
   }
 })()
+
+// 3. EXPORT APP ĐỂ SUPERTEST CÓ THỂ ĐỌC ĐƯỢC
+export default app

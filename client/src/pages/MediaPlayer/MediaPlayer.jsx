@@ -66,14 +66,15 @@ const MediaPlayer = () => {
         <span className="font-semibold text-md">Đang xem tập {episode}</span>
       </div>
       {/* Media Player */}
-      <div className="h-225">
+      {/* <div className="h-150">
         <iframe
           src={embeddedURL}
           key={`${season}-${episode}`}
           frameBorder="0"
           className="w-full h-full rounded-lg border border-white/10"
+          
         ></iframe>
-      </div>
+      </div> */}
       {/* Media Info */}
       <div>
         <div className="flex justify-between items-start">

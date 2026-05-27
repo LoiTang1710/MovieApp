@@ -8,7 +8,7 @@ const Casts = () => {
       {activeTab === 'cast' && (
         <div className="grid grid-cols-5 gap-4 max-h-100 overflow-y-auto">
           {casts.map((actor) => (
-            <div className="flex flex-col justify-center items-center text-center">
+            <div key={actor.id} className="flex flex-col justify-center items-center text-center">
               <img
                 src={
                   actor.profile_path

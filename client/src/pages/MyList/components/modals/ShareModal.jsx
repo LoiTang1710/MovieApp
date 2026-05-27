@@ -19,13 +19,13 @@ export default function ShareModal({ onClose }) {
 
   return (
     <Modal onClose={onClose}>
-      <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors">
+      <button type="button" onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors">
         <X size={20} />
       </button>
       <h2 className="text-xl font-bold text-white text-center mb-8">Chia Sẻ Danh Sách</h2>
       <div className="flex justify-center gap-6">
         {SHARE_OPTIONS.map(({ key, label, Icon, action }) => (
-          <button key={key} onClick={action} className="flex flex-col items-center gap-2 group">
+          <button type="button" key={key} onClick={action} className="flex flex-col items-center gap-2 group">
             <div className="w-16 h-16 rounded-2xl bg-[#333] flex items-center justify-center text-white group-hover:bg-[#444] transition-colors">
               <Icon size={28} />
             </div>
@@ -34,7 +34,7 @@ export default function ShareModal({ onClose }) {
         ))}
 
         {/* Copy link — separate because label changes */}
-        <button onClick={handleCopyLink} className="flex flex-col items-center gap-2 group">
+        <button type="button" onClick={handleCopyLink} className="flex flex-col items-center gap-2 group">
           <div className="w-16 h-16 rounded-2xl bg-[#333] flex items-center justify-center text-white group-hover:bg-[#444] transition-colors">
             <Link size={28} />
           </div>
