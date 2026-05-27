@@ -2,7 +2,6 @@ import { useHome } from "../../../../contexts/HomeContext";
 
 const PageIndicator = () => {
   const { mediaBanner, activeMediaId, setActiveMediaId } = useHome()
-  console.log("mediaBanner: ", mediaBanner)
 
   return (
     <div className="absolute bottom-[5%] right-[3%]">

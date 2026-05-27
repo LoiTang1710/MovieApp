@@ -1,6 +1,7 @@
 import { Navigate } from 'react-router-dom'
 import { useAuth } from './contexts/AuthContext'
 
+
 /**
  * Component bọc (Wrapper) để phân quyền (Authorization)
  * Kiểm tra xem user đã đăng nhập chưa, nếu chưa thì redirect về trang Login
@@ -17,9 +18,9 @@ const ProtectedRoute = ({ children, requiredRole = null }) => {
   // Đang kiểm tra authentication
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-bg-default flex items-center justify-center">
         <div className="text-center">
-          <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
           <p className="text-slate-300">Đang tải...</p>
         </div>
       </div>
@@ -32,7 +33,7 @@ const ProtectedRoute = ({ children, requiredRole = null }) => {
   }
 
   // Kiểm tra role nếu cần
-  if (requiredRole && user?.role !== requiredRole) {
+  if (requiredRole && user?.role?.toString().toLowerCase() !== requiredRole.toLowerCase()) {
     return <Navigate to="/403" replace />
   }
 
