@@ -14,10 +14,10 @@ export function usePremiumPlans() {
 
 export function useCreateSubscription() {
   return useMutation({
-    mutationFn: async (planId) => {
+    mutationFn: async ({ planId, paymentProvider }) => {
       const response = await authClient.post(
         '/api/premium/subscriptions',
-        { planId },
+        { planId, paymentProvider },
         { withCredentials: false },
       )
       return response.data
