@@ -4,7 +4,8 @@ import {
   manageMovies,
   manageUsers,
   managePromotions,
-  manageStats
+  manageStats,
+  manageComments,
 } from '../controllers/admin.controller.js'
 
 const Router = express.Router()
@@ -42,7 +43,11 @@ Router.route('/promotions/:id')
   .put(managePromotions.update)
   .delete(managePromotions.remove)
 
-// 4. Quản lý thống kê
+// 4. Kiểm duyệt bình luận
+Router.route('/comments/:id')
+  .delete(manageComments.remove)
+
+// 5. Quản lý thống kê
 Router.get('/stats/overview', manageStats.getOverview) // Người dùng mới, doanh thu, phim phổ biến
 Router.get('/stats/views', manageStats.getViewsReport)   // Lượt xem theo phim/ngày
 Router.get('/stats/export', manageStats.exportReport)   // Xuất báo cáo (CSV/Excel)

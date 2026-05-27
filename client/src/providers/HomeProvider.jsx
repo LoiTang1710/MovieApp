@@ -8,7 +8,7 @@ export const HomeProvider = ({ children }) => {
   const [selectedMediaId, setSelectedMediaId] = useState(null)
 
 
-  const { mediasCollection, bannerTrailers, bannerLogos, isLoading } = useMedias()
+  const { mediasCollection, bannerTrailers, bannerLogos, isLoading, isError, error } = useMedias()
 
   
   const activeMediaId =
@@ -31,7 +31,9 @@ export const HomeProvider = ({ children }) => {
         mediasAnime: mediasCollection.mediasAnime || [],
         mediasWatching,
         bannerLogos,
-        isLoading
+        isLoading,
+        isError,
+        error,
       }}
     >
       {children}

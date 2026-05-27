@@ -20,7 +20,7 @@ const MediaCard = ({ item }) => {
         <p className="movie-card-title">{item.title || item.name}</p>
       </div>
       {item.type === 'tv' && (
-        <div className="bg-primary py-1 px-2 absolute top-0 right-0">
+        <div className="bg-primary  sm:text-xs md:text-sm lg:text-md xl:text-lg py-1 px-2 absolute top-0 right-0">
           <p>TV Series</p>
         </div>
       )}

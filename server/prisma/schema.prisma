@@ -93,6 +93,12 @@ enum MovieStatus {
   HIDDEN
 }
 
+enum CommentStatus {
+  APPROVED
+  REJECTED
+  DELETED
+}
+
 // --- MODELS ---
 
 // UC01 & UC08: Đăng ký, Đăng nhập & Quản lý người dùng
@@ -175,4 +181,61 @@ model Promotion {
   endAt           DateTime
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
+}
+
+// Đánh giá & bình luận theo phim TMDB (tmdbId + mediaType)
+model MediaRating {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tmdbId    Int
+  mediaType String
+  stars     Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, tmdbId, mediaType])
+  @@index([tmdbId, mediaType])
+}
+
+model MediaRatingStats {
+  id           String   @id @default(uuid())
+  tmdbId       Int
+  mediaType    String
+  averageStars Float    @default(0)
+  totalRatings Int      @default(0)
+  updatedAt    DateTime @updatedAt
+
+  @@unique([tmdbId, mediaType])
+}
+
+model Comment {
+  id         String        @id @default(uuid())
+  userId     String
+  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tmdbId     Int
+  mediaType  String
+  content    String        @db.Text
+  parentId   String?
+  parent     Comment?      @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies    Comment[]     @relation("CommentReplies")
+  status     CommentStatus @default(APPROVED)
+  likeCount  Int           @default(0)
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+  likes      CommentLike[]
+
+  @@index([tmdbId, mediaType, createdAt(sort: Desc)])
+  @@index([parentId])
+}
+
+model CommentLike {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  commentId String
+  comment   Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, commentId])
 }

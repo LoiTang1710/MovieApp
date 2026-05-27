@@ -73,7 +73,9 @@ export default function ForgotPassword() {
   return (
     <AuthLayout>
       <div className="w-full max-w-md mt-24">
-        <h1 className="text-4xl font-bold text-center mb-10 text-white/60 tracking-tight">Khôi phục mật khẩu</h1>
+        <h1 className="text-4xl font-bold text-center mb-10 text-white/60 tracking-tight">
+          Khôi phục mật khẩu
+        </h1>
 
         <div className="bg-black/60 backdrop-blur-2xl border border-white/20 py-14 px-10 rounded-md shadow-2xl">
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
@@ -107,11 +109,14 @@ export default function ForgotPassword() {
             >
               {sendOtpMutation.isPending ? 'Đang gửi...' : otpSent ? 'Đã gửi ✓' : 'Lấy mã'}
             </button>
-          </div>
+          </form>
+        </div>
 
-          <button 
-            type="submit" disabled={resetMutation.isPending}
-            className="w-full bg-[#e50914] hover:bg-[#ff0f1a] text-white font-bold py-4 rounded-md mt-6 transition-all active:scale-[0.98] disabled:opacity-50 uppercase tracking-wider text-sm shadow-lg shadow-red-900/20"
+        <p className="text-center text-sm text-gray-400 mt-8">
+          Quay lại trang{' '}
+          <Link
+            to="/login"
+            className="text-red-600 hover:text-red-500 font-black transition-all ml-1 underline decoration-red-600/30 underline-offset-4"
           >
             {resetMutation.isPending ? 'Đang xử lý...' : 'ĐẶT LẠI MẬT KHẨU'}
           </button>

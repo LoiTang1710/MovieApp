@@ -1,5 +1,6 @@
 import { StatusCodes } from 'http-status-codes'
-
+import jwt from 'jsonwebtoken'
+import { env } from '../config/environment.config.js'
 
 /**
  * Middleware xác thực Token (Authentication)
@@ -7,8 +8,17 @@ import { StatusCodes } from 'http-status-codes'
 export const isAuthenticated = (req, res, next) => {
   if (!req.session || !req.session.user) {
     return res.status(StatusCodes.UNAUTHORIZED).json({
-      success: false,
-      message: 'Bạn chưa đăng nhập. Vui lòng đăng nhập lại.',
+      message: 'Bạn chưa đăng nhập hoặc Token bị thiếu.',
+    })
+  }
+
+  try {
+    const decoded = jwt.verify(token, env.JWT_SECRET)
+    req.user = decoded
+    next()
+  } catch {
+    return res.status(StatusCodes.UNAUTHORIZED).json({
+      message: 'Phiên làm việc hết hạn hoặc Token không hợp lệ.',
     })
   }
   req.user = req.session.user

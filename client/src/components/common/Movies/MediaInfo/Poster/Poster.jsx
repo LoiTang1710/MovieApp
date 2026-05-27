@@ -5,7 +5,7 @@ const Poster = ({poster_path}) => {
       <img
         src={`https://image.tmdb.org/t/p/original${poster_path}`}
         alt="Poster"
-        className="w-62"
+        className="w-31 lg:w-62"
       />
     </div>
   )

@@ -1,7 +1,8 @@
 import { Navigate, useLocation } from 'react-router-dom'
+import { useEffect, useRef, useState } from 'react'
 import { DetailContext } from '../contexts/DetailContext'
+import { DevAuthProvider } from '../contexts/DevAuthContext'
 import { useMediaDetails } from '../hooks/useMediaDetail'
-import { useState } from 'react'
 import MediaDetailSkeleton from '../pages/MediaDetails/MediaDetailSkeleton'
 // import { useState } from 'react'
 
@@ -18,8 +19,21 @@ const DetailProvider = ({ children }) => {
   const [activeTab, setActiveTab] = useState('episodes')
   const [activeSeason, setActiveSeason] = useState(1)
   const [activeEpisode, setActiveEpisode] = useState(1)
+  const [ratingModalOpen, setRatingModalOpen] = useState(false)
+  const commentsSectionRef = useRef(null)
   const seasonList = mediaDetail?.seasons.filter((s) => s.season_number > 0)
-  console.log('seasonList: ', seasonList)
+
+  const scrollToComments = () => {
+    commentsSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
+  useEffect(() => {
+    if (location.state?.scrollToCommunity) {
+      const timer = setTimeout(scrollToComments, 400)
+      return () => clearTimeout(timer)
+    }
+  }, [mediaDetail])
+
   if (!mediaId || !type) {
     return <Navigate to="/" replace />
   }
@@ -38,6 +52,7 @@ const DetailProvider = ({ children }) => {
     )
   }
   return (
+    <DevAuthProvider>
     <DetailContext.Provider
       value={{
         mediaId,
@@ -58,11 +73,16 @@ const DetailProvider = ({ children }) => {
         activeSeason,
         setActiveSeason,
         activeEpisode,
-        setActiveEpisode
+        setActiveEpisode,
+        ratingModalOpen,
+        setRatingModalOpen,
+        commentsSectionRef,
+        scrollToComments,
       }}
     >
       {children}
     </DetailContext.Provider>
+    </DevAuthProvider>
   )
 }
 

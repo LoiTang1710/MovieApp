@@ -7,6 +7,7 @@ import {
   adminPromotionService,
   adminStatsService,
 } from '../services/admin.service.js'
+import * as commentService from '../services/comment.service.js'
 
 const handleError = (res, error) => {
   const status = error.statusCode || StatusCodes.INTERNAL_SERVER_ERROR
@@ -43,6 +44,14 @@ export const manageMovies = {
     } catch (e) {
       handleError(res, e)
     }
+  }),
+}
+
+export const manageComments = {
+  remove: catchAsync(async (req, res) => {
+    const { id } = req.params
+    const data = await commentService.deleteCommentByAdmin(id)
+    res.status(StatusCodes.OK).json({ message: 'Đã xóa bình luận vi phạm.', data })
   }),
 }
 
