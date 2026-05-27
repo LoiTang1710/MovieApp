@@ -4,6 +4,7 @@ import { mediaClient } from '../api/axiosClient'
 export function useMedias() {
   const MediasCollectionQuery = useQuery({
     queryKey: ['medias'],
+    retry: 2,
     queryFn: async () => {
       const [resPopular, resReleased, resTopRated, resAnime] =
         await Promise.all([
@@ -96,6 +97,8 @@ export function useMedias() {
     mediasCollection: MediasCollectionQuery.data || {},
     bannerTrailers: MediaTrailersQuery.data || {},
     bannerLogos: MediaLogosQuery.data || [],
-    isLoading: MediasCollectionQuery.isLoading
+    isLoading: MediasCollectionQuery.isLoading,
+    isError: MediasCollectionQuery.isError,
+    error: MediasCollectionQuery.error,
   }
 }
