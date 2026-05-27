@@ -45,7 +45,10 @@ export default function PremiumCheckout() {
     }
 
     if (selectedPlan) {
-      subscriptionMutation.mutate(selectedPlan.id)
+      subscriptionMutation.mutate({
+        planId: selectedPlan.id,
+        paymentProvider: paymentMethod.toUpperCase(),
+      })
     }
   }
 
@@ -141,7 +144,10 @@ export default function PremiumCheckout() {
                         : 'text-white/45 hover:text-white/80'
                     }`}
                     key={id}
-                    onClick={() => setPaymentMethod(id)}
+                    onClick={() => {
+                      setPaymentMethod(id)
+                      subscriptionMutation.reset()
+                    }}
                     type="button"
                   >
                     <Icon className="h-4 w-4" />
@@ -193,7 +199,10 @@ export default function PremiumCheckout() {
 
                 {subscriptionMutation.isSuccess && (
                   <p className="mt-4 text-center text-sm text-green-400">
-                    Yêu cầu đăng ký đã được tạo. Thanh toán đang chờ xử lý.
+                    Đã tạo thanh toán{' '}
+                    {subscriptionMutation.data.payment.provider} trị giá{' '}
+                    {formatPrice(subscriptionMutation.data.payment.amount)}đ.
+                    Giao dịch đang chờ xử lý.
                   </p>
                 )}
                 {subscriptionMutation.isError && (
