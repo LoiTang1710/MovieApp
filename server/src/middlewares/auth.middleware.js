@@ -1,5 +1,6 @@
 import { StatusCodes } from 'http-status-codes'
 import jwt from 'jsonwebtoken'
+import { env } from '../config/environment.config.js'
 
 /**
  * Middleware xác thực Token (Authentication)
@@ -15,7 +16,7 @@ export const verifyToken = (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET)
+    const decoded = jwt.verify(token, env.JWT_SECRET)
     req.user = decoded
     next()
   } catch {

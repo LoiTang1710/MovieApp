@@ -1,12 +1,15 @@
-import axios from 'axios';
+import axios from 'axios'
+import { resolveServerUrl } from '../utils/env.js'
+
+/** baseURL rỗng = dùng Vite proxy /api; có URL = gọi thẳng backend */
+const API_BASE = resolveServerUrl()
 
 export const authClient = axios.create({
-  baseURL: import.meta.env.VITE_SERVER_URL, // Thay bằng URL Backend thực tế của bạn
-  withCredentials: true, // BẮT BUỘC để dùng Session Auth
+  baseURL: API_BASE,
   headers: {
     'Content-Type': 'application/json',
   },
-});
+})
 
 authClient.interceptors.request.use((config) => {
   const token = localStorage.getItem('token')
@@ -18,8 +21,19 @@ authClient.interceptors.request.use((config) => {
   return config
 })
 
+authClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token')
+      window.dispatchEvent(new Event('auth:logout'))
+    }
+    return Promise.reject(error)
+  },
+)
+
 export const mediaClient = axios.create({
-  baseURL: import.meta.env.VITE_SERVER_URL,
+  baseURL: API_BASE,
   headers: {
     Accept: 'application/json',
   },

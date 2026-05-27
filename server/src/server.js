@@ -4,21 +4,33 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import { env } from './config/environment.config.js'
 import apiRouter from './routes/index.js'
+import { errorHandler } from './middlewares/error.middleware.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-// 1. Đưa app ra ngoài
-const app = express()
+const START_SERVER = () => {
+  const app = express()
+  app.use(
+    cors({
+      origin: ['http://localhost:5173', 'http://127.0.0.1:5173'],
+      credentials: true,
+    }),
+  )
+  app.use(express.json({ limit: '10mb' }))
 
-app.use(cors())
-app.use(express.json({ limit: '10mb' }))
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')))
-app.use('/api', apiRouter)
+  app.use('/uploads', express.static(path.join(__dirname, '../uploads')))
+
+  app.use('/api', apiRouter)
+  app.use(errorHandler)
 
 // 2. Hàm start server chỉ làm nhiệm vụ lắng nghe cổng (listen)
 const START_SERVER = () => {
   app.listen(env.APP_PORT, () => {
     console.log(`Server is running on port ${env.APP_PORT}`)
+    console.log('Reviews: /api/reviews | Comments: /api/comments')
+    if (process.env.ALLOW_DEV_AUTH === 'true') {
+      console.log('Dev auth: POST /api/dev/token')
+    }
   })
 }
 

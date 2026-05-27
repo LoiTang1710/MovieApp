@@ -205,11 +205,29 @@ const seedPromotions = async () => {
   }
 }
 
+const seedTestUsers = async () => {
+  const devPassword = await hashPassword('dev123')
+  await prisma.user.upsert({
+    where: { email: 'user@test.com' },
+    update: {},
+    create: { email: 'user@test.com', password: devPassword, role: 'USER' },
+  })
+
+  await prisma.user.upsert({
+    where: { email: 'admin@test.com' },
+    update: {},
+    create: { email: 'admin@test.com', password: devPassword, role: 'ADMIN' },
+  })
+
+  console.log('Seeded test users: user@test.com, admin@test.com (password: dev123)')
+}
+
 try {
   await seedPremiumPlans()
   await seedAdminUser()
   await seedGenresAndMovies()
   await seedPromotions()
+  await seedTestUsers()
   console.log('Seed completed: admin, users, movies, promotions.')
   console.log('Admin login: admin@cinevibe.com / admin123')
 } catch (error) {
