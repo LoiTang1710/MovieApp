@@ -1,10 +1,13 @@
 import { useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
+import { authClient } from '../../../api/axiosClient';
 import AuthLayout from "../../../components/layouts/AuthLayout";
+import { useAuth } from '../../../contexts/AuthContext';
 
 export default function Login() {
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const formData = useRef({
     email: '',
@@ -13,16 +16,22 @@ export default function Login() {
 
   const loginMutation = useMutation({
     mutationFn: async (data) => {
-      console.log('Logging in user:', data);
-      // Giả lập gọi API đăng nhập
-      return new Promise((resolve) => setTimeout(resolve, 1000));
+      const response = await authClient.post('/auth/login', data);
+      return response.data.user;
     },
-    onSuccess: () => {
+    onSuccess: (userData) => {
+      login(userData);
       alert('Đăng nhập thành công!');
-      navigate('/');
+      
+      if (userData?.role?.toUpperCase() === 'ADMIN') {
+        navigate('/admin/dashboard');
+      } else {
+        navigate('/');
+      }
     },
     onError: (error) => {
-      alert('Đăng nhập thất bại: ' + error.message);
+      const errorMessage = error.response?.data?.message || error.message;
+      alert('Đăng nhập thất bại: ' + errorMessage);
     }
   });
 
@@ -54,26 +63,10 @@ export default function Login() {
               className="w-full bg-[#0f0f0f] text-sm text-gray-200 px-5 py-4 rounded-md outline-none border border-white/15 focus:border-white/30 transition-all placeholder:text-gray-500"
               onChange={handleChange}
             />
-
-            <div className="flex flex-col gap-4">
-              <input
-                type="password"
-                name="password"
-                placeholder="Nhập mật khẩu"
-                required
-                aria-label="Nhập mật khẩu"
-                className="w-full bg-[#0f0f0f] text-sm text-gray-200 px-5 py-4 rounded-md outline-none border border-white/15 focus:border-white/30 transition-all placeholder:text-gray-500"
-                onChange={handleChange}
-              />
-              <div className="flex justify-start">
-                <Link
-                  to="/forgot-password"
-                  university-offset-4
-                  className="text-xs text-red-600 hover:text-red-500 font-bold transition-all"
-                >
-                  Quên mật khẩu ?
-                </Link>
-              </div>
+            <div className="flex justify-start">
+              <Link to="/forgot-password"  className="text-xs text-red-600 hover:text-red-500 font-bold transition-all underline underline-offset-4">
+                Quên mật khẩu ?
+              </Link>
             </div>
 
             <button
@@ -97,5 +90,5 @@ export default function Login() {
         </p>
       </div>
     </AuthLayout>
-  )
+  );
 }

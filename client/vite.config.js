@@ -19,23 +19,14 @@ function resolveProxyTarget(env) {
 }
 
 // https://vite.dev/config/
-export default defineConfig(({ mode }) => {
-  const env = loadEnv(mode, process.cwd(), '')
-  const proxyTarget = resolveProxyTarget(env)
-
-  return {
-    plugins: [
-      tailwindcss(),
-      react(),
-      babel({ presets: [reactCompilerPreset()] }),
-    ],
-    server: {
-      proxy: {
-        '/api': {
-          target: proxyTarget,
-          changeOrigin: true,
-        },
-      },
-    },
-  }
-})
+export default defineConfig({
+  plugins: [
+    tailwindcss(),
+    react(),
+    babel({ presets: [reactCompilerPreset()] }),
+  ],
+  server: {
+    port: 5173,
+    strictPort: true, // Báo lỗi nếu port đã bị chiếm (thay vì tự động đổi)
+  },
+});

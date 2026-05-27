@@ -1,39 +1,45 @@
 import bcrypt from 'bcryptjs'
-import jwt from 'jsonwebtoken'
-import { StatusCodes } from 'http-status-codes'
-import prisma from '../config/database.config.js'
-import { env } from '../config/environment.config.js'
+import { prisma } from '../config/database.config.js'
 
-export const hashPassword = (plain) => bcrypt.hash(plain, 10)
-export const comparePassword = (plain, hash) => bcrypt.compare(plain, hash)
+export const register = async (email, password, username) => {
+  const existingUser = await prisma.user.findUnique({ where: { email } })
+  if (existingUser) throw new Error('Email đã tồn tại')
 
-export const signToken = (user) =>
-  jwt.sign(
-    { id: user.id, email: user.email, role: user.role },
-    env.JWT_SECRET || 'dev-secret',
-    { expiresIn: '7d' },
-  )
+  const salt = await bcrypt.genSalt(10)
+  const hashedPassword = await bcrypt.hash(password, salt)
 
-export const login = async ({ email, password }) => {
+  return await prisma.user.create({
+    data: {
+      email,
+      password: hashedPassword,
+      name: username, // Lưu username từ frontend vào cột name trong database
+      role: 'USER'
+    }
+  })
+}
+
+export const login = async (email, password) => {
   const user = await prisma.user.findUnique({ where: { email } })
-  if (!user || !user.password) {
-    const err = new Error('Email hoặc mật khẩu không đúng')
-    err.statusCode = StatusCodes.UNAUTHORIZED
-    throw err
-  }
+  if (!user) throw new Error('Email hoặc mật khẩu không đúng')
 
-  const valid = await comparePassword(password, user.password)
-  if (!valid) {
-    const err = new Error('Email hoặc mật khẩu không đúng')
-    err.statusCode = StatusCodes.UNAUTHORIZED
-    throw err
-  }
+  const isMatch = await bcrypt.compare(password, user.password)
+  if (!isMatch) throw new Error('Email hoặc mật khẩu không đúng')
 
-  const token = signToken(user)
-  return {
-    id: user.id,
-    email: user.email,
-    role: user.role,
-    token,
-  }
+  // Trả về user để controller xử lý safeUser
+  return user
+}
+
+
+
+export const forgotPassword = async (email, newPassword) => {
+  const user = await prisma.user.findUnique({ where: { email } })
+  if (!user) throw new Error('Người dùng không tồn tại')
+
+  const salt = await bcrypt.genSalt(10)
+  const hashedPassword = await bcrypt.hash(newPassword, salt)
+  
+  await prisma.user.update({
+    where: { email },
+    data: { password: hashedPassword }
+  })
 }

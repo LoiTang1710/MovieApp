@@ -5,11 +5,8 @@ import { env } from '../config/environment.config.js'
 /**
  * Middleware xác thực Token (Authentication)
  */
-export const verifyToken = (req, res, next) => {
-  const authHeader = req.headers.authorization
-  const token = authHeader && authHeader.split(' ')[1]
-
-  if (!token) {
+export const isAuthenticated = (req, res, next) => {
+  if (!req.session || !req.session.user) {
     return res.status(StatusCodes.UNAUTHORIZED).json({
       message: 'Bạn chưa đăng nhập hoặc Token bị thiếu.',
     })
@@ -24,6 +21,8 @@ export const verifyToken = (req, res, next) => {
       message: 'Phiên làm việc hết hạn hoặc Token không hợp lệ.',
     })
   }
+  req.user = req.session.user
+  next()
 }
 
 /**
