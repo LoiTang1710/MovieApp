@@ -8,7 +8,7 @@ import { errorHandler } from './middlewares/error.middleware.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-const START_SERVER = () => {
+export const createApp = () => {
   const app = express()
   app.use(
     cors({
@@ -17,27 +17,33 @@ const START_SERVER = () => {
     }),
   )
   app.use(express.json({ limit: '10mb' }))
-
   app.use('/uploads', express.static(path.join(__dirname, '../uploads')))
-
   app.use('/api', apiRouter)
   app.use(errorHandler)
+  return app
+}
 
+const app = createApp()
+
+const START_SERVER = () => {
   app.listen(env.APP_PORT, () => {
     console.log(`Server is running on port ${env.APP_PORT}`)
     console.log('Reviews: /api/reviews | Comments: /api/comments')
-    if (process.env.ALLOW_DEV_AUTH === 'true') {
+    if (env.ALLOW_DEV_AUTH === 'true') {
       console.log('Dev auth: POST /api/dev/token')
     }
   })
 }
+
 ;(async () => {
   try {
-    console.log(`1. Connecting to Database`)
-    console.log(`2. Connected to Database`)
+    console.log('1. Connecting to Database')
+    console.log('2. Connected to Database')
     START_SERVER()
   } catch (error) {
     console.log(error)
     process.exit(0)
   }
 })()
+
+export default app
