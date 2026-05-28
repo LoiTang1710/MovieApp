@@ -1,5 +1,5 @@
 import express from 'express'
-import { verifyToken, verifyAdmin } from '../middlewares/auth.middleware.js'
+import { verifyUserSession, authorizeRoles } from '../middlewares/userAuth.middleware.js'
 import { uploadAvatar } from '../middlewares/upload.middleware.js'
 import { uploadAvatarImage } from '../controllers/upload.controller.js'
 import {
@@ -12,9 +12,8 @@ import {
 
 const Router = express.Router()
 
-// Áp dụng middleware verifyAdmin cho tất cả các route bên dưới
-// Phải chạy verifyToken trước để lấy thông tin user từ JWT
-Router.use(verifyToken, verifyAdmin)
+// Áp dụng middleware phân quyền dựa trên session cho tất cả các route bên dưới
+Router.use(verifyUserSession, authorizeRoles('ADMIN'))
 
 // 1. Quản lý phim
 Router.route('/movies')
