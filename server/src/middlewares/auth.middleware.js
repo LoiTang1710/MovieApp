@@ -29,6 +29,8 @@ export const verifyToken = (req, res, next) => {
       message: 'Phiên làm việc hết hạn hoặc Token không hợp lệ.',
     })
   }
+  req.user = req.session.user
+  next()
 }
 
 /**

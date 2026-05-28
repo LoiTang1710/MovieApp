@@ -1,4 +1,5 @@
 import express from 'express'
+import authRoutes from './auth.route.js'
 import statsRoutes from './stats.route.js'
 import mediasRoutes from './media.route.js'
 import premiumRoutes from './premium.route.js'

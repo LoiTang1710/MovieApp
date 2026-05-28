@@ -62,4 +62,4 @@ export const register = catchAsync(async (req, res) => {
     message: 'Đăng ký thành công',
     data: user,
   })
-})
+}

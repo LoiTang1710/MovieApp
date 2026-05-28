@@ -1,33 +1,54 @@
-import { useRef } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { useMutation } from '@tanstack/react-query'
-import AuthLayout from '../../../components/layouts/AuthLayout'
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useMutation } from '@tanstack/react-query';
+import { authClient } from '../../../api/axiosClient';
+import AuthLayout from "../../../components/layouts/AuthLayout";
 
 export default function Register() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    username: '', email: '', password: '', confirmPassword: '', code: ''
+  });
+  const [otpSent, setOtpSent] = useState(false);
 
-  const formData = useRef({
-    username: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    code: '',
-  })
+  // Mutation gửi OTP
+  const sendOtpMutation = useMutation({
+    mutationFn: async (email) => {
+      const response = await authClient.post('/auth/send-otp', {
+        email,
+        type: 'register'
+      });
+      return response.data;
+    },
+    onSuccess: () => {
+      setOtpSent(true);
+      alert('Đã gửi mã OTP! Vui lòng kiểm tra terminal backend để lấy mã.');
+    },
+    onError: (error) => {
+      const errorMessage = error.response?.data?.message || error.message;
+      alert('Gửi mã thất bại: ' + errorMessage);
+    }
+  });
 
   const registerMutation = useMutation({
     mutationFn: async (data) => {
-      console.log('Registering user:', data)
-      // Giả lập gọi API
-      return new Promise((resolve) => setTimeout(resolve, 1000))
+      const response = await authClient.post('/auth/register', {
+        username: data.username,
+        email: data.email,
+        password: data.password,
+        code: data.code
+      });
+      return response.data;
     },
     onSuccess: () => {
       alert('Đăng ký thành công!')
       navigate('/login')
     },
     onError: (error) => {
-      alert('Đăng ký thất bại: ' + error.message)
-    },
-  })
+      const errorMessage = error.response?.data?.message || error.message;
+      alert('Đăng ký thất bại: ' + errorMessage);
+    }
+  });
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -40,8 +61,20 @@ export default function Register() {
       alert('Mật khẩu không khớp!')
       return
     }
-    registerMutation.mutate(formData.current)
-  }
+    if (!otpSent) {
+      alert('Vui lòng gửi mã OTP trước!');
+      return;
+    }
+    registerMutation.mutate(formData);
+  };
+
+  const handleSendOtp = () => {
+    if (!formData.email) {
+      alert('Vui lòng nhập email trước!');
+      return;
+    }
+    sendOtpMutation.mutate(formData.email);
+  };
 
   return (
     <AuthLayout>
@@ -79,8 +112,13 @@ export default function Register() {
               className="w-60 bg-[#0f0f0f] text-sm text-gray-200 px-5 py-4 rounded-md outline-none border border-white/15 focus:border-white/30 transition-all"
               onChange={handleChange}
             />
-            <button type="button" className="whitespace-nowrap text-xs text-red-600 hover:text-red-500 font-bold transition-all cursor-pointer underline ml-[25px]">
-              Gửi mã
+            <button 
+              type="button" 
+              onClick={handleSendOtp}
+              disabled={sendOtpMutation.isPending || otpSent}
+              className="whitespace-nowrap text-xs text-red-600 hover:text-red-500 font-bold transition-all cursor-pointer underline ml-[25px] disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {sendOtpMutation.isPending ? 'Đang gửi...' : otpSent ? 'Đã gửi ✓' : 'Gửi mã'}
             </button>
           </div>
 
