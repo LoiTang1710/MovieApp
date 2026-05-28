@@ -2,6 +2,7 @@ import express from 'express'
 import cors from 'cors'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import cookieParser from 'cookie-parser'
 import { env } from './config/environment.config.js'
 import apiRouter from './routes/index.js'
 import { errorHandler } from './middlewares/error.middleware.js'
@@ -12,11 +13,12 @@ export const createApp = () => {
   const app = express()
   app.use(
     cors({
-      origin: ['http://localhost:5173', 'http://127.0.0.1:5173'],
+      origin: ['http://localhost:5173', 'http://127.0.0.1:5173', 'http://localhost:5174', 'http://127.0.0.1:5174'],
       credentials: true,
     }),
   )
   app.use(express.json({ limit: '10mb' }))
+  app.use(cookieParser())
   app.use('/uploads', express.static(path.join(__dirname, '../uploads')))
   app.use('/api', apiRouter)
   app.use(errorHandler)
