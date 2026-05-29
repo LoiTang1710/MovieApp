@@ -102,7 +102,9 @@ export default function ForgotPassword() {
               required
               className="w-full bg-[#0f0f0f] text-sm text-gray-200 px-5 py-4 rounded-md outline-none border border-white/15 focus:border-white/30 transition-all placeholder:text-gray-500"
               onChange={(e) => {
-                formData.current.email = e.target.value
+                const nextEmail = e.target.value
+                if (formData.current.email !== nextEmail) setCodeSent(false)
+                formData.current.email = nextEmail
                 if (error) setError('')
               }}
             />
