@@ -9,7 +9,7 @@ const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
 export const login = catchAsync(async (req, res) => {
   const { email, password } = req.body
 
-  // 1. Input Validation chặt chẽ (Chống DoS qua độ dài password)
+  // 1. Input Validation chặt chẽ
   if (!email || !password) {
     throw new AppError('Vui lòng nhập email và mật khẩu', StatusCodes.BAD_REQUEST)
   }
@@ -20,27 +20,23 @@ export const login = catchAsync(async (req, res) => {
     throw new AppError('Mật khẩu không được vượt quá 100 ký tự', StatusCodes.BAD_REQUEST)
   }
 
-  const { user, token } = await authService.login({ email, password })
+  const { user } = await authService.login({ email, password })
 
-  // 2. Security: Trả token qua HttpOnly Cookie thay vì JSON Body
-  res.cookie('token', token, {
-    httpOnly: true, // Tránh XSS, JS trên frontend không thể đọc
-    secure: process.env.NODE_ENV === 'production', // Phải dùng HTTPS trên Production
-    sameSite: 'strict', // Tránh CSRF
-    maxAge: 7 * 24 * 60 * 60 * 1000 // 7 ngày
-  })
+  // Lưu thông tin vào session (Authenticate)
+  req.session.user = { id: user.id, role: user.role }
 
   res.status(StatusCodes.OK).json({
+    success: true,
     message: 'Đăng nhập thành công',
-    data: user, // Token không còn nằm trong payload này
+    data: user,
   })
 })
 
 export const register = catchAsync(async (req, res) => {
-  const { email, password, fullName } = req.body
+  const { email, password, fullName, code } = req.body
 
-  if (!email || !password || !fullName) {
-    throw new AppError('Vui lòng cung cấp đủ thông tin (email, password, fullName)', StatusCodes.BAD_REQUEST)
+  if (!email || !password || !fullName || !code) {
+    throw new AppError('Vui lòng cung cấp đủ thông tin và mã xác nhận', StatusCodes.BAD_REQUEST)
   }
   if (!isValidEmail(email)) {
     throw new AppError('Định dạng email không hợp lệ', StatusCodes.BAD_REQUEST)
@@ -49,17 +45,61 @@ export const register = catchAsync(async (req, res) => {
     throw new AppError('Mật khẩu phải từ 6 đến 100 ký tự', StatusCodes.BAD_REQUEST)
   }
 
-  const { user, token } = await authService.register({ email, password, fullName })
+  // Kiểm tra mã xác nhận
+  const isCodeValid = await authService.verifyCode(email, code, 'REGISTER')
+  if (!isCodeValid) {
+    throw new AppError('Mã xác nhận không chính xác hoặc đã hết hạn', StatusCodes.BAD_REQUEST)
+  }
 
-  res.cookie('token', token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
-    maxAge: 7 * 24 * 60 * 60 * 1000
-  })
+  const { user } = await authService.register({ email, password, fullName })
+
+  // Tự động đăng nhập sau khi đăng ký
+  req.session.user = { id: user.id, role: user.role }
 
   res.status(StatusCodes.CREATED).json({
+    success: true,
     message: 'Đăng ký thành công',
     data: user,
+  })
+})
+
+export const sendVerificationCode = catchAsync(async (req, res) => {
+  const { email, type } = req.body
+  
+  if (!email || !type) {
+    throw new AppError('Vui lòng nhập đầy đủ email và loại mã xác nhận', StatusCodes.BAD_REQUEST)
+  }
+  if (!isValidEmail(email)) {
+    throw new AppError('Định dạng email không hợp lệ', StatusCodes.BAD_REQUEST)
+  }
+
+  await authService.generateAndSendVerificationCode(email, type)
+
+  res.status(StatusCodes.OK).json({
+    success: true,
+    message: 'Mã xác nhận đã được gửi thành công.',
+  })
+})
+
+export const resetPassword = catchAsync(async (req, res) => {
+  const { email, newPassword, code } = req.body
+
+  if (!email || !newPassword || !code) {
+    throw new AppError('Vui lòng cung cấp đủ email, mật khẩu mới và mã xác nhận', StatusCodes.BAD_REQUEST)
+  }
+  if (newPassword.length < 6 || newPassword.length > 100) {
+    throw new AppError('Mật khẩu phải từ 6 đến 100 ký tự', StatusCodes.BAD_REQUEST)
+  }
+
+  const isCodeValid = await authService.verifyCode(email, code, 'RESET_PASSWORD')
+  if (!isCodeValid) {
+    throw new AppError('Mã xác nhận không chính xác hoặc đã hết hạn', StatusCodes.BAD_REQUEST)
+  }
+
+  await authService.resetPassword({ email, newPassword })
+
+  res.status(StatusCodes.OK).json({
+    success: true,
+    message: 'Đổi mật khẩu thành công. Vui lòng đăng nhập lại.',
   })
 })

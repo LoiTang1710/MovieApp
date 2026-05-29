@@ -3,6 +3,7 @@ import cors from 'cors'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import cookieParser from 'cookie-parser'
+import session from 'express-session'
 import { env } from './config/environment.config.js'
 import apiRouter from './routes/index.js'
 import { errorHandler } from './middlewares/error.middleware.js'
@@ -19,6 +20,19 @@ export const createApp = () => {
   )
   app.use(express.json({ limit: '10mb' }))
   app.use(cookieParser())
+  app.use(
+    session({
+      secret: env.SESSION_SECRET || 'fallback-session-secret',
+      resave: false,
+      saveUninitialized: false,
+      cookie: {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày
+        sameSite: 'lax',
+      },
+    })
+  )
   app.use('/uploads', express.static(path.join(__dirname, '../uploads')))
   app.use('/api', apiRouter)
   app.use(errorHandler)
