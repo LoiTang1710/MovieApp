@@ -68,16 +68,18 @@ export const generateAndSendVerificationCode = async (email, type) => {
   verificationCodes.set(email, { code, expiresAt, type })
 
   // Trong một ứng dụng thực tế, hãy tích hợp với dịch vụ gửi email/SMS tại đây
-  const timestamp = new Date().toLocaleString('vi-VN')
-  console.log(`\n${'='.repeat(60)}`)
-  console.log(`📧 VERIFICATION CODE GENERATED`)
-  console.log(`${'='.repeat(60)}`)
-  console.log(`⏰ Time: ${timestamp}`)
-  console.log(`📨 Email: ${email}`)
-  console.log(`🔐 Code: ${code}`)
-  console.log(`📝 Type: ${type}`)
-  console.log(`⏳ Expires in: 10 minutes`)
-  console.log(`${'='.repeat(60)}\n`)
+  if (process.env.NODE_ENV !== 'production') {
+    const timestamp = new Date().toLocaleString('vi-VN')
+    console.log(`\n${'='.repeat(60)}`)
+    console.log(`📧 VERIFICATION CODE GENERATED`)
+    console.log(`${'='.repeat(60)}`)
+    console.log(`⏰ Time: ${timestamp}`)
+    console.log(`📨 Email: ${email}`)
+    console.log(`🔐 Code: ${code}`)
+    console.log(`📝 Type: ${type}`)
+    console.log(`⏳ Expires in: 10 minutes`)
+    console.log(`${'='.repeat(60)}\n`)
+  }
 
   return true // Cho biết thành công
 }
