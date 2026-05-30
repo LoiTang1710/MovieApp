@@ -16,12 +16,14 @@ const LoginPage = () => {
 
   const loginMutation = useMutation({
     mutationFn: loginApi,
-    onSuccess: (response) => {
+    onSuccess: async (response) => {
       // loginApi returns the user object directly
       const userData = response;
       
       //  Kiểm tra nếu là ADMIN thì không cho đăng nhập
       if (userData.role?.toUpperCase() === 'ADMIN') {
+        // Hủy session vừa được tạo ở server để chặn đăng nhập admin tại đây
+        await logoutApi().catch(() => {});
         setErrorMsg('Tài khoản Admin không thể đăng nhập tại đây. Vui lòng sử dụng trang Admin.');
         return;
       }
