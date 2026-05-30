@@ -42,13 +42,16 @@ export const createApp = () => {
 const app = createApp()
 
 const START_SERVER = () => {
-  app.listen(env.APP_PORT, () => {
+  const server = app.listen(env.APP_PORT, () => {
     console.log(`Server is running on port ${env.APP_PORT}`)
     console.log('Reviews: /api/reviews | Comments: /api/comments')
     if (env.ALLOW_DEV_AUTH === 'true') {
       console.log('Dev auth: POST /api/dev/token')
     }
   })
+  
+  // Set a timeout for the server to start
+  server.setTimeout(30000)
 }
 
 ;(async () => {

@@ -20,3 +20,5 @@ export const resetPassword = async (data) => {
   const response = await authClient.post('/auth/reset-password', data);
   return response.data;
 };
+
+export default authClient;

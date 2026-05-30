@@ -103,3 +103,35 @@ export const resetPassword = catchAsync(async (req, res) => {
     message: 'Đổi mật khẩu thành công. Vui lòng đăng nhập lại.',
   })
 })
+
+/**
+ * LOGOUT - Destroy session
+ */
+export const logout = catchAsync(async (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      throw new AppError('Không thể đăng xuất', StatusCodes.INTERNAL_SERVER_ERROR)
+    }
+    res.clearCookie('connect.sid')
+    res.status(StatusCodes.OK).json({
+      success: true,
+      message: 'Đăng xuất thành công',
+    })
+  })
+})
+
+/**
+ * GET CURRENT USER - Kiểm tra session
+ */
+export const getCurrentUser = catchAsync(async (req, res) => {
+  const user = req.user || req.session?.user
+  
+  if (!user) {
+    throw new AppError('Chưa đăng nhập', StatusCodes.UNAUTHORIZED)
+  }
+
+  res.status(StatusCodes.OK).json({
+    success: true,
+    data: { user },
+  })
+})

@@ -1,11 +1,14 @@
-import { Bell, Menu, Search, User } from 'lucide-react'
-import { Link, NavLink } from 'react-router-dom'
+import { Bell, Menu, Search, User, LogOut, Settings } from 'lucide-react'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../../contexts/AuthContext'
 import { useState } from 'react'
 
 const AppBar = () => {
-  const { isAuthenticated: isLogged } = useAuth()
+  const { user, isAuthenticated: isLogged, logout } = useAuth()
+  const navigate = useNavigate()
   const [isOpen, setIsOpen] = useState(false)
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
+  
   const navLinks = [
     {
       id: crypto.randomUUID(),
@@ -33,6 +36,42 @@ const AppBar = () => {
       path: '/premium',
     },
   ]
+
+  // ✅ Hàm để lấy thông tin người dùng
+  const getUserInfo = () => {
+    if (!user) return null;
+    return {
+      id: user.id,
+      email: user.email,
+      fullName: user.fullName || user.name,
+      role: user.role,
+      avatarUrl: user.avatarUrl,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+      // Thêm các trường khác nếu có
+      ...user
+    };
+  }
+
+  // ✅ Hàm để kiểm tra quyền người dùng
+  const hasRole = (role) => {
+    return user?.role?.toUpperCase() === role.toUpperCase();
+  }
+
+  // ✅ Hàm để kiểm tra xem người dùng đã xác thực chưa
+  const isUserAuthenticated = () => {
+    return isLogged && user !== null;
+  }
+
+  // ✅ Hàm để lấy tên hiển thị của người dùng
+  const getDisplayName = () => {
+    return user?.fullName || user?.name || user?.email?.split('@')[0] || 'User';
+  }
+
+  // ✅ Hàm để lấy avatar URL hoặc default
+  const getAvatarUrl = () => {
+    return user?.avatarUrl || null;
+  }
 
   return (
     <div id="AppBar" className='relative w-full'>
@@ -69,7 +108,78 @@ const AppBar = () => {
             <Menu />
           </button>
           {isLogged ? (
-            <User className="text-red-600" />
+            <div className="flex items-center gap-2 group relative cursor-pointer">
+              <button
+                onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                className="flex items-center gap-2 hover:text-red-600 transition-colors"
+                title="Thông tin người dùng"
+              >
+                {getAvatarUrl() ? (
+                  <img src={getAvatarUrl()} alt="Avatar" className="w-7 h-7 rounded-full object-cover border border-white/30" />
+                ) : (
+                  <User className="w-7 h-7 text-red-600" />
+                )}
+                <span className="hidden lg:block text-sm font-medium">
+                  {getDisplayName()}
+                </span>
+              </button>
+
+              {/* ✅ Dropdown Menu */}
+              {isUserMenuOpen && (
+                <div className="absolute top-full right-0 mt-2 w-56 bg-black/95 border border-white/20 rounded-lg shadow-lg z-50">
+                  {/* ✅ User Info Section */}
+                  <div className="p-4 border-b border-white/20">
+                    <p className="text-sm font-medium text-white">{getDisplayName()}</p>
+                    <p className="text-xs text-gray-400">{user?.email}</p>
+                    {user?.role && (
+                      <p className="text-xs text-red-500 mt-1 font-semibold">
+                        {user.role.toUpperCase()}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* ✅ User Stats Section */}
+                  {user?.id && (
+                    <div className="px-4 py-3 border-b border-white/20 grid grid-cols-2 gap-2 text-xs">
+                      <div className="text-center">
+                        <p className="text-gray-400">ID</p>
+                        <p className="text-white font-mono text-xs truncate">{user.id}</p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-gray-400">Status</p>
+                        <p className="text-green-400 font-semibold">Active</p>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* ✅ Menu Items */}
+                  <div className="py-2">
+                    <button
+                      onClick={() => {
+                        navigate('/profile');
+                        setIsUserMenuOpen(false);
+                      }}
+                      className="w-full px-4 py-2 text-sm text-white hover:bg-red-600/20 hover:text-red-600 transition-colors flex items-center gap-2"
+                    >
+                      <Settings size={16} />
+                      Hồ sơ
+                    </button>
+                    
+                    <button
+                      onClick={async () => {
+                        await logout();
+                        setIsUserMenuOpen(false);
+                        navigate('/login');
+                      }}
+                      className="w-full px-4 py-2 text-sm text-white hover:bg-red-600/20 hover:text-red-600 transition-colors flex items-center gap-2 border-t border-white/20"
+                    >
+                      <LogOut size={16} />
+                      Đăng xuất
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           ) : (
             <div className="flex items-center justify-center">
               <Link
@@ -78,7 +188,7 @@ const AppBar = () => {
               >
                 Login
               </Link>
-              <p>/</p>
+              <p className="mx-1">/</p>
               <Link
                 to={'/register'}
                 className="hover:text-red-600 transition-colors text-sm font-medium"
