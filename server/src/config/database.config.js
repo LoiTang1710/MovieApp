@@ -12,7 +12,10 @@ try {
   console.log('Prisma client initialized')
 } catch (error) {
   console.error('Failed to initialize Prisma client:', error.message)
-  // Create a mock prisma for development
+  if (env.NODE_ENV === 'production') {
+    throw error
+  }
+  // Mock prisma for local development only
   prisma = {
     user: {
       findUnique: async () => null,
