@@ -68,6 +68,7 @@ export function DevAuthProvider({ children }) {
   return <DevAuthContext.Provider value={value}>{children}</DevAuthContext.Provider>
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useDevAuth() {
   const ctx = useContext(DevAuthContext)
   if (!ctx) {

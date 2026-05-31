@@ -2,8 +2,10 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
 import AuthLayout from '../../../components/layouts/AuthLayout'
-import { useAuth } from '../../../contexts/AuthContext'
+
 import { loginApi } from '../../../apis/auth.api'
+import { useAuth } from '../../../contexts/AuthContext.jsx'
+
 
 export default function Login() {
   const navigate = useNavigate()
@@ -37,7 +39,9 @@ export default function Login() {
         <h1 className="text-4xl font-bold text-center mb-2 text-white/80 tracking-tight">
           Admin Panel
         </h1>
-        <p className="text-center text-gray-500 text-sm mb-8">Đăng nhập để quản trị hệ thống</p>
+        <p className="text-center text-gray-500 text-sm mb-8">
+          Đăng nhập để quản trị hệ thống
+        </p>
 
         <div className="bg-black/60 backdrop-blur-2xl border border-white/20 py-10 px-8 rounded-md shadow-2xl">
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
@@ -47,7 +51,9 @@ export default function Login() {
               placeholder="admin@cinevibe.com"
               required
               className="w-full bg-[#0f0f0f] text-sm text-gray-200 px-5 py-4 rounded-md outline-none border border-white/15 focus:border-white/30"
-              onChange={(e) => setFormData((p) => ({ ...p, email: e.target.value }))}
+              onChange={(e) =>
+                setFormData((p) => ({ ...p, email: e.target.value }))
+              }
             />
             <input
               type="password"
@@ -55,7 +61,9 @@ export default function Login() {
               placeholder="Mật khẩu"
               required
               className="w-full bg-[#0f0f0f] text-sm text-gray-200 px-5 py-4 rounded-md outline-none border border-white/15 focus:border-white/30"
-              onChange={(e) => setFormData((p) => ({ ...p, password: e.target.value }))}
+              onChange={(e) =>
+                setFormData((p) => ({ ...p, password: e.target.value }))
+              }
             />
             <button
               type="submit"

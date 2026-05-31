@@ -1,14 +1,13 @@
-import { Heart } from 'lucide-react'
 import PageIndicator from './PageIndicator'
 import { useHome } from '../../../../contexts/HomeContext'
 import { Link } from 'react-router-dom'
 import { createSlug } from '../../../../utils/formatters'
+import FavouriteButton from '../../ActionButton/FavouriteButton/FavouriteButton'
+import { useQuery } from '@tanstack/react-query'
 
 const MediaBanner = () => {
   const {
     activeMediaId,
-    setLoved,
-    loved,
     mediaBanner,
     bannerTrailers,
     bannerLogos,
@@ -20,6 +19,7 @@ const MediaBanner = () => {
   const mediaType = data.type || (data.first_air_date ? 'tv' : 'movie')
   const detailURL = `/movie/${createSlug(data.title || data.name || 'phim')}`
   const videoURL = `/video/${createSlug(data.title || data.name || 'phim')}.${data.id}`
+  const { data: myMovies = [] } = useQuery({ queryKey: ['movies'] })
   return (
     <div>
       <div className="relative">
@@ -108,9 +108,9 @@ const MediaBanner = () => {
             >
               Thông tin
             </Link>
-            <Heart
-              onClick={() => setLoved(!loved)}
-              className={`${loved ? 'fill-primary text-primary' : ''} hidden lg:block cursor-pointer transition-transform hover:scale-110`}
+            <FavouriteButton
+              movie={data}
+              isLovedInitial={myMovies.some((m) => m.id === data.id)}
             />
           </div>
         </div>

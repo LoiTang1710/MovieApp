@@ -1,49 +1,34 @@
-import { authClient } from './axiosClient'
+import { apiClient } from './axiosClient'
 
-/**
- * Login API
- */
-export const loginApi = async (data) => {
-  const response = await authClient.post('/auth/login', data)
-  return response.data.data || response.data
-}
-
-/**
- * Register API
- */
-export const registerApi = async (data) => {
-  const response = await authClient.post('/auth/register', data)
-  return response.data.data || response.data
-}
-
-/**
- * Send Verification Code API
- */
-export const sendVerificationCodeApi = async (data) => {
-  const response = await authClient.post('/auth/send-verification-code', data)
-  return response.data
-}
-
-/**
- * Reset Password API
- */
-export const resetPasswordApi = async (data) => {
-  const response = await authClient.post('/auth/reset-password', data)
-  return response.data
-}
-
-/**
- * Logout API
- */
-export const logoutApi = async () => {
-  const response = await authClient.post('/auth/logout')
-  return response.data
-}
-
-/**
- * Get Current User API
- */
 export const getCurrentUserApi = async () => {
-  const response = await authClient.get('/auth/me')
+  const response = await apiClient.get('/auth/me') // Đã thêm /api
+  return response.data
+}
+
+export const loginApi = async (data) => {
+  const response = await apiClient.post('/auth/login', data)
+  return response.data
+}
+
+export const registerApi = async (data) => {
+  const response = await apiClient.post('/auth/register', data)
+  return response.data
+}
+
+export const logoutApi = async () => {
+  const response = await apiClient.post('/auth/logout')
+  return response.data
+}
+
+export const sendVerificationCodeApi = async (data) => {
+  const response = await apiClient.post(
+    '/api/auth/send-verification-code',
+    data,
+  )
+  return response.data
+}
+
+export const resetPasswordApi = async (data) => {
+  const response = await apiClient.post('/auth/reset-password', data)
   return response.data
 }

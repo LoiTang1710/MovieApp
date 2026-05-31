@@ -120,6 +120,7 @@ model User {
   mediaRatings MediaRating[]
   comments     Comment[]
   commentLikes CommentLike[]
+  collections Collection[]
 }
 
 // UC02: Quản lý hồ sơ người dùng (Profiles)
@@ -242,4 +243,30 @@ model CommentLike {
   createdAt DateTime @default(now())
 
   @@unique([userId, commentId])
+}
+
+model Collection {
+  id Int @id @default(autoincrement())
+  userId String
+  collectionName String
+  iconKey String
+  isDefault Boolean @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+  items CollectionItem[]
+}
+model CollectionItem {
+  id Int @id @default(autoincrement())
+  collectionId Int
+  mediaId Int
+  mediaType String
+  title String?
+  posterPath String?
+  rating Float?
+  releasedDate String?
+  addedAt DateTime @default(now())
+
+  collection Collection @relation(fields: [collectionId], references: [id])
+  @@unique([collectionId,mediaId])
 }

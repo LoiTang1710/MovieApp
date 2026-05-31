@@ -2,8 +2,9 @@ import { useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
 import AuthLayout from '../../../components/layouts/AuthLayout'
-import { useAuth } from '../../../contexts/AuthContext'
+
 import { registerApi, sendVerificationCodeApi } from '../../../api/auth.api'
+import { useAuth } from '../../../hooks/useAuth.jsx'
 
 export default function Register() {
   const navigate = useNavigate()
