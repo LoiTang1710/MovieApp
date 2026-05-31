@@ -1,4 +1,5 @@
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from "./useAuth.jsx";
+
 
 /**
  * ✅ Custom Hook: useUserData
@@ -10,7 +11,8 @@ import { useAuth } from '../contexts/AuthContext';
  * const { user, getUserInfo, hasRole, isAuthenticated, getDisplayName } = useUserData();
  */
 export const useUserData = () => {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useAuth
+  ();
 
   /**
    * Get complete user information object

@@ -5,16 +5,15 @@ import {
   Share2 /*Facebook, Twitter, Instagram, */,
 } from 'lucide-react'
 import { useMyList } from '../../hooks/useMyList'
-import Sidebar from './components/Sidebar'
-import MovieCard from './components/MovieCard'
-import MovieRow from './components/MovieRow'
-import EmptyState from './components/EmptyState'
-import CreateModal from './components/modals/CreateModal'
-import DeleteModal from './components/modals/DeleteModal'
-import ShareModal from './components/modals/ShareModal'
-import FilterDropdown from './components/modals/FilterDropdown'
-//import Footer from "../../components/layouts/Footer"
-//import Header from "../../components/layouts/Header"
+import Sidebar from './Content/Sidebar.jsx'
+import MovieCard from './Content/MovieCard'
+import MovieRow from './Content/MovieRow'
+import EmptyState from './Content/EmptyState'
+import CreateModal from './ListCollections/modals/CreateModal'
+import DeleteModal from './ListCollections/modals/DeleteModal'
+import ShareModal from './ListCollections/modals/ShareModal'
+import FilterDropdown from './ListCollections/modals/FilterDropdown'
+
 
 export default function MyList() {
   const {

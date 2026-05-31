@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { Check, QrCode, ShieldCheck, Smartphone, WalletCards } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../../contexts/AuthContext'
+
 import {
   useCreateSubscription,
   usePremiumPlans,
 } from '../../hooks/usePremium'
+import { useAuth } from '../../hooks/useAuth.jsx'
 
 const paymentMethods = [
   { id: 'momo', label: 'Ví MoMo', icon: WalletCards },

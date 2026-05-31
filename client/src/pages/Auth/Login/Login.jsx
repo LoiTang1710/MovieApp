@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
-import { useAuth } from '../../../contexts/AuthContext';
-import { loginApi } from '../../../api/auth.api';
+
+import { loginApi, logoutApi } from '../../../api/auth.api';
 import { LogIn, Loader2 } from 'lucide-react';
 import AuthLayout from '../../../components/layouts/AuthLayout';
+import { useAuth } from '../../../hooks/useAuth.jsx';
 
 const LoginPage = () => {
   const navigate = useNavigate();

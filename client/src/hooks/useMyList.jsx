@@ -1,120 +1,155 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo } from 'react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'react-toastify'
+import {
+  fetchCollectionsApi,
+  fetchMoviesByCollectionApi,
+  createCollectionApi,
+  deleteCollectionApi,
+  toggleFavoriteApi,
+} from '../api/collection.api'
 
-// ─── Constants ────────────────────────────────────────────────────────────────
 export const ICON_OPTIONS = [
-  { key: "heart",  label: "Heart" },
-  { key: "star",   label: "Star" },
-  { key: "video",  label: "Video" },
-  { key: "thumbs", label: "Thumbs Up" },
-  { key: "flame",  label: "Flame" },
-  { key: "ticket", label: "Ticket" },
-];
+  { key: 'heart', label: 'Heart' },
+  { key: 'star', label: 'Star' },
+  { key: 'video', label: 'Video' },
+  { key: 'thumbs', label: 'Thumbs Up' },
+  { key: 'flame', label: 'Flame' },
+  { key: 'ticket', label: 'Ticket' },
+]
 
 export const SORT_OPTIONS = [
-  { value: "all",    label: "Tất Cả" },
-  { value: "newest", label: "Mới Thêm" },
-  { value: "az",     label: "A - Z" },
-];
+  { value: 'all', label: 'Tất Cả' },
+  { value: 'newest', label: 'Mới Thêm' },
+  { value: 'az', label: 'A - Z' },
+]
 
-const INITIAL_MOVIES = [
-  { id: 1, title: "Nữ Hoàng Băng Giá 3",  rating: 9.0, liked: true,  year: 2027, poster: "https://image.tmdb.org/t/p/w500/kgwjIb2JDHRhNk13lmSxiClFjVk.jpg" },
-  { id: 2, title: "Hành Trình Của Moana",  rating: 9.6, liked: true,  year: 2027, poster: "https://image.tmdb.org/t/p/w500/" },
-  { id: 3, title: "Minions & Quái Vật",    rating: 9.5, liked: false, year: 2027, poster: "https://image.tmdb.org/t/p/w500/" },
-  { id: 4, title: "Chàng Mèo Mang Mũ",    rating: 9.0, liked: false, year: 2027, poster: "https://image.tmdb.org/t/p/w500/" },
-  { id: 5, title: "Kung Fu Panda 4",       rating: 9.1, liked: false, year: 2027, poster: "https://image.tmdb.org/t/p/w500/kDp1vUBnMpe8ak4rjgl3cLELqjU.jpg" },
-  { id: 6, title: "Mufasa: Vua Sư Tử",    rating: 8.9, liked: true,  year: 2027, poster: "https://image.tmdb.org/t/p/w500/lurEK87kukWNaHd0zYnsi3yzJrs.jpg" },
-  { id: 7, title: "Lọ Lem",               rating: 9.6, liked: false, year: 2027, poster: "https://image.tmdb.org/t/p/w500/" },
-  { id: 8, title: "Công Chúa Mononoke",   rating: 9.0, liked: false, year: 2027, poster: "https://image.tmdb.org/t/p/w500/" },
-];
-
-const INITIAL_COLLECTIONS = [
-  { id: 1, name: "Watch Later",    displayName: "Xem Sau",          iconKey: "clock",  isDefault: true,  movieIds: [1,2,3,4,5,6,7,8] },
-  { id: 2, name: "Action Movies",  displayName: "Phim Hành Động",   iconKey: "flame",  isDefault: false, movieIds: [5,6,7,8] },
-  { id: 3, name: "Animation",      displayName: "Phim Hoạt Hình",   iconKey: "heart",  isDefault: false, movieIds: [] },
-];
-
-// ─── Hook ─────────────────────────────────────────────────────────────────────
 export function useMyList() {
-  const [collections, setCollections]           = useState(INITIAL_COLLECTIONS);
-  const [activeCollectionId, setActiveCollectionId] = useState(1);
-  const [movies, setMovies]                     = useState(INITIAL_MOVIES);
-  const [isGridView, setIsGridView]             = useState(true);
-  const [sortFilter, setSortFilter]             = useState("all");
+  const queryClient = useQueryClient()
 
-  // Modal / UI states
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [isShareModalOpen, setIsShareModalOpen]   = useState(false);
-  const [isFilterOpen, setIsFilterOpen]           = useState(false);
-  const [deleteTarget, setDeleteTarget]           = useState(null); // collection | null
+  // UI States
+  const [activeCollectionId, setActiveCollectionId] = useState(null)
+  const [isGridView, setIsGridView] = useState(true)
+  const [sortFilter, setSortFilter] = useState('all')
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false)
+  const [isFilterOpen, setIsFilterOpen] = useState(false)
+  const [deleteTarget, setDeleteTarget] = useState(null)
 
-  // ─── Derived ───────────────────────────────────────────────────────────────
+  // 1. LẤY DANH SÁCH BỘ SƯU TẬP
+  const { data: collections = [] } = useQuery({
+    queryKey: ['collections'],
+    queryFn: fetchCollectionsApi,
+    select: (data) => {
+      return data.map((collection) => ({
+        ...collection,
+      }))
+    },
+  })
+  const resolvedCollectionId =
+    activeCollectionId ||
+    (collections.length > 0
+      ? collections.find((c) => c.isDefault)?.id || collections[0].id
+      : null)
+
+  // 2. LẤY PHIM TRONG BỘ SƯU TẬP ĐANG CHỌN
+  const { data: movies = [], isLoading: isMoviesLoading } = useQuery({
+    queryKey: ['collections', resolvedCollectionId, 'movies'],
+    queryFn: () => fetchMoviesByCollectionApi(resolvedCollectionId),
+    enabled: !!resolvedCollectionId, // Chỉ chạy API khi đã có ID
+  })
+
+  // 3. CÁC MUTATION (THÊM, XÓA, SỬA)
+  const createMutation = useMutation({
+    mutationFn: (newCollection) => createCollectionApi(newCollection),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['collections'] })
+      setIsCreateModalOpen(false)
+      toast.success('Đã tạo danh sách mới! 🎉')
+    },
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: (id) => deleteCollectionApi(id),
+    onSuccess: (_, deletedId) => {
+      queryClient.invalidateQueries({ queryKey: ['collections'] })
+      if (activeCollectionId === deletedId && collections.length > 0) {
+        setActiveCollectionId(collections[0].id) // Đá về tab đầu tiên
+      }
+      setDeleteTarget(null)
+      toast.info('Đã xóa danh sách.')
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.message || 'Không thể xóa!')
+      setDeleteTarget(null)
+    },
+  })
+
+  const toggleLikeMutation = useMutation({
+    mutationFn: ({ movieId, movieData }) =>
+      toggleFavoriteApi(movieId, movieData),
+    onSuccess: () => {
+      // Làm mới lại danh sách phim đang hiển thị
+      queryClient.invalidateQueries({
+        queryKey: ['collections', activeCollectionId, 'movies'],
+      })
+    },
+  })
+
+  // Derived states
   const activeCollection = useMemo(
-    () => collections.find((c) => c.id === activeCollectionId),
-    [collections, activeCollectionId]
-  );
+    () =>
+      collections.find((c) => c.id === resolvedCollectionId) || collections[0],
+    [collections, resolvedCollectionId],
+  )
 
-  // Collections enriched with live count (stays in sync automatically)
-  const enrichedCollections = useMemo(
-    () => collections.map((col) => ({ ...col, count: col.movieIds.length })),
-    [collections]
-  );
-
-  // Movies belonging to active collection, sorted by current filter
   const displayedMovies = useMemo(() => {
-    if (!activeCollection) return [];
-    const subset = movies.filter((m) => activeCollection.movieIds.includes(m.id));
-    if (sortFilter === "az")     return [...subset].sort((a, b) => a.title.localeCompare(b.title, "vi"));
-    if (sortFilter === "newest") return [...subset].sort((a, b) => b.id - a.id);
-    return subset;
-  }, [movies, activeCollection, sortFilter]);
+    let subset = [...movies]
+    if (sortFilter === 'az')
+      return subset.sort((a, b) => a.title.localeCompare(b.title, 'vi'))
+    return subset
+  }, [movies, sortFilter])
 
-  // ─── Actions ──────────────────────────────────────────────────────────────
-  function toggleLike(movieId) {
-    setMovies((prev) => prev.map((m) => (m.id === movieId ? { ...m, liked: !m.liked } : m)));
-  }
-
-  function createCollection(displayName, iconKey) {
-    setCollections((prev) => [
-      ...prev,
-      { id: Date.now(), name: displayName, displayName, iconKey, isDefault: false, movieIds: [] },
-    ]);
-  }
-
-  function deleteCollection(id) {
-    setCollections((prev) => prev.filter((c) => c.id !== id));
-    if (activeCollectionId === id) setActiveCollectionId(1);
-    //setDeleteTarget(null);
-  }
-
-  function applySortFilter(value) {
-    setSortFilter(value);
-    setIsFilterOpen(false);
+  // Actions
+  const toggleLike = (movie) => {
+    // Ép kiểu chuẩn bị dữ liệu gửi xuống Backend
+    toggleLikeMutation.mutate({
+      movieId: movie.id,
+      movieData: {
+        title: movie.title,
+        posterPath: movie.poster || movie.posterPath,
+        rating: movie.rating || 0,
+        year: movie.year || new Date().getFullYear(),
+        mediaType: movie.mediaType || 'movie',
+      },
+    })
   }
 
   return {
-    // Data
-    collections: enrichedCollections,
+    collections,
     activeCollection,
-    activeCollectionId,
+    activeCollectionId: resolvedCollectionId,
     displayedMovies,
     isGridView,
     sortFilter,
-    // UI states
     isCreateModalOpen,
     isShareModalOpen,
     isFilterOpen,
     deleteTarget,
-    // Setters
+    isMoviesLoading,
     setActiveCollectionId,
     setIsGridView,
     setIsFilterOpen,
     setIsShareModalOpen,
     setIsCreateModalOpen,
     setDeleteTarget,
-    // Actions
     toggleLike,
-    createCollection,
-    deleteCollection,
-    applySortFilter,
-  };
+    createCollection: (name, icon) =>
+      createMutation.mutate({ collectionName: name, iconKey: icon }),
+    deleteCollection: (id) => deleteMutation.mutate(id),
+    applySortFilter: (val) => {
+      setSortFilter(val)
+      setIsFilterOpen(false)
+    },
+  }
 }

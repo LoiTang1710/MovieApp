@@ -17,13 +17,14 @@ authClient.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       // Session hết hạn hoặc người dùng chưa đăng nhập
-      console.warn('Session expired or Unauthorized. Redirecting to login...');
+      console.warn('Session expired or Unauthorized. Redirecting to login...')
       // Bạn có thể thêm logic xóa dữ liệu user trong Global State hoặc redirect tại đây
       // window.location.href = '/login';
     }
     return Promise.reject(error)
-  }
+  },
 )
 
 /** Xuất thêm mediaClient để sử dụng trong các hooks như useMedias */
 export const mediaClient = authClient
+export const apiClient = authClient
