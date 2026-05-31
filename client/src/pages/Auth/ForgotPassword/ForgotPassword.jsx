@@ -2,13 +2,14 @@ import { useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
 import AuthLayout from '../../../components/layouts/AuthLayout'
-import { sendVerificationCode, resetPassword } from '../../../services/auth.service' // Đảm bảo đường dẫn này đúng
+import { sendVerificationCodeApi, resetPasswordApi } from '../../../api/auth.api'
 
 export default function ForgotPassword() {
   const navigate = useNavigate()
   const [error, setError] = useState('')
   const [codeSent, setCodeSent] = useState(false)
   const [success, setSuccess] = useState('')
+  const [email, setEmail] = useState('')
 
   const formData = useRef({
     email: '',
@@ -20,7 +21,7 @@ export default function ForgotPassword() {
   // Mutation gọi API đặt lại mật khẩu
   const resetMutation = useMutation({
     mutationFn: (data) =>
-      resetPassword({
+      resetPasswordApi({
         email: data.email,
         newPassword: data.newPassword,
         code: data.code,
@@ -36,13 +37,16 @@ export default function ForgotPassword() {
 
   // Mutation gọi API gửi OTP
   const sendCodeMutation = useMutation({
-    mutationFn: (email) => sendVerificationCode({ email, type: 'RESET_PASSWORD' }),
-    onSuccess: () => {
+    mutationFn: (email) => sendVerificationCodeApi({ email, type: 'RESET_PASSWORD' }),
+    onSuccess: (response) => {
+      console.log('Send code success:', response)
       setCodeSent(true)
       setError('')
     },
     onError: (err) => {
-      setError(err.response?.data?.message || 'Gửi mã thất bại. Vui lòng thử lại.')
+      console.error('Send code error:', err)
+      const errorMessage = err.response?.data?.message || err.message || 'Gửi mã thất bại. Vui lòng thử lại.'
+      setError(errorMessage)
     },
   })
 
@@ -105,6 +109,7 @@ export default function ForgotPassword() {
                 const nextEmail = e.target.value
                 if (formData.current.email !== nextEmail) setCodeSent(false)
                 formData.current.email = nextEmail
+                setEmail(nextEmail)
                 if (error) setError('')
               }}
             />
@@ -147,8 +152,8 @@ export default function ForgotPassword() {
               <button
                 type="button"
                 onClick={handleSendCode}
-                disabled={sendCodeMutation.isPending}
-                className="shrink-0 text-xs text-red-500 hover:text-red-400 font-bold transition-all cursor-pointer underline underline-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={sendCodeMutation.isPending || !email}
+                className="shrink-0 text-xs text-red-500 hover:text-red-400 font-bold transition-all cursor-pointer underline underline-offset-2 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
               >
                 {sendCodeMutation.isPending ? 'Đang gửi...' : 'Gửi mã'}
               </button>

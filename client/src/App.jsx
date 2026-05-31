@@ -13,7 +13,7 @@ import DetailProvider from './providers/DetailProvider'
 import MediaPlayer from './pages/MediaPlayer/MediaPlayer'
 import ScrollToTop from './utils/scrollToTop'
 import PremiumCheckout from './pages/PremiumCheckout/PremiumCheckout'
-import { AuthProvider } from './providers/AuthProvider'
+import { AuthProvider } from './contexts/AuthContext'
 
 const RootLayout = () => {
   return (

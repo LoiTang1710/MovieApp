@@ -1,22 +1,36 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
-import axiosInstance from '../../../services/axios'; // Đảm bảo đường dẫn này đúng
+import { useAuth } from '../../../contexts/AuthContext';
+import { loginApi } from '../../../api/auth.api';
 import { LogIn, Loader2 } from 'lucide-react';
 import AuthLayout from '../../../components/layouts/AuthLayout';
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
+  
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
 
   const loginMutation = useMutation({
-    mutationFn: async (data) => {
-      const res = await axiosInstance.post('/auth/login', data);
-      return res.data;
-    },
-    onSuccess: () => {
+    mutationFn: loginApi,
+    onSuccess: async (response) => {
+      // loginApi returns the user object directly
+      const userData = response;
+      
+      //  Kiểm tra nếu là ADMIN thì không cho đăng nhập
+      if (userData.role?.toUpperCase() === 'ADMIN') {
+        // Hủy session vừa được tạo ở server để chặn đăng nhập admin tại đây
+        await logoutApi().catch(() => {});
+        setErrorMsg('Tài khoản Admin không thể đăng nhập tại đây. Vui lòng sử dụng trang Admin.');
+        return;
+      }
+      
+      //  Gọi login từ AuthContext để lưu user vào state
+      login(userData);
+      
       setSuccessMsg('Đăng nhập thành công! Đang chuyển hướng...');
       setTimeout(() => navigate('/'), 1500);
     },

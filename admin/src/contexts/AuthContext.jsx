@@ -23,16 +23,14 @@ export const AuthProvider = ({ children }) => {
     const checkAuth = () => {
       try {
         const storedUser = localStorage.getItem('user');
-        const token = localStorage.getItem('token');
 
-        if (storedUser && token) {
+        if (storedUser) {
           setUser(JSON.parse(storedUser));
           setIsAuthenticated(true);
         }
       } catch (error) {
         console.error('Lỗi khôi phục phiên đăng nhập:', error);
         localStorage.removeItem('user');
-        localStorage.removeItem('token');
       } finally {
         setIsLoading(false);
       }
@@ -46,9 +44,6 @@ export const AuthProvider = ({ children }) => {
    * @param {Object} userData - Chứa thông tin user và token
    */
   const login = (userData) => {
-    if (userData.token) {
-      localStorage.setItem('token', userData.token);
-    }
     localStorage.setItem('user', JSON.stringify(userData));
     
     setUser(userData);
