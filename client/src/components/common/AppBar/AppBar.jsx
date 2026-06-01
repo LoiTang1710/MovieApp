@@ -2,9 +2,13 @@ import { Bell, Menu, Search, User, LogOut, Settings } from 'lucide-react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import { useAuth } from '../../../hooks/useAuth.jsx'
+import { useMyPremiumSubscription } from '../../../hooks/usePremium.jsx'
 
 const AppBar = () => {
   const { user, isAuthenticated: isLogged, logout } = useAuth()
+  const { data: premiumSubscription } = useMyPremiumSubscription({
+    enabled: isLogged,
+  })
   const navigate = useNavigate()
   const [isOpen, setIsOpen] = useState(false)
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
@@ -124,6 +128,11 @@ const AppBar = () => {
                           {user.role}
                         </span>
                       )}
+                      {premiumSubscription && (
+                        <span className="text-[10px] font-black uppercase tracking-widest bg-amber-400/10 text-amber-300 px-2.5 py-1 rounded-md border border-amber-400/20">
+                          Premium
+                        </span>
+                      )}
                       {user?.id && (
                         <span
                           className="text-[10px] text-gray-500 bg-white/5 px-2.5 py-1 rounded-md border border-white/5 truncate max-w-30"
@@ -133,6 +142,14 @@ const AppBar = () => {
                         </span>
                       )}
                     </div>
+                    {premiumSubscription && (
+                      <p className="mt-3 text-[11px] text-amber-200/70">
+                        {premiumSubscription.plan.name} · Hết hạn{' '}
+                        {new Intl.DateTimeFormat('vi-VN').format(
+                          new Date(premiumSubscription.endAt),
+                        )}
+                      </p>
+                    )}
                   </div>
 
                   <div className="p-2 flex flex-col gap-1">

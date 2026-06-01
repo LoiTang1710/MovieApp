@@ -6,6 +6,11 @@ import { env } from '../config/environment.config.js'
  * Middleware xác thực Token (Authentication)
  */
 export const verifyToken = (req, res, next) => {
+  if (req.session?.user) {
+    req.user = req.session.user
+    return next()
+  }
+
   const authHeader = req.headers.authorization
   let token = authHeader && authHeader.split(' ')[1]
 

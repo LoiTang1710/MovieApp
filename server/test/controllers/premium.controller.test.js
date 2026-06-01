@@ -3,9 +3,15 @@ import { StatusCodes } from 'http-status-codes'
 import * as premiumController from '../../src/controllers/premium.controller.js'
 import * as premiumService from '../../src/services/premium.service.js'
 
+vi.mock('../../src/config/environment.config.js', () => ({
+  env: { ALLOW_DEV_AUTH: 'true' },
+}))
+
 vi.mock('../../src/services/premium.service.js', () => ({
   createPendingSubscription: vi.fn(),
   getActivePremiumPlans: vi.fn(),
+  getCurrentPremiumSubscription: vi.fn(),
+  simulateSuccessfulPayment: vi.fn(),
 }))
 
 const mockResponse = () => {
@@ -46,6 +52,28 @@ describe('Premium Controller', () => {
 
     expect(res.status).toHaveBeenCalledWith(StatusCodes.BAD_REQUEST)
     expect(premiumService.createPendingSubscription).not.toHaveBeenCalled()
+  })
+
+  it('returns the current active subscription', async () => {
+    const subscription = {
+      id: 'subscription-1',
+      status: 'ACTIVE',
+    }
+    const res = mockResponse()
+
+    premiumService.getCurrentPremiumSubscription.mockResolvedValue(subscription)
+
+    await premiumController.getMyPremiumSubscription(
+      { user: { id: 'user-1' } },
+      res,
+      vi.fn(),
+    )
+
+    expect(premiumService.getCurrentPremiumSubscription).toHaveBeenCalledWith({
+      userId: 'user-1',
+    })
+    expect(res.status).toHaveBeenCalledWith(StatusCodes.OK)
+    expect(res.json).toHaveBeenCalledWith({ subscription })
   })
 
   it('creates a pending payment for the selected provider', async () => {
@@ -103,5 +131,31 @@ describe('Premium Controller', () => {
       subscription: result.subscription,
       payment: result.payment,
     })
+  })
+
+  it('confirms a pending payment in the dev environment', async () => {
+    const result = {
+      payment: { id: 'payment-1', status: 'SUCCEEDED' },
+      subscription: { id: 'subscription-1', status: 'ACTIVE' },
+    }
+    const res = mockResponse()
+
+    premiumService.simulateSuccessfulPayment.mockResolvedValue(result)
+
+    await premiumController.confirmDevPayment(
+      {
+        params: { paymentId: 'payment-1' },
+        user: { id: 'user-1' },
+      },
+      res,
+      vi.fn(),
+    )
+
+    expect(premiumService.simulateSuccessfulPayment).toHaveBeenCalledWith({
+      paymentId: 'payment-1',
+      userId: 'user-1',
+    })
+    expect(res.status).toHaveBeenCalledWith(StatusCodes.OK)
+    expect(res.json).toHaveBeenCalledWith(result)
   })
 })
