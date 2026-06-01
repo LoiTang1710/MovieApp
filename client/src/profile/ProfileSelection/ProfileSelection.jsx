@@ -1,7 +1,15 @@
-  import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Plus } from 'lucide-react';
 import { useProfiles } from '../../hooks/useProfiles';
 
+/**
+ * Render a centered profile selection UI that lists fetched profiles and provides actions to add or manage profiles.
+ *
+ * When profile data is loading, displays a loading message. Otherwise, renders a grid of profile cards showing each
+ * profile's avatar and name, a card linking to /profiles/add to create a new profile, and a link to /profiles/manage.
+ *
+ * @returns {JSX.Element} The rendered profile selection interface.
+ */
 export default function ProfileSelection() {
   const { data: profiles = [], isLoading } = useProfiles();
 

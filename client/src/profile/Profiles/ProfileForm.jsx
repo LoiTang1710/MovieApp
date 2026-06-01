@@ -5,6 +5,18 @@ import { ArrowLeft, Trash2 } from 'lucide-react';
 import { getProfileApi, createProfileApi, updateProfileApi, deleteProfileApi } from '../../api/profileApi';
 import Footer from '../../components/layouts/Footer';
 
+/**
+ * Render a form for creating, editing, and deleting a user profile.
+ *
+ * When an `id` route param is present the component loads the existing profile
+ * and pre-fills the form fields. The form lets the user edit the profile name
+ * and toggle a kid/adult type, save changes (create or update), and delete the
+ * profile after confirming in a modal. On successful create/update/delete the
+ * component invalidates the cached `userProfiles` query and navigates to
+ * `/profiles`. Load and save errors are displayed in the UI.
+ *
+ * @returns {JSX.Element} The profile form UI.
+ */
 export default function ProfileForm() {
   const { id } = useParams();
   const navigate = useNavigate();
