@@ -7,7 +7,7 @@ Thư mục này chứa cấu hình PostgreSQL chạy local cho dự án MovieApp
 Tạo file môi trường local từ `.env.example`, sau đó khởi động PostgreSQL:
 
 ```powershell
-Copy-Item .env.example .env
+
 docker compose up -d
 ```
 

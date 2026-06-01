@@ -7,6 +7,7 @@ import authRoutes from './auth.route.js'
 import reviewRoutes from './review.route.js'
 import commentRoutes from './comment.route.js'
 import devRoutes from './dev.route.js'
+import profileRoutes from './profile.route.js'
 import collectionsRoutes from './collection.route.js'
 
 
@@ -20,6 +21,7 @@ apiRouter.use('/admin', adminRoutes)
 apiRouter.use('/reviews', reviewRoutes)
 apiRouter.use('/comments', commentRoutes)
 apiRouter.use('/dev', devRoutes)
+apiRouter.use('/profiles', profileRoutes)
 apiRouter.use('/collections',collectionsRoutes)
 
 export default apiRouter

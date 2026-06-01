@@ -13,8 +13,10 @@ import DetailProvider from './providers/DetailProvider'
 import MediaPlayer from './pages/MediaPlayer/MediaPlayer'
 import ScrollToTop from './utils/scrollToTop'
 import PremiumCheckout from './pages/PremiumCheckout/PremiumCheckout'
-import { AuthProvider } from './providers/AuthProvider.jsx'
-
+import { AuthProvider } from './providers/AuthProvider'
+import ProfileSelection from './profile/Profiles/ProfileSelection'
+import ProfileManage from './profile/Profiles/ProfileManage'
+import ProfileForm from './profile/Profiles/ProfileForm'
 
 const RootLayout = () => {
   return (
@@ -82,6 +84,24 @@ const router = createBrowserRouter([
       {
         path: '/forgot-password',
         element: <ForgotPassword />,
+      },
+
+      // === NHÓM 3: PROFILE (KHÔNG CÓ NAVBAR/FOOTER) ===
+      {
+        path: '/profiles',
+        element: <ProfileSelection />,
+      },
+      {
+        path: '/profiles/manage',
+        element: <ProfileManage />,
+      },
+      {
+        path: '/profiles/add',
+        element: <ProfileForm />,
+      },
+      {
+        path: '/profiles/edit/:id',
+        element: <ProfileForm />,
       },
     ],
   },
