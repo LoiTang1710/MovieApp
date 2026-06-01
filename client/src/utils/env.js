@@ -4,7 +4,7 @@
  */
 export function resolveServerUrl() {
   const port = String(import.meta.env.VITE_SERVER_PORT ?? '3000').trim()
-  let url = String(import.meta.env.VITE_SERVER_URL ?? '').trim()
+  let url = `${String(import.meta.env.VITE_SERVER_URL ?? '').trim()}/api`
 
   if (url) {
     url = url.replace(/\$\{VITE_SERVER_PORT\}/g, port)

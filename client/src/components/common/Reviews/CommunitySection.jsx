@@ -46,9 +46,9 @@ const CommunitySection = () => {
 
       <DevAuthBanner />
 
-      <div className="mb-6 flex items-center gap-3 text-sm">
+      <div className="mb-6 mt-6 flex items-center gap-3 text-sm">
         <StarRating value={Math.round(summary?.averageStars || 0)} readonly size={20} />
-        <span>
+        <span className="flex-1">
           <strong className="text-yellow-400">{summary?.averageStars?.toFixed(1) ?? '0.0'}</strong>
           {' '}/ 5 · {summary?.totalRatings ?? 0} đánh giá
           {summary?.userRating != null && (

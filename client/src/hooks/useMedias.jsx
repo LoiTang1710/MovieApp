@@ -8,10 +8,10 @@ export function useMedias() {
     queryFn: async () => {
       const [resPopular, resReleased, resTopRated, resAnime] =
         await Promise.all([
-          mediaClient.get('/api/medias/popular'),
-          mediaClient.get('/api/medias/released'),
-          mediaClient.get('/api/medias/top_rated'),
-          mediaClient.get('/api/medias/anime'),
+          mediaClient.get('/medias/popular'),
+          mediaClient.get('/medias/released'),
+          mediaClient.get('/medias/top_rated'),
+          mediaClient.get('/medias/anime'),
         ])
       const popularResults = Array.isArray(resPopular.data) ? resPopular.data : []
       const released = Array.isArray(resReleased.data) ? resReleased.data : []
@@ -49,7 +49,7 @@ export function useMedias() {
     queryFn: async () => {
       const response = await Promise.all(
         mediaBanner.map((meida) =>
-          mediaClient.get(`/api/medias/trailer/${meida.id}`, {
+          mediaClient.get(`/medias/trailer/${meida.id}`, {
             params: { type: meida.type },
           }),
         ),
@@ -77,14 +77,15 @@ export function useMedias() {
       })
       return trailersMap
     },
-    staleTime: 60 * 1000,
+    enabled: mediaBanner.length > 0,
+    // staleTime: 60 * 1000,
   })
   const MediaLogosQuery = useQuery({
     queryKey: ['medias', 'logos', mediaBanner.map((m) => m.id)],
     queryFn: async () => {
       const response = await Promise.all(
         mediaBanner.map((media) =>
-          mediaClient.get(`/api/medias/images/${media.id}`, {
+          mediaClient.get(`/medias/images/${media.id}`, {
             params: { type: media.type },
           }),
         ),
@@ -100,6 +101,7 @@ export function useMedias() {
       })
       return logosMap
     },
+    enabled: mediaBanner.length > 0
   })
   return {
     mediasCollection: MediasCollectionQuery.data || {},

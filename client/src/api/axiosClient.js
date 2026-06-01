@@ -6,35 +6,25 @@ const API_BASE = resolveServerUrl()
 
 export const authClient = axios.create({
   baseURL: API_BASE,
+  withCredentials: true, // Quan trọng: Cho phép gửi/nhận Cookie session
   headers: {
     'Content-Type': 'application/json',
   },
-})
-
-authClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token')
-
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
-  }
-
-  return config
 })
 
 authClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('token')
-      window.dispatchEvent(new Event('auth:logout'))
+      // Session hết hạn hoặc người dùng chưa đăng nhập
+      console.warn('Session expired or Unauthorized. Redirecting to login...')
+      // Bạn có thể thêm logic xóa dữ liệu user trong Global State hoặc redirect tại đây
+      // window.location.href = '/login';
     }
     return Promise.reject(error)
   },
 )
 
-export const mediaClient = axios.create({
-  baseURL: API_BASE,
-  headers: {
-    Accept: 'application/json',
-  },
-})
+/** Xuất thêm mediaClient để sử dụng trong các hooks như useMedias */
+export const mediaClient = authClient
+export const apiClient = authClient
