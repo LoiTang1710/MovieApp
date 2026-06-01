@@ -2,56 +2,61 @@ import { Heart, X, ListPlus, Loader2 } from 'lucide-react'
 import { useLocation } from 'react-router-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-toastify'
+import { useState, useMemo } from 'react'
 import {
   toggleFavoriteApi,
   fetchCollectionsApi,
 } from '../../../../api/collection.api.js'
-import { useState } from 'react'
 
-const FavouriteButton = ({ movie, isLovedInitial }) => {
+const FavouriteButton = ({ movie }) => {
   const location = useLocation()
   const isHome = location.pathname === '/'
   const queryClient = useQueryClient()
-
-  const [isLoved, setIsLoved] = useState(() => isLovedInitial)
   const [isModalOpen, setIsModalOpen] = useState(false)
 
+  // 1. Dùng TanStack Query quản lý danh sách bộ sưu tập (Lúc nào cũng fetch ngầm)
   const { data: collections = [], isLoading: isLoadingCollections } = useQuery({
     queryKey: ['collections'],
     queryFn: fetchCollectionsApi,
-    enabled: isModalOpen,
   })
+
+  // 2. TẬN DỤNG TANSTACK QUERY ĐỂ GIẢI QUYẾT RE-RENDER:
+  // Dùng useMemo để tính toán trực tiếp từ dữ liệu Collections của cache server
+  const isLoved = useMemo(() => {
+    if (!collections || collections.length === 0) return false
+    // Duyệt qua toàn bộ bộ sưu tập, nếu có bất kỳ item nào trùng mediaId với phim này -> Tim đỏ
+    return collections.some((col) =>
+      col.items?.some((item) => Number(item.mediaId) === Number(movie.id)),
+    )
+  }, [collections, movie.id])
+  console.log("isLoved: ", isLoved)
 
   const { mutate: saveToCollection, isPending } = useMutation({
     mutationFn: (collectionId) =>
       toggleFavoriteApi(movie.id, {
         title: movie.title || movie.name,
-        posterPath: movie.poster_path || movie.poster,
+        posterPath: movie.poster_path || movie.poster || movie.posterPath,
         rating: movie.vote_average || movie.rating,
         releasedDate: movie.release_date ? String(movie.release_date) : null,
         mediaType: movie.media_type || 'movie',
-        collectionId: collectionId, // Nếu ở Trang chủ, biến này là undefined -> Backend tự gán vào "Phim Yêu Thích"
+        collectionId: collectionId,
       }),
     onSuccess: (data) => {
-      // Lấy trạng thái mới nhất từ server trả về
-      console.log('data: ', data)
-      setIsLoved(!!data.isAdded)
       setIsModalOpen(false)
+      console.log("data: ", data)
+      // Đập tan dữ liệu cũ, ép TanStack Query fetch lại danh sách collections mới ngay lập tức
+      queryClient.invalidateQueries({ queryKey: ['collections'] })
+      queryClient.invalidateQueries({ queryKey: ['media', 'detail'] })
 
       if (data.isAdded) {
         toast.success(`Đã thêm vào danh sách! 🍿`)
       } else {
         toast.info(`Đã bỏ khỏi danh sách.`)
       }
-
-      // Quan trọng: Đảm bảo dữ liệu bộ sưu tập được làm mới ngay lập tức
-      queryClient.invalidateQueries({ queryKey: ['collections'] })
-      queryClient.invalidateQueries({ queryKey: ['medias'] }) // Nếu có query này
-      queryClient.invalidateQueries({ queryKey: ['favorites'] })
     },
     onError: () => {
       toast.error('Lỗi khi thao tác, vui lòng thử lại!')
-      setIsModalOpen(false) // Lỗi cũng phải đóng Modal để user không bị kẹt
+      setIsModalOpen(false)
     },
   })
 
@@ -60,13 +65,12 @@ const FavouriteButton = ({ movie, isLovedInitial }) => {
     e.stopPropagation()
 
     if (isHome) {
-      // ✅ NẾU LÀ TRANG CHỦ: Lưu thẳng, không hỏi nhiều
       saveToCollection()
     } else {
-      // ✅ NẾU LÀ TRANG KHÁC: Mở Modal chọn bộ sưu tập
       setIsModalOpen(true)
     }
   }
+
   return (
     <>
       <div className="icon-block">
@@ -78,13 +82,16 @@ const FavouriteButton = ({ movie, isLovedInitial }) => {
         >
           <Heart
             className={`${
-              isLoved === true ? 'fill-primary text-primary' : 'text-white'
-            } hidden lg:block cursor-pointer transition-transform hover:scale-110 ${isPending && isHome ? 'opacity-50 animate-pulse' : ''}`}
+              isLoved ? 'fill-red-600 text-red-600' : 'text-white'
+            } hidden lg:block cursor-pointer transition-transform hover:scale-110 ${
+              isPending && isHome ? 'opacity-50 animate-pulse' : ''
+            }`}
           />
         </button>
         {!isHome && <p className="action-subtitle">Yêu thích</p>}
       </div>
 
+      {/* ── Phần Modal giữ nguyên như cũ của bạn bên dưới ── */}
       {isModalOpen && (
         <div className="fixed inset-0 z-90 flex items-center justify-center p-4">
           <div
@@ -132,7 +139,7 @@ const FavouriteButton = ({ movie, isLovedInitial }) => {
                       disabled={isPending}
                       onClick={(e) => {
                         e.preventDefault()
-                        e.stopPropagation() // Cực kỳ quan trọng để Modal không bị kẹt khi nhúng trong Link
+                        e.stopPropagation()
                         saveToCollection(col.id)
                       }}
                       className="flex items-center justify-between w-full text-left px-4 py-3 rounded-xl hover:bg-white/10 text-gray-200 hover:text-white transition-colors disabled:opacity-50"

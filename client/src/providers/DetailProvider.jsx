@@ -9,7 +9,7 @@ import MediaDetailSkeleton from '../pages/MediaDetails/MediaDetailSkeleton'
 const DetailProvider = ({ children }) => {
   // const [activeTab, setActiveTab] = useState()
   const location = useLocation()
-  const { mediaId, type } = location.state || {}
+  const { mediaId, type, isPremium } = location.state || {}
   const {
     data: mediaDetail,
     isLoading,
@@ -57,12 +57,14 @@ const DetailProvider = ({ children }) => {
       value={{
         mediaId,
         type,
+        isPremium,
         casts: mediaDetail.credits?.cast || [],
         genres: mediaDetail.genres || [],
         backdrop_path: mediaDetail.backdrop_path,
         name: mediaDetail.name || mediaDetail.title,
         vote_average: mediaDetail.vote_average,
         overview: mediaDetail.overview,
+        release_date: mediaDetail.release_date || mediaDetail.first_air_date,
         run_time:
           mediaDetail?.runtime || mediaDetail?.episode_run_time?.[0] || [],
         country: mediaDetail.origin_country,
