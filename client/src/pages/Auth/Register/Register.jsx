@@ -2,13 +2,17 @@ import { useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
 import AuthLayout from '../../../components/layouts/AuthLayout'
-import { register, sendVerificationCode } from '../../../services/auth.service' // Đảm bảo đường dẫn này đúng
+
+import { registerApi, sendVerificationCodeApi } from '../../../api/auth.api'
+import { useAuth } from '../../../hooks/useAuth.jsx'
 
 export default function Register() {
   const navigate = useNavigate()
+  const { login } = useAuth()
   const [error, setError] = useState('')
   const [codeSent, setCodeSent] = useState(false)
   const [success, setSuccess] = useState('')
+  const [email, setEmail] = useState('')
 
   const formData = useRef({
     fullName: '',
@@ -21,13 +25,18 @@ export default function Register() {
   // Mutation gọi API đăng ký thực tế
   const registerMutation = useMutation({
     mutationFn: (data) =>
-      register({
+      registerApi({
         fullName: data.fullName,
         email: data.email,
         password: data.password,
         code: data.code,
       }),
-    onSuccess: () => {
+    onSuccess: (response) => {
+      //  Tự động đăng nhập sau khi đăng ký
+      // registerApi returns the user object directly
+      const userData = response;
+      login(userData);
+      
       setSuccess('Đăng ký tài khoản thành công! Đang chuyển hướng...')
       setTimeout(() => navigate('/'), 2000)
     },
@@ -38,19 +47,25 @@ export default function Register() {
 
   // Mutation gọi API gửi OTP
   const sendCodeMutation = useMutation({
-    mutationFn: (email) => sendVerificationCode({ email, type: 'REGISTER' }),
-    onSuccess: () => {
+    mutationFn: (email) => sendVerificationCodeApi({ email, type: 'REGISTER' }),
+    onSuccess: (response) => {
+      console.log('Send code success:', response)
       setCodeSent(true)
       setError('')
     },
     onError: (err) => {
-      setError(err.response?.data?.message || 'Gửi mã thất bại. Vui lòng thử lại.')
+      console.error('Send code error:', err)
+      const errorMessage = err.response?.data?.message || err.message || 'Gửi mã thất bại. Vui lòng thử lại.'
+      setError(errorMessage)
     },
   })
 
   const handleChange = (e) => {
     const { name, value } = e.target
     formData.current[name] = value
+    if (name === 'email') {
+      setEmail(value)
+    }
     if (error) setError('')
   }
 
@@ -106,9 +121,9 @@ export default function Register() {
             <input
               type="text"
               name="fullName"
-              placeholder="Họ và tên"
+              placeholder="Username"
               required
-              aria-label="Họ và tên"
+              aria-label="Username"
               className="w-full bg-[#0f0f0f] text-sm text-gray-200 px-5 py-4 rounded-md outline-none border border-white/15 focus:border-white/30 transition-all placeholder:text-gray-500"
               onChange={handleChange}
             />
@@ -154,8 +169,8 @@ export default function Register() {
               <button
                 type="button"
                 onClick={handleSendCode}
-                disabled={sendCodeMutation.isPending}
-                className="shrink-0 text-xs text-red-500 hover:text-red-400 font-bold transition-all cursor-pointer underline underline-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={sendCodeMutation.isPending || !email}
+                className="shrink-0 text-xs text-red-500 hover:text-red-400 font-bold transition-all cursor-pointer underline underline-offset-2 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
               >
                 {sendCodeMutation.isPending ? 'Đang gửi...' : 'Gửi mã'}
               </button>

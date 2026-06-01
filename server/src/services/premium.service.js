@@ -10,7 +10,11 @@ export const getActivePremiumPlans = async () => {
   return plans.map(serializePlan)
 }
 
-export const createPendingSubscription = async ({ planId, userId }) => {
+export const createPendingSubscription = async ({
+  planId,
+  userId,
+  paymentProvider,
+}) => {
   const plan = await prisma.premiumPlan.findFirst({
     where: {
       id: planId,
@@ -22,38 +26,60 @@ export const createPendingSubscription = async ({ planId, userId }) => {
     return null
   }
 
-  const pendingSubscription = await prisma.subscription.findFirst({
-    where: {
-      planId: plan.id,
-      userId,
-      status: 'PENDING',
-    },
-    include: {
-      plan: true,
-    },
-  })
+  return prisma.$transaction(async (tx) => {
+    let subscription = await tx.subscription.findFirst({
+      where: {
+        planId: plan.id,
+        userId,
+        status: 'PENDING',
+      },
+      include: {
+        plan: true,
+      },
+    })
+    let subscriptionCreated = false
 
-  if (pendingSubscription) {
-    return {
-      created: false,
-      subscription: serializeSubscription(pendingSubscription),
+    if (!subscription) {
+      subscription = await tx.subscription.create({
+        data: {
+          planId: plan.id,
+          userId,
+        },
+        include: {
+          plan: true,
+        },
+      })
+      subscriptionCreated = true
     }
-  }
 
-  const subscription = await prisma.subscription.create({
-    data: {
-      planId: plan.id,
-      userId,
-    },
-    include: {
-      plan: true,
-    },
+    let payment = await tx.payment.findFirst({
+      where: {
+        subscriptionId: subscription.id,
+        provider: paymentProvider,
+        status: 'PENDING',
+      },
+    })
+    let paymentCreated = false
+
+    if (!payment) {
+      payment = await tx.payment.create({
+        data: {
+          userId,
+          subscriptionId: subscription.id,
+          provider: paymentProvider,
+          amount: plan.price,
+          currency: plan.currency,
+        },
+      })
+      paymentCreated = true
+    }
+
+    return {
+      created: subscriptionCreated || paymentCreated,
+      subscription: serializeSubscription(subscription),
+      payment: serializePayment(payment),
+    }
   })
-
-  return {
-    created: true,
-    subscription: serializeSubscription(subscription),
-  }
 }
 
 const serializePlan = (plan) => ({
@@ -64,4 +90,9 @@ const serializePlan = (plan) => ({
 const serializeSubscription = (subscription) => ({
   ...subscription,
   plan: serializePlan(subscription.plan),
+})
+
+const serializePayment = (payment) => ({
+  ...payment,
+  amount: Number(payment.amount),
 })

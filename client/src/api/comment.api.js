@@ -1,13 +1,13 @@
 import { authClient } from './axiosClient'
 
 export const listComments = (params) =>
-  authClient.get('/api/comments', { params })
+  authClient.get('/comments', { params })
 
 export const createComment = (body) =>
-  authClient.post('/api/comments', body)
+  authClient.post('/comments', body)
 
 export const createReply = (parentId, content) =>
-  authClient.post(`/api/comments/${parentId}/replies`, { content })
+  authClient.post(`/comments/${parentId}/replies`, { content })
 
 export const toggleCommentLike = (commentId) =>
-  authClient.post(`/api/comments/${commentId}/like`)
+  authClient.post(`/comments/${commentId}/like`)

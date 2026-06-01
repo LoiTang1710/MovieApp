@@ -32,7 +32,7 @@ export default function Sidebar({
                 <p
                   className={`text-sm font-semibold ${isActive ? 'text-white' : 'text-gray-300'}`}
                 >
-                  {col.displayName}
+                  {col.collectionName}
                 </p>
                 <p
                   className={`text-[11px] ${isActive ? 'text-red-200' : 'text-gray-600'}`}
@@ -44,7 +44,7 @@ export default function Sidebar({
 
             {!col.isDefault && (
               <button
-                type='button'
+                type="button"
                 onClick={(e) => {
                   e.stopPropagation()
                   onDeleteCollection(col)
@@ -60,13 +60,16 @@ export default function Sidebar({
 
       <div className="mt-auto pt-8 flex flex-col gap-2">
         <button
-        type='button'
+          type="button"
           onClick={onOpenCreate}
           className="mt-2 flex items-center justify-center gap-2 border border-white/10 hover:text-primary hover:border-primary/10 text-white text-sm font-bold py-2.5 rounded transition-colors cursor-pointer"
         >
           <Plus size={15} /> Tạo Danh Sách Mới
         </button>
-        <button type='button' className="flex items-center justify-center gap-2 bg-primary hover:bg-primary/80 text-white text-sm font-bold py-2.5 rounded transition-colors cursor-pointer">
+        <button
+          type="button"
+          className="flex items-center justify-center gap-2 bg-primary hover:bg-primary/80 text-white text-sm font-bold py-2.5 rounded transition-colors cursor-pointer"
+        >
           <Zap size={14} /> Nâng Cấp Lên PRO
         </button>
       </div>

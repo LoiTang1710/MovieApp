@@ -5,7 +5,7 @@ export function usePremiumPlans() {
   return useQuery({
     queryKey: ['premium', 'plans'],
     queryFn: async () => {
-      const response = await mediaClient.get('/api/premium/plans')
+      const response = await mediaClient.get('/premium/plans')
       return response.data
     },
     staleTime: 60 * 1000,
@@ -14,11 +14,10 @@ export function usePremiumPlans() {
 
 export function useCreateSubscription() {
   return useMutation({
-    mutationFn: async (planId) => {
+    mutationFn: async ({ planId, paymentProvider }) => {
       const response = await authClient.post(
-        '/api/premium/subscriptions',
-        { planId },
-        { withCredentials: false },
+        '/premium/subscriptions',
+        { planId, paymentProvider },
       )
       return response.data
     },

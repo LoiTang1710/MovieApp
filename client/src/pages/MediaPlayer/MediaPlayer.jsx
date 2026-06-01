@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 import Episodes from '../../components/common/Movies/MediaInfo/Seasons/Episodes/Episodes'
 import Seasons from '../../components/common/Movies/MediaInfo/Seasons/Seasons'
 
-import FavouriteButton from '../../components/common/ActionButton/FavouriteButton/FavouriteButton'
+// import FavouriteButton from '../../components/common/ActionButton/FavouriteButton/FavouriteButton'
 import SendButton from '../../components/common/ActionButton/SendButton/SendButton'
 import CommentButton from '../../components/common/ActionButton/CommentButton/CommentButton'
 import IMDbScore from '../../components/common/Movies/MediaInfo/IMDbScore/IMDbScore'
@@ -37,10 +37,10 @@ const MediaPlayer = () => {
       behavior: 'smooth', 
     })
   }, [season, episode])
-  const embeddedURL =
-    type === 'movie'
-      ? `https://vidsrc.me/embed/movie/${mediaId}`
-      : `https://vidsrc.me/embed/tv/${mediaId}/${season}/${episode}`
+  // const embeddedURL =
+  //   type === 'movie'
+  //     ? `https://vidsrc.me/embed/movie/${mediaId}`
+  //     : `https://vidsrc.me/embed/tv/${mediaId}/${season}/${episode}`
 
   return (
     <div className="p-10 flex flex-col gap-4">
@@ -89,7 +89,7 @@ const MediaPlayer = () => {
           </div>
           <div className="flex gap-4">
             {/* <ActionButton/> */}
-            <FavouriteButton />
+            {/* <FavouriteButton /> */}
             <SendButton />
             <CommentButton />
           </div>

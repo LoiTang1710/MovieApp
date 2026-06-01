@@ -2,7 +2,7 @@ import AppBar from '../common/AppBar/AppBar'
 
 const Header = () => {
   return (
-    <div>
+    <div className='relative z-10'>
       <AppBar/>
     </div>
   )

@@ -5,7 +5,7 @@ export function useMediaDetails(mediaId, type) {
   return useQuery({
     queryKey: ['media', 'detail', type, mediaId],
     queryFn: async () => {
-      const res = await mediaClient.get(`/api/medias/detail/${mediaId}`, {
+      const res = await mediaClient.get(`/medias/detail/${mediaId}`, {
         params: {
           type,
         },
