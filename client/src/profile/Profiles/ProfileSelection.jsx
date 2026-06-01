@@ -4,6 +4,15 @@ import { Plus, User } from 'lucide-react';
 import { getProfilesApi } from '../../api/profileApi';
 import Footer from '../../components/layouts/Footer';
 
+/**
+ * Render the profile selection page and its loading/error states.
+ *
+ * Fetches the current user's profiles and displays a selection UI: a loading screen while fetching,
+ * an error screen when the query fails (showing the error message), an empty-state message when
+ * there are no profiles, or a grid of profile tiles (with a "Trẻ em" badge for kid profiles) plus
+ * controls to add or manage profiles.
+ * @returns {JSX.Element} The profile selection React element.
+ */
 export default function ProfileSelection() {
   const { data: profiles = [], isLoading, isError, error } = useQuery({
     queryKey: ['userProfiles'],

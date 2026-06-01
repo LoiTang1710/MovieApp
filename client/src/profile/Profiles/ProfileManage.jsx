@@ -5,6 +5,12 @@ import { Pencil, Trash2, ArrowLeft, User } from 'lucide-react';
 import { getProfilesApi, deleteProfileApi } from '../../api/profileApi';
 import Footer from '../../components/layouts/Footer';
 
+/**
+ * Render the profile management interface for viewing, editing, and deleting user profiles.
+ *
+ * Shows a loading screen while profiles load, an error screen if fetching fails, an empty-state with a link to add a profile when none exist, and a list of profiles with edit and delete actions. Deleting a profile opens a confirmation modal; deletion errors are displayed as an alert.
+ * @returns {JSX.Element} The profile management page UI.
+ */
 export default function ProfileManage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
