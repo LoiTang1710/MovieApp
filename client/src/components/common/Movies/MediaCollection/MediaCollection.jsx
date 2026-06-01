@@ -10,7 +10,6 @@ const MediaCollection = () => {
     mediasTopRated,
     mediasAnime,
   } = useHome()
-  
   const collections = [
     {
       id: 1,

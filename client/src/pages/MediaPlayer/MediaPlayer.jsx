@@ -1,4 +1,4 @@
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { useEffect } from 'react'
 
 import Episodes from '../../components/common/Movies/MediaInfo/Seasons/Episodes/Episodes'
@@ -14,42 +14,10 @@ import Title from '../../components/common/Movies/MediaInfo/Title/Title'
 import Poster from '../../components/common/Movies/MediaInfo/Poster/Poster'
 import Casts from '../../components/common/Movies/MediaInfo/Casts/Casts'
 import { createSlug } from '../../utils/formatters'
-import { useAuth } from '../../hooks/useAuth'
-
-const LoginRequiredOverlay = ({ onLogin }) => (
-  <div className="w-full h-full rounded-lg border border-white/10 bg-black/80 flex flex-col items-center justify-center text-center p-6 gap-4">
-    <h2 className="text-2xl font-bold text-white">Yêu cầu đăng nhập</h2>
-    <p className="text-white/70">Bạn cần đăng nhập để xem nội dung phim mới phát hành.</p>
-    <button
-      onClick={onLogin}
-      className="bg-primary text-white font-bold py-2 px-6 rounded-lg hover:bg-primary/80 transition"
-    >
-      Đăng nhập ngay
-    </button>
-  </div>
-)
-
-const PremiumRequiredOverlay = ({ onUpgrade }) => (
-  <div className="w-full h-full rounded-lg border border-white/10 bg-gradient-to-br from-yellow-900 to-black flex flex-col items-center justify-center text-center p-6 gap-4 relative overflow-hidden">
-    <div className="absolute inset-0 bg-black/40 backdrop-blur-sm z-0"></div>
-    <div className="z-10 flex flex-col items-center justify-center gap-4">
-      <h2 className="text-3xl font-bold text-yellow-500">Nội Dung Premium</h2>
-      <p className="text-white/80 max-w-md">Phim mới phát hành hiện đang nằm trong danh mục Premium. Vui lòng nâng cấp gói thành viên của bạn để tiếp tục xem.</p>
-      <button
-        className="bg-yellow-500 text-black font-bold py-3 px-8 rounded-full hover:scale-105 transition shadow-[0_0_15px_rgba(234,179,8,0.5)]"
-        onClick={onUpgrade}
-      >
-        Nâng cấp Premium
-      </button>
-    </div>
-  </div>
-)
+import PremiumContentGate from '../../components/common/PremiumContentGate/PremiumContentGate'
 
 const MediaPlayer = () => {
   const location = useLocation()
-  const navigate = useNavigate()
-  const { isAuthenticated } = useAuth()
-
   const {
     type,
     mediaId,
@@ -107,6 +75,7 @@ const MediaPlayer = () => {
             poster_path,
             vote_average,
             overview,
+            isPremium,
             season: 1,
             episode: 1,
           }}
@@ -120,18 +89,14 @@ const MediaPlayer = () => {
 
       {/* Player Section */}
       <div className="h-150">
-        {isPremium && !isAuthenticated ? (
-          <LoginRequiredOverlay onLogin={() => navigate('/login')} />
-        ) : isPremium && isAuthenticated ? (
-          <PremiumRequiredOverlay onUpgrade={() => navigate('/premium')} />
-        ) : (
+        <PremiumContentGate required={isPremium}>
           <iframe
             src={embeddedURL}
             key={`${season}-${episode}`}
             frameBorder="0"
             className="w-full h-full rounded-lg border border-white/10"
           ></iframe>
-        )}
+        </PremiumContentGate>
       </div>
 
       {/* Media Info */}
