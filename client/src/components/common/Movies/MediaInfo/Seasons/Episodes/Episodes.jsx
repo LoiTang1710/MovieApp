@@ -17,6 +17,7 @@ const EpisodeList = () => {
     vote_average,
     genres,
     overview,
+    isPremium,
   } = useDetail()
 
   const location = useLocation()
@@ -90,6 +91,7 @@ const EpisodeList = () => {
                 vote_average,
                 genres,
                 overview,
+                isPremium,
               }}
               className={`p-4 rounded cursor-pointer border border-white/5 flex gap-4 items-center group transition-colors ease-in-out duration-300 ${isActive ? 'bg-primary hover:bg-primary/90 shadow-[0_0_15px_rgba(255,0,0,0.5)]' : 'bg-white/5 hover:bg-white/10 '}`}
             >

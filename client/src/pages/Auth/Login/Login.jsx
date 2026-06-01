@@ -34,7 +34,13 @@ const LoginPage = () => {
       login(userData);
       
       setSuccessMsg('Đăng nhập thành công! Đang chuyển hướng...');
-      setTimeout(() => navigate(location.state?.from || '/'), 1500);
+      setTimeout(
+        () =>
+          navigate(location.state?.from || '/', {
+            state: location.state?.fromState,
+          }),
+        1500,
+      );
     },
     onError: (error) => {
       const message = error.response?.data?.message || 'Có lỗi xảy ra, vui lòng thử lại.';

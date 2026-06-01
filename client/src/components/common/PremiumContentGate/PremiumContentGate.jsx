@@ -1,17 +1,22 @@
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { Crown, Loader2, LockKeyhole } from 'lucide-react'
 
 import { useAuth } from '../../../hooks/useAuth.jsx'
 import { useMyPremiumSubscription } from '../../../hooks/usePremium.jsx'
 
-const PremiumContentGate = ({ children }) => {
+const PremiumContentGate = ({ children, required = false }) => {
+  const location = useLocation()
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth()
   const {
     data: premiumSubscription,
     isLoading: isPremiumLoading,
   } = useMyPremiumSubscription({
-    enabled: isAuthenticated,
+    enabled: required && isAuthenticated,
   })
+
+  if (!required) {
+    return children
+  }
 
   if (isAuthLoading || (isAuthenticated && isPremiumLoading)) {
     return (
@@ -25,7 +30,7 @@ const PremiumContentGate = ({ children }) => {
     return (
       <AccessMessage
         actionLabel="Đăng nhập để tiếp tục"
-        actionState={{ from: '/premium' }}
+        actionState={{ from: location.pathname, fromState: location.state }}
         actionTo="/login"
         description="Bạn cần đăng nhập và có gói Premium đang hoạt động để xem nội dung này."
         icon={LockKeyhole}

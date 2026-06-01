@@ -17,7 +17,6 @@ import { AuthProvider } from './providers/AuthProvider'
 import ProfileSelection from './profile/Profiles/ProfileSelection'
 import ProfileManage from './profile/Profiles/ProfileManage'
 import ProfileForm from './profile/Profiles/ProfileForm'
-import PremiumContentGate from './components/common/PremiumContentGate/PremiumContentGate'
 
 const RootLayout = () => {
   return (
@@ -58,9 +57,7 @@ const router = createBrowserRouter([
             path: '/video/:slug',
             element: (
               <DetailProvider>
-                <PremiumContentGate>
-                  <MediaPlayer />
-                </PremiumContentGate>
+                <MediaPlayer />
               </DetailProvider>
             ),
           },
