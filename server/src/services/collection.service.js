@@ -8,6 +8,7 @@ export const getUserCollections = async (userId) => {
     where: { userId },
     include: {
       _count: { select: { items: true } },
+      items: { select: { mediaId: true } },
     },
     orderBy: {
       isDefault: 'desc',
@@ -19,6 +20,7 @@ export const getUserCollections = async (userId) => {
     iconKey: col.iconKey,
     isDefault: col.isDefault,
     count: col._count.items,
+    items: col.items,
   }))
 }
 
@@ -137,7 +139,9 @@ export const toggleFavouriteMovie = async (userId, movieId, movieData) => {
         title: title || 'Unknown',
         posterPath: posterPath || '',
         rating: Number(rating) || 0,
-        releasedDate: releasedDate || null,
+        releasedDate: releasedDate
+          ? String(releasedDate)
+          : null,
         mediaType: mediaType || 'movie',
       },
     })
