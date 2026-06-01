@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 
 import { loginApi, logoutApi } from '../../../api/auth.api';
@@ -9,6 +9,7 @@ import { useAuth } from '../../../hooks/useAuth.jsx';
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { login } = useAuth();
   
   const [formData, setFormData] = useState({ email: '', password: '' });
@@ -33,7 +34,7 @@ const LoginPage = () => {
       login(userData);
       
       setSuccessMsg('Đăng nhập thành công! Đang chuyển hướng...');
-      setTimeout(() => navigate('/'), 1500);
+      setTimeout(() => navigate(location.state?.from || '/'), 1500);
     },
     onError: (error) => {
       const message = error.response?.data?.message || 'Có lỗi xảy ra, vui lòng thử lại.';

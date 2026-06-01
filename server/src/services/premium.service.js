@@ -10,6 +10,26 @@ export const getActivePremiumPlans = async () => {
   return plans.map(serializePlan)
 }
 
+export const getCurrentPremiumSubscription = async ({ userId }) => {
+  const subscription = await prisma.subscription.findFirst({
+    where: {
+      userId,
+      status: 'ACTIVE',
+      endAt: {
+        gt: new Date(),
+      },
+    },
+    include: {
+      plan: true,
+    },
+    orderBy: {
+      endAt: 'desc',
+    },
+  })
+
+  return subscription ? serializeSubscription(subscription) : null
+}
+
 export const createPendingSubscription = async ({
   planId,
   userId,
@@ -81,6 +101,73 @@ export const createPendingSubscription = async ({
     }
   })
 }
+
+export const simulateSuccessfulPayment = async ({ paymentId, userId }) =>
+  prisma.$transaction(async (tx) => {
+    const payment = await tx.payment.findFirst({
+      where: {
+        id: paymentId,
+        userId,
+      },
+      include: {
+        subscription: {
+          include: {
+            plan: true,
+          },
+        },
+      },
+    })
+
+    if (!payment?.subscription) {
+      return null
+    }
+
+    if (payment.status === 'SUCCEEDED') {
+      return {
+        payment: serializePayment(payment),
+        subscription: serializeSubscription(payment.subscription),
+      }
+    }
+
+    if (payment.status !== 'PENDING') {
+      return {
+        invalidStatus: true,
+        payment: serializePayment(payment),
+        subscription: serializeSubscription(payment.subscription),
+      }
+    }
+
+    const paidAt = new Date()
+    const endAt = new Date(paidAt)
+    endAt.setDate(endAt.getDate() + payment.subscription.plan.durationDays)
+
+    const [updatedPayment, updatedSubscription] = await Promise.all([
+      tx.payment.update({
+        where: { id: payment.id },
+        data: {
+          status: 'SUCCEEDED',
+          paidAt,
+          providerTransactionId: `DEV-${payment.id}`,
+        },
+      }),
+      tx.subscription.update({
+        where: { id: payment.subscription.id },
+        data: {
+          status: 'ACTIVE',
+          startAt: paidAt,
+          endAt,
+        },
+        include: {
+          plan: true,
+        },
+      }),
+    ])
+
+    return {
+      payment: serializePayment(updatedPayment),
+      subscription: serializeSubscription(updatedSubscription),
+    }
+  })
 
 const serializePlan = (plan) => ({
   ...plan,

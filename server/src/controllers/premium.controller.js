@@ -2,12 +2,22 @@ import { StatusCodes } from 'http-status-codes'
 import {
   createPendingSubscription,
   getActivePremiumPlans,
+  getCurrentPremiumSubscription,
+  simulateSuccessfulPayment,
 } from '../services/premium.service.js'
+import { env } from '../config/environment.config.js'
 import { catchAsync } from '../utils/catchAsync.js'
 
 export const getPremiumPlans = catchAsync(async (req, res) => {
   const plans = await getActivePremiumPlans()
   res.status(StatusCodes.OK).json(plans)
+})
+
+export const getMyPremiumSubscription = catchAsync(async (req, res) => {
+  const userId = req.user?.id || req.user?.sub
+  const subscription = await getCurrentPremiumSubscription({ userId })
+
+  res.status(StatusCodes.OK).json({ subscription })
 })
 
 export const createSubscription = catchAsync(async (req, res) => {
@@ -49,4 +59,32 @@ export const createSubscription = catchAsync(async (req, res) => {
     subscription: result.subscription,
     payment: result.payment,
   })
+})
+
+export const confirmDevPayment = catchAsync(async (req, res) => {
+  if (env.ALLOW_DEV_AUTH !== 'true') {
+    return res.status(StatusCodes.FORBIDDEN).json({
+      message: 'Mo phong thanh toan chi duoc bat trong moi truong dev.',
+    })
+  }
+
+  const userId = req.user?.id || req.user?.sub
+  const result = await simulateSuccessfulPayment({
+    paymentId: req.params.paymentId,
+    userId,
+  })
+
+  if (!result) {
+    return res.status(StatusCodes.NOT_FOUND).json({
+      message: 'Khong tim thay giao dich thanh toan.',
+    })
+  }
+
+  if (result.invalidStatus) {
+    return res.status(StatusCodes.CONFLICT).json({
+      message: 'Chi co the xac nhan giao dich dang cho xu ly.',
+    })
+  }
+
+  res.status(StatusCodes.OK).json(result)
 })

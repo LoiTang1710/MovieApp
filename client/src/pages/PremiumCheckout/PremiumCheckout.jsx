@@ -3,6 +3,7 @@ import { Check, QrCode, ShieldCheck, Smartphone, WalletCards } from 'lucide-reac
 import { useNavigate } from 'react-router-dom'
 
 import {
+  useConfirmDevPayment,
   useCreateSubscription,
   usePremiumPlans,
 } from '../../hooks/usePremium'
@@ -31,6 +32,7 @@ export default function PremiumCheckout() {
   const { isAuthenticated } = useAuth()
   const { data: plans = [], isLoading, isError } = usePremiumPlans()
   const subscriptionMutation = useCreateSubscription()
+  const confirmPaymentMutation = useConfirmDevPayment()
   const [selectedPlanId, setSelectedPlanId] = useState(null)
   const [paymentMethod, setPaymentMethod] = useState('momo')
 
@@ -97,6 +99,7 @@ export default function PremiumCheckout() {
                     onClick={() => {
                       setSelectedPlanId(plan.id)
                       subscriptionMutation.reset()
+                      confirmPaymentMutation.reset()
                     }}
                     type="button"
                   >
@@ -148,6 +151,7 @@ export default function PremiumCheckout() {
                     onClick={() => {
                       setPaymentMethod(id)
                       subscriptionMutation.reset()
+                      confirmPaymentMutation.reset()
                     }}
                     type="button"
                   >
@@ -199,11 +203,39 @@ export default function PremiumCheckout() {
                 </button>
 
                 {subscriptionMutation.isSuccess && (
-                  <p className="mt-4 text-center text-sm text-green-400">
-                    Đã tạo thanh toán{' '}
-                    {subscriptionMutation.data.payment.provider} trị giá{' '}
-                    {formatPrice(subscriptionMutation.data.payment.amount)}đ.
-                    Giao dịch đang chờ xử lý.
+                  <>
+                    <p className="mt-4 text-center text-sm text-green-400">
+                      Đã tạo thanh toán{' '}
+                      {subscriptionMutation.data.payment.provider} trị giá{' '}
+                      {formatPrice(subscriptionMutation.data.payment.amount)}đ.
+                      Giao dịch đang chờ xử lý.
+                    </p>
+                    {!confirmPaymentMutation.isSuccess && (
+                      <button
+                        className="mt-4 w-full rounded-md border border-amber-400/40 bg-amber-400/10 py-3 text-sm font-semibold text-amber-200 transition hover:bg-amber-400/20 disabled:cursor-not-allowed disabled:opacity-60"
+                        disabled={confirmPaymentMutation.isPending}
+                        onClick={() =>
+                          confirmPaymentMutation.mutate(
+                            subscriptionMutation.data.payment.id,
+                          )
+                        }
+                        type="button"
+                      >
+                        {confirmPaymentMutation.isPending
+                          ? 'ĐANG XÁC NHẬN...'
+                          : 'DEV: MÔ PHỎNG THANH TOÁN THÀNH CÔNG'}
+                      </button>
+                    )}
+                  </>
+                )}
+                {confirmPaymentMutation.isSuccess && (
+                  <p className="mt-4 text-center text-sm font-semibold text-green-400">
+                    Thanh toán thành công. Gói premium đã được kích hoạt.
+                  </p>
+                )}
+                {confirmPaymentMutation.isError && (
+                  <p className="mt-4 text-center text-sm text-red-400">
+                    {getErrorMessage(confirmPaymentMutation.error)}
                   </p>
                 )}
                 {subscriptionMutation.isError && (

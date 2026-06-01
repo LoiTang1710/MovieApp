@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { authClient, mediaClient } from '../api/axiosClient'
 
 export function usePremiumPlans() {
@@ -20,6 +20,33 @@ export function useCreateSubscription() {
         { planId, paymentProvider },
       )
       return response.data
+    },
+  })
+}
+
+export function useMyPremiumSubscription({ enabled = true } = {}) {
+  return useQuery({
+    queryKey: ['premium', 'me'],
+    queryFn: async () => {
+      const response = await authClient.get('/premium/me')
+      return response.data.subscription
+    },
+    enabled,
+  })
+}
+
+export function useConfirmDevPayment() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (paymentId) => {
+      const response = await authClient.post(
+        `/premium/payments/${paymentId}/simulate-success`,
+      )
+      return response.data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['premium', 'me'] })
     },
   })
 }

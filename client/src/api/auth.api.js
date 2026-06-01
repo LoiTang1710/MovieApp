@@ -7,12 +7,12 @@ export const getCurrentUserApi = async () => {
 
 export const loginApi = async (data) => {
   const response = await apiClient.post('/auth/login', data)
-  return response.data
+  return response.data.data
 }
 
 export const registerApi = async (data) => {
   const response = await apiClient.post('/auth/register', data)
-  return response.data
+  return response.data.data
 }
 
 export const logoutApi = async () => {
@@ -22,7 +22,7 @@ export const logoutApi = async () => {
 
 export const sendVerificationCodeApi = async (data) => {
   const response = await apiClient.post(
-    '/api/auth/send-verification-code',
+    '/auth/send-verification-code',
     data,
   )
   return response.data
