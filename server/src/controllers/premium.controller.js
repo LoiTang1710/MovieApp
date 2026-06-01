@@ -11,12 +11,18 @@ export const getPremiumPlans = catchAsync(async (req, res) => {
 })
 
 export const createSubscription = catchAsync(async (req, res) => {
-  const { planId } = req.body
+  const { planId, paymentProvider } = req.body
   const userId = req.user?.id || req.user?.sub
 
   if (!planId) {
     return res.status(StatusCodes.BAD_REQUEST).json({
       message: 'Vui long chon goi premium.',
+    })
+  }
+
+  if (!['MOMO', 'VIETQR'].includes(paymentProvider)) {
+    return res.status(StatusCodes.BAD_REQUEST).json({
+      message: 'Phuong thuc thanh toan khong hop le.',
     })
   }
 
@@ -26,7 +32,11 @@ export const createSubscription = catchAsync(async (req, res) => {
     })
   }
 
-  const result = await createPendingSubscription({ planId, userId })
+  const result = await createPendingSubscription({
+    planId,
+    userId,
+    paymentProvider,
+  })
 
   if (!result) {
     return res.status(StatusCodes.NOT_FOUND).json({
@@ -35,5 +45,8 @@ export const createSubscription = catchAsync(async (req, res) => {
   }
 
   const statusCode = result.created ? StatusCodes.CREATED : StatusCodes.OK
-  res.status(statusCode).json(result.subscription)
+  res.status(statusCode).json({
+    subscription: result.subscription,
+    payment: result.payment,
+  })
 })
