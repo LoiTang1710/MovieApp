@@ -3,6 +3,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Pencil, Trash2, ArrowLeft } from 'lucide-react';
 import { useProfiles, useDeleteProfile } from '../../hooks/useProfiles';
 
+/**
+ * Render the "Quản lý hồ sơ" page with a list of user profiles, edit buttons, and a confirmation modal for deleting a selected profile.
+ *
+ * The component fetches profiles, shows a loading state, allows navigation to edit a profile, and opens a modal to confirm permanent deletion.
+ * @returns {JSX.Element} The rendered profile management page.
+ */
 export default function ProfileManage() {
   const navigate = useNavigate();
   const [deleteTarget, setDeleteTarget] = useState(null);
