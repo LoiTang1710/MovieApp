@@ -107,7 +107,7 @@ const MediaBanner = () => {
             >
               Thông tin
             </Link>
-            <FavouriteButton movie={data} />
+            <FavouriteButton movie={data} variant="card"/>
           </div>
         </div>
 
