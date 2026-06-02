@@ -4,6 +4,8 @@ import Login from './pages/Auth/Login/Login'
 import Register from './pages/Auth/Register/Register'
 import ForgotPassword from './pages/Auth/ForgotPassword/ForgotPassword'
 import MyList from './pages/MyList/MyList'
+import Search from './pages/Search/Search'
+import Movies from './pages/Movies'
 
 import { HomeProvider } from './providers/HomeProvider'
 import { AppProvider } from './providers/AppProvider'
@@ -14,9 +16,9 @@ import MediaPlayer from './pages/MediaPlayer/MediaPlayer'
 import ScrollToTop from './utils/scrollToTop'
 import PremiumCheckout from './pages/PremiumCheckout/PremiumCheckout'
 import { AuthProvider } from './providers/AuthProvider'
-import ProfileSelection from './profile/Profiles/ProfileSelection'
-import ProfileManage from './profile/Profiles/ProfileManage'
-import ProfileForm from './profile/Profiles/ProfileForm'
+import ProfileSelection from './pages/Profile/ProfileSelection'
+import ProfileManage from './pages/Profile/ProfileManage'
+import ProfileForm from './pages/Profile/ProfileForm'
 
 const RootLayout = () => {
   return (
@@ -68,6 +70,14 @@ const router = createBrowserRouter([
           {
             path: '/premium',
             element: <PremiumCheckout />,
+          },
+          {
+            path: '/search',
+            element: <Search />,
+          },
+          {
+            path: '/movies',
+            element: <Movies />,
           },
         ],
       },

@@ -7,9 +7,18 @@ import {
   getMediasReleased,
   getMediasTopRated,
   getMediasTrailer,
+  getMediasSearch,
+  getMoviesList,
 } from '../services/media.service.js'
 import { StatusCodes } from 'http-status-codes'
 import { catchAsync } from '../utils/catchAsync.js'
+
+export const getSearch = catchAsync(async (req, res) => {
+  const { q } = req.query
+  if (!q) return res.status(StatusCodes.OK).json([])
+  const data = await getMediasSearch(q)
+  res.status(StatusCodes.OK).json(data)
+})
 
 export const getImages = catchAsync(async (req, res) => {
   const { id } = req.params
@@ -52,5 +61,11 @@ export const getTopRates = catchAsync(async (req, res) => {
 })
 export const getAnimes = catchAsync(async (req, res) => {
   const data = await getMediasAnime()
+  res.status(StatusCodes.OK).json(data)
+})
+
+export const getMovies = catchAsync(async (req, res) => {
+  const { page = 1, year } = req.query
+  const data = await getMoviesList(parseInt(page), year ? parseInt(year) : null)
   res.status(StatusCodes.OK).json(data)
 })

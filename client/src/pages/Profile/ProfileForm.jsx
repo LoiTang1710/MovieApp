@@ -75,8 +75,10 @@ export default function ProfileForm() {
 
   if (isEditMode && isLoadError) {
     return (
-      <div className="min-h-screen flex flex-col text-white"
-        style={{background: 'radial-gradient(ellipse at 50% 0%, #3d0000 0%, #1a0000 40%, #0d0000 100%)'}}>
+      <div className="min-h-screen flex flex-col text-white relative overflow-hidden bg-bg-default">
+      {/* Background glow effects */}
+      <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-primary/20 blur-[120px] rounded-full pointer-events-none"></div>
+      <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-primary/10 blur-[120px] rounded-full pointer-events-none"></div>
         <main className="grow flex items-center justify-center p-4">
           <div className="w-full max-w-3xl bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl shadow-[0_0_50px_rgba(220,38,38,0.1)] p-10 md:p-14 text-center">
             <h2 className="text-xl font-bold text-red-400 mb-2">Không thể tải thông tin hồ sơ</h2>
@@ -99,8 +101,10 @@ export default function ProfileForm() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col text-white"
-      style={{background: 'radial-gradient(ellipse at 50% 0%, #3d0000 0%, #1a0000 40%, #0d0000 100%)'}}>
+    <div className="min-h-screen flex flex-col text-white relative overflow-hidden bg-bg-default">
+      {/* Background glow effects */}
+      <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-primary/20 blur-[120px] rounded-full pointer-events-none"></div>
+      <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-primary/10 blur-[120px] rounded-full pointer-events-none"></div>
       <main className="grow flex items-center justify-center p-4 relative">
         <div className="absolute top-0 left-0">
           <Link to="/profiles" className="text-white hover:text-gray-300 transition inline-block">

@@ -8,10 +8,14 @@ import {
   getReleases,
   getTopRates,
   getTrailers,
+  getSearch,
+  getMovies,
 } from '../controllers/media.controller.js'
 
 const Router = express.Router()
 
+Router.route('/search').get(getSearch)
+Router.route('/movies').get(getMovies)
 // GET /api/medias
 Router.route('/images/:id').get(getImages)
 Router.route('/popular').get(getPopulars)

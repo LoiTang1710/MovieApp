@@ -1,4 +1,4 @@
-import { Heart, Star } from "lucide-react";
+import { Heart } from 'lucide-react'
 
 export default function MovieCard({ movie, onToggleLike }) {
   return (
@@ -26,9 +26,13 @@ export default function MovieCard({ movie, onToggleLike }) {
       <p className="mt-2 text-sm font-semibold text-gray-100 leading-snug">
         {movie.title}
       </p>
-      <p className="mt-1 text-xs text-gray-400 flex items-center gap-1">
-        <Star size={11} fill="#f5c518" className="text-yellow-400" />{' '}
-        {movie.rating}
+      <p className="mt-1 text-xs text-gray-400 flex items-center gap-1.5">
+        <img
+          src="https://upload.wikimedia.org/wikipedia/commons/6/69/IMDB_Logo_2016.svg"
+          alt="IMDb-logo"
+          className="w-7"
+        />
+        <span>{movie.rating ? `${movie.rating.toFixed(1)}/10` : 'N/A'}</span>
       </p>
     </div>
   )

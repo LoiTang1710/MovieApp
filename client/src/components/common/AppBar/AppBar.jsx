@@ -1,8 +1,11 @@
-import { Bell, Menu, Search, User, LogOut, Settings } from 'lucide-react'
+import { Bell, Menu, Search, User, LogOut, Settings, X, Star } from 'lucide-react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useAuth } from '../../../hooks/useAuth.jsx'
 import { useMyPremiumSubscription } from '../../../hooks/usePremium.jsx'
+import { useDebounce } from '../../../hooks/useDebounce.jsx'
+import { useSearch } from '../../../hooks/useSearch.jsx'
+import { createSlug } from '../../../utils/formatters.js'
 
 const AppBar = () => {
   const { user, isAuthenticated: isLogged, logout } = useAuth()
@@ -12,6 +15,28 @@ const AppBar = () => {
   const navigate = useNavigate()
   const [isOpen, setIsOpen] = useState(false)
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
+  
+  // Search State
+  const [isSearchOpen, setIsSearchOpen] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
+  const searchInputRef = useRef(null)
+  const searchContainerRef = useRef(null)
+  
+  const debouncedSearchTerm = useDebounce(searchTerm, 500)
+  const { data: searchResults, isLoading: isSearching } = useSearch(debouncedSearchTerm)
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target)) {
+        setIsSearchOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [])
 
   const navLinks = [
     { id: crypto.randomUUID(), name: 'Home', path: '/' },
@@ -21,21 +46,37 @@ const AppBar = () => {
     { id: crypto.randomUUID(), name: 'Premium', path: '/premium' },
   ]
 
-  // ✅ CHỈ GIỮ LẠI NHỮNG HÀM THỰC SỰ ĐƯỢC GỌI TRONG GIAO DIỆN
   const getDisplayName = () =>
     user?.fullName || user?.name || user?.email?.split('@')[0] || 'User'
   const getAvatarUrl = () => user?.avatarUrl || null
 
+  const handleSearchToggle = () => {
+    setIsSearchOpen(!isSearchOpen)
+    if (!isSearchOpen) {
+      setTimeout(() => searchInputRef.current?.focus(), 100)
+    } else {
+      setSearchTerm('')
+    }
+  }
+
+  const handleSearchSubmit = (e) => {
+    if (e.key === 'Enter' && searchTerm.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchTerm.trim())}`)
+      setIsSearchOpen(false)
+      setSearchTerm('')
+    }
+  }
+
   return (
     <div id="AppBar" className="relative w-full">
       <div className="flex border-b border-white/10 justify-between items-center px-8 h-15 bg-black/95 backdrop-blur-md top-0 w-full z-50">
-        <div className="text-title text-red-600 text-3xl font-black tracking-tighter">
+        <div className="text-title text-red-600 text-3xl font-black tracking-tighter shrink-0">
           <Link to="/" className="text-primary font-bold">
             <h1>Cinevibe</h1>
           </Link>
         </div>
 
-        <div className="page-links hidden lg:flex gap-8 text-white font-medium text-md">
+        <div className="page-links hidden lg:flex gap-8 text-white font-medium text-md flex-1 justify-center relative z-10">
           {navLinks.map((link) => (
             <NavLink
               key={link.id}
@@ -54,8 +95,109 @@ const AppBar = () => {
           ))}
         </div>
 
-        <div className="action-icons flex justify-center items-center gap-6 text-white">
-          <Search className="w-5 cursor-pointer hover:text-red-600 transition-colors" />
+        <div className="action-icons flex justify-end items-center gap-6 text-white shrink-0 relative z-20">
+          {/* SEARCH BAR */}
+          <div
+            ref={searchContainerRef}
+            className="relative flex items-center justify-end w-8 h-8"
+          >
+            <Search
+              className={`w-5 cursor-pointer hover:text-red-600 transition-all absolute right-1 z-10 ${isSearchOpen ? 'opacity-0 scale-50 pointer-events-none' : 'opacity-100 scale-100'}`}
+              onClick={handleSearchToggle}
+            />
+
+            <div
+              className={`absolute right-0 flex items-center transition-all duration-300 origin-right bg-black/60 backdrop-blur-xl border border-white/20 rounded-full ${isSearchOpen ? 'w-64 md:w-80 opacity-100 scale-x-100' : 'w-0 opacity-0 scale-x-0'}`}
+            >
+              <Search className="w-4 h-4 ml-3 text-white/50 shrink-0" />
+              <input
+                ref={searchInputRef}
+                type="text"
+                placeholder="Phim, diễn viên..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyDown={handleSearchSubmit}
+                className="w-full bg-transparent border-none text-sm text-white px-3 py-1.5 focus:outline-none"
+              />
+              {searchTerm && (
+                <X
+                  className="w-4 h-4 mr-3 text-white/50 cursor-pointer hover:text-white shrink-0"
+                  onClick={() => setSearchTerm('')}
+                />
+              )}
+            </div>
+
+            {/* LIVE SEARCH RESULTS DROPDOWN */}
+            {isSearchOpen && searchTerm && (
+              <div className="absolute top-[140%] right-0 w-80 max-h-[70vh] bg-[#141414]/95 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-2xl overflow-y-auto scrollbar-thin scrollbar-thumb-gray-700">
+                {isSearching ? (
+                  <div className="p-4 text-center text-white/50 text-sm">
+                    Đang tìm kiếm...
+                  </div>
+                ) : searchResults && searchResults.length > 0 ? (
+                  <div className="flex flex-col p-2">
+                    {searchResults.slice(0, 5).map((movie) => (
+                      <Link
+                        key={movie.id}
+                        to={`/movie/${createSlug(movie.name || movie.title)}`}
+                        state={{
+                          mediaId: movie.id,
+                          type: movie.type || 'movie',
+                        }}
+                        onClick={() => {
+                          setIsSearchOpen(false)
+                          setSearchTerm('')
+                        }}
+                        className="flex gap-3 p-2 hover:bg-white/10 rounded-xl transition-colors cursor-pointer"
+                      >
+                        <img
+                          src={
+                            movie.poster_path
+                              ? `https://image.tmdb.org/t/p/w92${movie.poster_path}`
+                              : 'https://via.placeholder.com/92x138?text=No+Image'
+                          }
+                          alt="poster"
+                          className="w-12 h-16 object-cover rounded-md shrink-0"
+                        />
+                        <div className="flex flex-col justify-center flex-1 min-w-0">
+                          <p className="text-sm font-bold text-white truncate">
+                            {movie.title || movie.name}
+                          </p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <img
+                              src="https://upload.wikimedia.org/wikipedia/commons/6/69/IMDB_Logo_2016.svg"
+                              alt="IMDb-logo"
+                              className="w-7"
+                            />
+                            <span className="text-xs text-white/70">
+                              {movie.vote_average
+                                ? movie.vote_average.toFixed(1)
+                                : 'N/A'}/10
+                            </span>
+                            <span className="text-[10px] bg-white/10 px-1.5 py-0.5 rounded text-white/70 uppercase">
+                              {movie.type === 'tv' ? 'TV' : 'Movie'}
+                            </span>
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                    <button
+                      onClick={() => handleSearchSubmit({ key: 'Enter' })}
+                      className="w-full mt-2 py-2 text-sm text-center text-primary hover:bg-white/5 rounded-t rounded-b-xl transition-colors font-medium"
+                    >
+                      Xem tất cả kết quả
+                    </button>
+                  </div>
+                ) : (
+                  <div className="p-4 text-center text-white/50 text-sm">
+                    Không tìm thấy kết quả.
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+          {/* END SEARCH BAR */}
+
           <Bell className="w-5 hidden lg:block cursor-pointer hover:text-red-600 transition-colors" />
           <button
             type="button"
@@ -155,7 +297,7 @@ const AppBar = () => {
                   <div className="p-2 flex flex-col gap-1">
                     <button
                       onClick={() => {
-                        navigate('/profile')
+                        navigate('/profiles')
                         setIsUserMenuOpen(false)
                       }}
                       className="w-full px-4 py-2.5 text-sm font-medium text-gray-300 hover:text-white hover:bg-white/10 rounded-xl transition-all flex items-center gap-3 group"

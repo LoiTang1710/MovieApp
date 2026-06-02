@@ -7,29 +7,32 @@ import {
   toggleFavoriteApi,
   fetchCollectionsApi,
 } from '../../../../api/collection.api.js'
+import { useAuth } from '../../../../hooks/useAuth.jsx'
+import RequireLoginModal from '../../Modals/RequireLoginModal.jsx'
 
 const FavouriteButton = ({ movie }) => {
   const location = useLocation()
   const isHome = location.pathname === '/'
   const queryClient = useQueryClient()
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false)
+  const { isAuthenticated } = useAuth()
 
-  // 1. Dùng TanStack Query quản lý danh sách bộ sưu tập (Lúc nào cũng fetch ngầm)
+  // 1. Dùng TanStack Query quản lý danh sách bộ sưu tập (Chỉ fetch khi đã đăng nhập)
   const { data: collections = [], isLoading: isLoadingCollections } = useQuery({
     queryKey: ['collections'],
     queryFn: fetchCollectionsApi,
+    enabled: isAuthenticated,
   })
 
   // 2. TẬN DỤNG TANSTACK QUERY ĐỂ GIẢI QUYẾT RE-RENDER:
-  // Dùng useMemo để tính toán trực tiếp từ dữ liệu Collections của cache server
   const isLoved = useMemo(() => {
-    if (!collections || collections.length === 0) return false
+    if (!collections || collections.length === 0 || !movie?.id) return false
     // Duyệt qua toàn bộ bộ sưu tập, nếu có bất kỳ item nào trùng mediaId với phim này -> Tim đỏ
     return collections.some((col) =>
       col.items?.some((item) => Number(item.mediaId) === Number(movie.id)),
     )
-  }, [collections, movie.id])
-  console.log("isLoved: ", isLoved)
+  }, [collections, movie?.id])
 
   const { mutate: saveToCollection, isPending } = useMutation({
     mutationFn: (collectionId) =>
@@ -43,7 +46,6 @@ const FavouriteButton = ({ movie }) => {
       }),
     onSuccess: (data) => {
       setIsModalOpen(false)
-      console.log("data: ", data)
       // Đập tan dữ liệu cũ, ép TanStack Query fetch lại danh sách collections mới ngay lập tức
       queryClient.invalidateQueries({ queryKey: ['collections'] })
       queryClient.invalidateQueries({ queryKey: ['media', 'detail'] })
@@ -54,15 +56,26 @@ const FavouriteButton = ({ movie }) => {
         toast.info(`Đã bỏ khỏi danh sách.`)
       }
     },
-    onError: () => {
+    onError: (error) => {
       toast.error('Lỗi khi thao tác, vui lòng thử lại!')
       setIsModalOpen(false)
+      console.error(error)
     },
   })
 
   const handleHeartClick = (e) => {
     e.preventDefault()
     e.stopPropagation()
+
+    if (!isAuthenticated) {
+      setIsLoginModalOpen(true)
+      return
+    }
+
+    if (!movie?.id) {
+      toast.error('Không tìm thấy thông tin phim!')
+      return
+    }
 
     if (isHome) {
       saveToCollection()
@@ -91,9 +104,15 @@ const FavouriteButton = ({ movie }) => {
         {!isHome && <p className="action-subtitle">Yêu thích</p>}
       </div>
 
-      {/* ── Phần Modal giữ nguyên như cũ của bạn bên dưới ── */}
+      <RequireLoginModal 
+        isOpen={isLoginModalOpen} 
+        onClose={() => setIsLoginModalOpen(false)} 
+        message="Bạn cần đăng nhập để lưu phim vào danh sách yêu thích."
+      />
+
+      {/* Modal chọn bộ sưu tập */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-90 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[90] flex items-center justify-center p-4">
           <div
             className="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity animate-in fade-in"
             onClick={(e) => {

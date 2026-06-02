@@ -48,3 +48,37 @@ export const getMediasAnime = async () => {
     '/discover/tv?&with_original_language=zh&with_genres=16&sort_by=popularity.desc&language=vi-VN',
   )
 }
+
+export const getMediasSearch = async (query) => {
+  return tmdbFetchAll(
+    `/search/movie?query=${encodeURIComponent(query)}&language=vi-VN`,
+    `/search/tv?query=${encodeURIComponent(query)}&language=vi-VN`,
+  )
+}
+
+export const getMoviesList = async (page = 1, year = null) => {
+  const pageSize = 20
+  const baseMovieUrl = year
+    ? `/discover/movie?language=vi-VN&sort_by=popularity.desc&primary_release_year=${year}&page=${page}`
+    : `/discover/movie?language=vi-VN&sort_by=popularity.desc&page=${page}`
+
+  const baseTvUrl = year
+    ? `/discover/tv?language=vi-VN&sort_by=popularity.desc&first_air_date_year=${year}&page=${page}`
+    : `/discover/tv?language=vi-VN&sort_by=popularity.desc&page=${page}`
+
+  const movieData = await tmdbFetch(baseMovieUrl)
+  const tvData = await tmdbFetch(baseTvUrl)
+
+  const movies = (movieData.results || []).map((movie) => ({ ...movie, type: 'movie' }))
+  const tvs = (tvData.results || []).map((tv) => ({ ...tv, type: 'tv' }))
+
+  const combinedData = [...movies, ...tvs]
+  const sorted = combinedData.sort((a, b) => b.popularity - a.popularity)
+
+  return {
+    results: sorted.slice(0, pageSize),
+    page,
+    totalPages: Math.max(movieData.total_pages || 1, tvData.total_pages || 1),
+    totalResults: (movieData.total_results || 0) + (tvData.total_results || 0),
+  }
+}
