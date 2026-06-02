@@ -9,6 +9,9 @@ import {
   getMediasTrailer,
   getMediasSearch,
   getMoviesList,
+  getTVShowsList,
+  getTVGenres,
+  getMovieGenres,
 } from '../services/media.service.js'
 import { StatusCodes } from 'http-status-codes'
 import { catchAsync } from '../utils/catchAsync.js'
@@ -32,7 +35,7 @@ export const getDetail = catchAsync(async (req, res) => {
   const data = await getMediaDetail(id, type)
   res.status(StatusCodes.OK).json(data)
 })
-export const getEpisodes = catchAsync(async(req,res) => {
+export const getEpisodes = catchAsync(async (req, res) => {
   const { id } = req.params
   const season = req.query.season || 1
   const data = await getDetailEpisodes(id, season)
@@ -65,7 +68,45 @@ export const getAnimes = catchAsync(async (req, res) => {
 })
 
 export const getMovies = catchAsync(async (req, res) => {
-  const { page = 1, year } = req.query
-  const data = await getMoviesList(parseInt(page), year ? parseInt(year) : null)
+  // Lấy thêm genres và minRating từ query params của url
+  const { page = 1, year, genres, minRating } = req.query
+
+  const filters = {
+    year: year ? parseInt(year) : null,
+    genres: genres
+      ? Array.isArray(genres)
+        ? genres.map(Number)
+        : [parseInt(genres)]
+      : [],
+    minRating: minRating ? parseFloat(minRating) : 0,
+  }
+
+  // Truyền full object filters vào getMoviesList
+  const data = await getMoviesList(parseInt(page), filters)
+  res.status(StatusCodes.OK).json(data)
+})
+
+export const getTVShows = catchAsync(async (req, res) => {
+  const { page = 1, year, genres, minRating } = req.query
+  const filters = {
+    year: year ? parseInt(year) : null,
+    genres: genres
+      ? Array.isArray(genres)
+        ? genres.map(Number)
+        : [parseInt(genres)]
+      : [],
+    minRating: minRating ? parseFloat(minRating) : 0,
+  }
+  const data = await getTVShowsList(parseInt(page), filters)
+  res.status(StatusCodes.OK).json(data)
+})
+
+export const getGenresTv = catchAsync(async (req, res) => {
+  const data = await getTVGenres()
+  res.status(StatusCodes.OK).json(data)
+})
+
+export const getGenresMovie = catchAsync(async (req, res) => {
+  const data = await getMovieGenres()
   res.status(StatusCodes.OK).json(data)
 })

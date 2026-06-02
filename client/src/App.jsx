@@ -6,6 +6,7 @@ import ForgotPassword from './pages/Auth/ForgotPassword/ForgotPassword'
 import MyList from './pages/MyList/MyList'
 import Search from './pages/Search/Search'
 import Movies from './pages/Movies'
+import TVShows from './pages/TVShows'
 
 import { HomeProvider } from './providers/HomeProvider'
 import { AppProvider } from './providers/AppProvider'
@@ -78,6 +79,10 @@ const router = createBrowserRouter([
           {
             path: '/movies',
             element: <Movies />,
+          },
+          {
+            path: '/tv-shows',
+            element: <TVShows />,
           },
         ],
       },

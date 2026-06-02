@@ -1,4 +1,4 @@
-import { Bell, Menu, Search, User, LogOut, Settings, X, Star } from 'lucide-react'
+import { Bell, Menu, Search, User, LogOut, Settings, X } from 'lucide-react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useState, useRef, useEffect } from 'react'
 import { useAuth } from '../../../hooks/useAuth.jsx'
