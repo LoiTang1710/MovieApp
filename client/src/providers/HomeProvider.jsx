@@ -6,6 +6,7 @@ export const HomeProvider = ({ children }) => {
   const [loved, setLoved] = useState(false)
   const [mediasWatching, setMediasWatching] = useState([])
   const [selectedMediaId, setSelectedMediaId] = useState(null)
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false)
 
 
   const { mediasCollection, bannerTrailers, bannerLogos, isLoading, isError, error } = useMedias()
@@ -34,6 +35,8 @@ export const HomeProvider = ({ children }) => {
         isLoading,
         isError,
         error,
+        isLoginModalOpen,
+        setIsLoginModalOpen,
       }}
     >
       {children}

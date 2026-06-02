@@ -8,7 +8,8 @@ import {
   fetchCollectionsApi,
 } from '../../../../api/collection.api.js'
 import { useAuth } from '../../../../hooks/useAuth.jsx'
-import RequireLoginModal from '../../Modals/RequireLoginModal.jsx'
+import { useHome } from '../../../../contexts/HomeContext.jsx'
+
 
 // THÊM prop variant vào đây (mặc định là 'detail')
 const FavouriteButton = ({ movie, variant = 'detail' }) => {
@@ -16,14 +17,16 @@ const FavouriteButton = ({ movie, variant = 'detail' }) => {
   const isHome = location.pathname === '/'
   const queryClient = useQueryClient()
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false)
+  
   const { isAuthenticated } = useAuth()
+  const { setIsLoginModalOpen } = useHome()
 
   const { data: collections = [], isLoading: isLoadingCollections } = useQuery({
     queryKey: ['collections'],
     queryFn: fetchCollectionsApi,
     enabled: isAuthenticated,
   })
+  
 
   const isLoved = useMemo(() => {
     if (!collections || collections.length === 0 || !movie?.id) return false
@@ -59,10 +62,8 @@ const FavouriteButton = ({ movie, variant = 'detail' }) => {
   const handleHeartClick = (e) => {
     e.preventDefault()
     e.stopPropagation()
-
     if (!isAuthenticated) {
       setIsLoginModalOpen(true)
-      return
     }
     if (!movie?.id) {
       toast.error('Không tìm thấy thông tin phim!')
@@ -83,7 +84,7 @@ const FavouriteButton = ({ movie, variant = 'detail' }) => {
           type="button"
           onClick={handleHeartClick}
           disabled={isPending}
-          className={`absolute top-2 right-2 w-8 h-8 rounded-full flex items-center justify-center bg-black/60 backdrop-blur-md transition-all hover:scale-110 z-20 ${
+          className={`absolute top-2 right-2 w-8 h-8 rounded-full flex items-center justify-center bg-black/60 backdrop-blur-md transition-all hover:scale-110 z-5 ${
             isLoved ? 'text-red-500' : 'text-white hover:text-red-400'
           } ${isPending ? 'opacity-50 pointer-events-none' : ''}`}
         >
@@ -119,16 +120,11 @@ const FavouriteButton = ({ movie, variant = 'detail' }) => {
         </div>
       )}
 
-      {/* Modal đăng nhập */}
-      <RequireLoginModal
-        isOpen={isLoginModalOpen}
-        onClose={() => setIsLoginModalOpen(false)}
-        message="Bạn cần đăng nhập để lưu phim vào danh sách yêu thích."
-      />
+      
 
       {/* Modal chọn list */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-[90] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-90 flex items-center justify-center p-4">
           <div
             className="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
             onClick={(e) => {
@@ -141,7 +137,7 @@ const FavouriteButton = ({ movie, variant = 'detail' }) => {
             className="relative bg-[#141414] border border-white/10 rounded-2xl w-full max-w-xs overflow-hidden shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between px-5 py-4 border-b border-white/10 bg-white/[0.02]">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-white/10 bg-white/2">
               <h3 className="text-white font-bold text-lg flex items-center gap-2">
                 <ListPlus className="w-5 h-5 text-primary" />
                 Lưu vào...

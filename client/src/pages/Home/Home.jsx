@@ -1,9 +1,11 @@
 import { Sidebar } from 'lucide-react'
 import MediaBanner from '../../components/common/Movies/MediaBanner/MediaBanner'
 import MediaCollection from '../../components/common/Movies/MediaCollection/MediaCollection'
-import { useState } from 'react'
 import { useHome } from '../../contexts/HomeContext'
 import HomeSkeleton from './HomeSkeleton'
+import RequireLoginModal from '../../components/common/Modals/RequireLoginModal.jsx'
+import { useState } from 'react'
+
 
 const Home = () => {
   const {
@@ -14,6 +16,8 @@ const Home = () => {
     activeMediaId,
     mediasPopular,
     mediasReleased,
+    isLoginModalOpen,
+    setIsLoginModalOpen,
   } = useHome()
   const [isOpen, setIsOpen] = useState(false)
 
@@ -24,10 +28,13 @@ const Home = () => {
   if (isError) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center gap-3 p-10 text-center">
-        <h2 className="text-xl font-bold text-red-400">Không tải được dữ liệu trang chủ</h2>
+        <h2 className="text-xl font-bold text-red-400">
+          Không tải được dữ liệu trang chủ
+        </h2>
         <p className="text-sm text-white/60 max-w-md">
-          Trang chủ cần backend chạy tại <code className="text-primary">http://localhost:3000</code>.
-          Mở terminal riêng: <code>cd server</code> rồi <code>npm run dev</code>.
+          Trang chủ cần backend chạy tại{' '}
+          <code className="text-primary">http://localhost:3000</code>. Mở
+          terminal riêng: <code>cd server</code> rồi <code>npm run dev</code>.
         </p>
         <p className="text-xs text-white/40">{error?.message}</p>
       </div>
@@ -41,10 +48,13 @@ const Home = () => {
   if (!hasAnyMedia) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center gap-3 p-10 text-center">
-        <h2 className="text-xl font-bold text-white/80">Chưa có dữ liệu phim</h2>
+        <h2 className="text-xl font-bold text-white/80">
+          Chưa có dữ liệu phim
+        </h2>
         <p className="text-sm text-white/50 max-w-md">
-          Kiểm tra server đang chạy (<code className="text-primary">cd server && npm run dev</code>)
-          và token TMDB trong <code>server/.env</code>.
+          Kiểm tra server đang chạy (
+          <code className="text-primary">cd server && npm run dev</code>) và
+          token TMDB trong <code>server/.env</code>.
         </p>
       </div>
     )
@@ -52,9 +62,17 @@ const Home = () => {
 
   return (
     <div>
-      {mediaBanner.length > 0 && activeMediaId && <MediaBanner key={activeMediaId} />}
+      {mediaBanner.length > 0 && activeMediaId && (
+        <MediaBanner key={activeMediaId} />
+      )}
       <MediaCollection />
       {isOpen && <Sidebar onClick={() => setIsOpen(!isOpen)} />}
+      {/* Modal đăng nhập */}
+      <RequireLoginModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+        message="Bạn cần đăng nhập để lưu phim vào danh sách yêu thích."
+      />
     </div>
   )
 }
