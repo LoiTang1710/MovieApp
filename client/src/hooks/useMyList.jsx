@@ -58,6 +58,7 @@ export function useMyList() {
     queryFn: () => fetchMoviesByCollectionApi(resolvedCollectionId),
     enabled: !!resolvedCollectionId, // Chỉ chạy API khi đã có ID
   })
+  console.log('Data phim từ API:', movies)
 
   // 3. CÁC MUTATION (THÊM, XÓA, SỬA)
   const createMutation = useMutation({
@@ -121,6 +122,7 @@ export function useMyList() {
         rating: movie.rating || 0,
         year: movie.year || new Date().getFullYear(),
         mediaType: movie.mediaType || 'movie',
+        overview: movie.overview || 'Chưa có thông tin mô tả cho phim này.',
       },
     })
   }

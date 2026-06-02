@@ -10,7 +10,8 @@ import {
 import { useAuth } from '../../../../hooks/useAuth.jsx'
 import RequireLoginModal from '../../Modals/RequireLoginModal.jsx'
 
-const FavouriteButton = ({ movie }) => {
+// THÊM prop variant vào đây (mặc định là 'detail')
+const FavouriteButton = ({ movie, variant = 'detail' }) => {
   const location = useLocation()
   const isHome = location.pathname === '/'
   const queryClient = useQueryClient()
@@ -18,21 +19,18 @@ const FavouriteButton = ({ movie }) => {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false)
   const { isAuthenticated } = useAuth()
 
-  // 1. Dùng TanStack Query quản lý danh sách bộ sưu tập (Chỉ fetch khi đã đăng nhập)
   const { data: collections = [], isLoading: isLoadingCollections } = useQuery({
     queryKey: ['collections'],
     queryFn: fetchCollectionsApi,
     enabled: isAuthenticated,
   })
 
-  // 2. TẬN DỤNG TANSTACK QUERY ĐỂ GIẢI QUYẾT RE-RENDER:
   const isLoved = useMemo(() => {
     if (!collections || collections.length === 0 || !movie?.id) return false
-    // Duyệt qua toàn bộ bộ sưu tập, nếu có bất kỳ item nào trùng mediaId với phim này -> Tim đỏ
     return collections.some((col) =>
       col.items?.some((item) => Number(item.mediaId) === Number(movie.id)),
     )
-  }, [collections, movie?.id])
+  }, [collections, movie.id])
 
   const { mutate: saveToCollection, isPending } = useMutation({
     mutationFn: (collectionId) =>
@@ -41,20 +39,15 @@ const FavouriteButton = ({ movie }) => {
         posterPath: movie.poster_path || movie.poster || movie.posterPath,
         rating: movie.vote_average || movie.rating,
         releasedDate: movie.release_date ? String(movie.release_date) : null,
-        mediaType: movie.media_type || 'movie',
+        mediaType: movie.media_type || movie.type || 'movie',
         collectionId: collectionId,
       }),
     onSuccess: (data) => {
       setIsModalOpen(false)
-      // Đập tan dữ liệu cũ, ép TanStack Query fetch lại danh sách collections mới ngay lập tức
       queryClient.invalidateQueries({ queryKey: ['collections'] })
       queryClient.invalidateQueries({ queryKey: ['media', 'detail'] })
-
-      if (data.isAdded) {
-        toast.success(`Đã thêm vào danh sách! 🍿`)
-      } else {
-        toast.info(`Đã bỏ khỏi danh sách.`)
-      }
+      if (data.isAdded) toast.success(`Đã thêm vào danh sách! 🍿`)
+      else toast.info(`Đã bỏ khỏi danh sách.`)
     },
     onError: (error) => {
       toast.error('Lỗi khi thao tác, vui lòng thử lại!')
@@ -71,13 +64,11 @@ const FavouriteButton = ({ movie }) => {
       setIsLoginModalOpen(true)
       return
     }
-
     if (!movie?.id) {
       toast.error('Không tìm thấy thông tin phim!')
       return
     }
-
-    if (isHome) {
+    if (isHome || variant === 'card') {
       saveToCollection()
     } else {
       setIsModalOpen(true)
@@ -86,43 +77,68 @@ const FavouriteButton = ({ movie }) => {
 
   return (
     <>
-      <div className="icon-block">
+      {/* RENDER THEO VARIANT */}
+      {variant === 'card' ? (
         <button
           type="button"
           onClick={handleHeartClick}
-          disabled={isPending && isHome}
-          className="bg-transparent border-none p-0 outline-none flex items-center justify-center"
+          disabled={isPending}
+          className={`absolute top-2 right-2 w-8 h-8 rounded-full flex items-center justify-center bg-black/60 backdrop-blur-md transition-all hover:scale-110 z-20 ${
+            isLoved ? 'text-red-500' : 'text-white hover:text-red-400'
+          } ${isPending ? 'opacity-50 pointer-events-none' : ''}`}
         >
           <Heart
-            className={`${
-              isLoved ? 'fill-red-600 text-red-600' : 'text-white'
-            } hidden lg:block cursor-pointer transition-transform hover:scale-110 ${
-              isPending && isHome ? 'opacity-50 animate-pulse' : ''
-            }`}
+            size={15}
+            fill={isLoved ? 'currentColor' : 'none'}
+            className={isPending ? 'animate-pulse' : ''}
           />
         </button>
-        {!isHome && <p className="action-subtitle">Yêu thích</p>}
-      </div>
+      ) : (
+        // GIAO DIỆN NẰM Ở TRANG DETAIL / BANNER (Đồng bộ Glassmorphism)
+        <div
+          className="flex flex-col items-center gap-2 cursor-pointer group"
+          onClick={handleHeartClick}
+        >
+          <button
+            type="button"
+            disabled={isPending}
+            className={`w-12 h-12 rounded-full flex items-center justify-center border backdrop-blur-md transition-all duration-300 group-hover:scale-110 ${
+              isLoved
+                ? 'bg-red-500/10 border-red-500/30'
+                : 'bg-white/5 border-white/10 group-hover:bg-white/10 group-hover:border-white/20'
+            }`}
+          >
+            <Heart
+              size={20}
+              className={`${isLoved ? 'fill-red-500 text-red-500' : 'text-white'} ${isPending ? 'animate-pulse' : ''}`}
+            />
+          </button>
+          <p className="text-xs font-medium text-gray-400 group-hover:text-white transition-colors">
+            {isLoved ? 'Đã lưu' : 'Yêu thích'}
+          </p>
+        </div>
+      )}
 
-      <RequireLoginModal 
-        isOpen={isLoginModalOpen} 
-        onClose={() => setIsLoginModalOpen(false)} 
+      {/* Modal đăng nhập */}
+      <RequireLoginModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
         message="Bạn cần đăng nhập để lưu phim vào danh sách yêu thích."
       />
 
-      {/* Modal chọn bộ sưu tập */}
+      {/* Modal chọn list */}
       {isModalOpen && (
         <div className="fixed inset-0 z-[90] flex items-center justify-center p-4">
           <div
-            className="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity animate-in fade-in"
+            className="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
             onClick={(e) => {
               e.stopPropagation()
               setIsModalOpen(false)
             }}
           ></div>
-
+          {/* ... Giữ nguyên phần UI Modal bên trong của bạn ... */}
           <div
-            className="relative bg-[#141414] border border-white/10 rounded-2xl w-full max-w-xs overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200"
+            className="relative bg-[#141414] border border-white/10 rounded-2xl w-full max-w-xs overflow-hidden shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between px-5 py-4 border-b border-white/10 bg-white/[0.02]">
@@ -140,10 +156,9 @@ const FavouriteButton = ({ movie }) => {
                 <X className="w-5 h-5" />
               </button>
             </div>
-
             <div className="max-h-[60vh] overflow-y-auto p-2 scrollbar-thin scrollbar-thumb-gray-700">
               {isLoadingCollections ? (
-                <div className="flex justify-center items-center py-8">
+                <div className="flex justify-center py-8">
                   <Loader2 className="w-6 h-6 text-primary animate-spin" />
                 </div>
               ) : collections.length === 0 ? (
@@ -161,7 +176,7 @@ const FavouriteButton = ({ movie }) => {
                         e.stopPropagation()
                         saveToCollection(col.id)
                       }}
-                      className="flex items-center justify-between w-full text-left px-4 py-3 rounded-xl hover:bg-white/10 text-gray-200 hover:text-white transition-colors disabled:opacity-50"
+                      className="flex items-center justify-between w-full text-left px-4 py-3 rounded-xl hover:bg-white/10 text-gray-200 hover:text-white transition-colors"
                     >
                       <span className="font-medium truncate pr-2">
                         {col.displayName || col.collectionName}
@@ -182,5 +197,4 @@ const FavouriteButton = ({ movie }) => {
     </>
   )
 }
-
 export default FavouriteButton

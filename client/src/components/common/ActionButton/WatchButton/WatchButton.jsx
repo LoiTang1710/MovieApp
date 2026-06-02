@@ -1,14 +1,22 @@
-import { Link } from "react-router-dom"
-import { useDetail } from "../../../../contexts/DetailContext"
-import { createSlug } from "../../../../utils/formatters"
-
+import { Link } from 'react-router-dom'
+import { useDetail } from '../../../../contexts/DetailContext'
+import { createSlug } from '../../../../utils/formatters'
 
 const WatchButton = () => {
-  const { mediaId, name, type, poster_path, vote_average, genres, overview, isPremium } =
-    useDetail()
+  const {
+    mediaId,
+    name,
+    type,
+    poster_path,
+    vote_average,
+    genres,
+    overview,
+    isPremium,
+  } = useDetail()
   const videoURL = `/video/${createSlug(name)}.${mediaId}`
+
   return (
-    <div className="mr-10">
+    <div className="mr-0 lg:mr-10">
       <Link
         to={videoURL}
         state={{
@@ -21,7 +29,7 @@ const WatchButton = () => {
           mediaId,
           isPremium,
         }}
-        className="detail-button md:text-md lg:text-lg px-8 md:px-16 py-4"
+        className="flex items-center justify-center gap-2 bg-red-600 hover:bg-red-500 text-white font-bold text-base md:text-lg px-10 py-3.5 rounded-xl transition-all duration-300 shadow-[0_0_20px_rgba(220,38,38,0.3)] hover:shadow-[0_0_30px_rgba(220,38,38,0.6)] hover:scale-105"
       >
         ▶ Xem ngay
       </Link>

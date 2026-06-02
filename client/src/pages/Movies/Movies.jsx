@@ -1,5 +1,4 @@
 import { useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
 
 // Import lại các hook gọi API chuẩn của bạn từ thư mục hooks
 import { useMovies, useMovieGenres } from '../../hooks/useMovies'
@@ -7,11 +6,9 @@ import { useMediaFilters } from '../../hooks/useMediaFilters'
 import { AdvancedFilter } from '../../components/common/Filters/AdvancedFilter'
 import { Pagination } from '../../components/common/Pagination/Pagination'
 import { MovieListSkeletonGrid } from '../../components/common/Skeletons/MovieCardSkeleton'
-import MovieCard from '../MyList/Content/MovieCard'
+import MediaCard_2 from '../../components/common/Movies/MediaCollection/MediaGrid/MediaCard.jsx/MediaCard_2.jsx'
 
 const Movies = () => {
-  const navigate = useNavigate()
-
   // 1. Quản lý State qua URL
   const { filters, updateFilters, resetFilters, setPage } = useMediaFilters()
 
@@ -24,7 +21,7 @@ const Movies = () => {
   const movies = data?.results || []
   const totalPages = data?.totalPages || 1
   const genres = genresData || []
-
+  console.log('movies: ', movies)
   // Cuộn lên đầu trang khi đổi page hoặc filter
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -71,23 +68,11 @@ const Movies = () => {
           <>
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
               {movies.map((movie) => (
-                <div
-                  key={`movie-${movie.id}`}
-                  onClick={() => navigate(`/movie/${movie.id}`)}
-                  className="cursor-pointer"
-                >
-                  <MovieCard
-                    movie={{
-                      id: movie.id,
-                      title: movie.title || movie.name,
-                      posterPath: movie.poster_path,
-                      poster: movie.poster_path,
-                      rating: movie.vote_average,
-                      liked: false,
-                    }}
-                    onToggleLike={handleToggleLike}
-                  />
-                </div>
+                <MediaCard_2
+                  key={`${movie.type || 'movie'}-${movie.id}`}
+                  media={movie}
+                  onToggleLike={handleToggleLike}
+                />
               ))}
             </div>
 

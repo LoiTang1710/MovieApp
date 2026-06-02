@@ -102,7 +102,9 @@ const router = createBrowserRouter([
             path: '/movies',
             element: (
               <Suspense fallback={<PageLoader />}>
-                <Movies />
+
+                  <Movies />
+
               </Suspense>
             ),
           },

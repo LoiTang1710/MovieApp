@@ -1,5 +1,4 @@
 import { useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import axios from 'axios'
 
@@ -7,15 +6,13 @@ import { useMediaFilters } from '../../hooks/useMediaFilters'
 import { AdvancedFilter } from '../../components/common/Filters/AdvancedFilter'
 import { Pagination } from '../../components/common/Pagination/Pagination'
 import { MovieListSkeletonGrid } from '../../components/common/Skeletons/MovieCardSkeleton'
-import MovieCard from '../MyList/Content/MovieCard'
+import MediaCard_2 from '../../components/common/Movies/MediaCollection/MediaGrid/MediaCard.jsx/MediaCard_2.jsx'
 
 // Lưu ý: Đảm bảo biến môi trường này trỏ đúng vào API của bạn
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api'
 
 const TVShows = () => {
-  const navigate = useNavigate()
-
   // 1. Quản lý toàn bộ State qua URL thông qua Hook
   const { filters, updateFilters, resetFilters, setPage } = useMediaFilters()
 
@@ -65,14 +62,9 @@ const TVShows = () => {
   const totalPages = data?.totalPages || 1
   const genres = genresData || []
 
-  // Cuộn lên đầu trang khi đổi page hoặc filter
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }, [filters])
-
-  const handleShowClick = (show) => {
-    navigate(`/video/${show.id}`)
-  }
 
   const handleToggleLike = () => {}
 
@@ -117,23 +109,11 @@ const TVShows = () => {
           <>
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
               {shows.map((show) => (
-                <div
-                  key={`tv-${show.id}`}
-                  onClick={() => handleShowClick(show)}
-                  className="cursor-pointer"
-                >
-                  <MovieCard
-                    movie={{
-                      id: show.id,
-                      title: show.name || show.title,
-                      posterPath: show.poster_path,
-                      poster: show.poster_path,
-                      rating: show.vote_average,
-                      liked: false,
-                    }}
-                    onToggleLike={handleToggleLike}
-                  />
-                </div>
+                <MediaCard_2
+                  key={`${show.type || 'tv'}-${show.id}`}
+                  media={show}
+                  onToggleLike={handleToggleLike}
+                />
               ))}
             </div>
 
