@@ -93,6 +93,6 @@ client/src/
 Các thay đổi đều tuân thủ kiến trúc hiện tại của dự án. Không cần cài thêm dependencies mới.
 - Khởi động Server: `cd server && npm run dev`
 - Khởi động Client: `cd client && npm run dev`
-- Để kiểm tra phần Search: gõ vào Header (đợi ~1.5s sẽ thấy kết quả thả xuống), nhấn Enter để chuyển đến trang kết quả lọc `/search`.
+- Để kiểm tra phần Search: gõ vào Header (đợi ~500ms sẽ thấy kết quả thả xuống), nhấn Enter để chuyển đến trang kết quả lọc `/search`.
 - Để kiểm tra Yêu thích: Vào Home, click tim trên Banner; chuyển tới trang Chi tiết, click Tim; chuyển lại ra Home.
 - Để kiểm tra Profile: Click nút Settings > "Quản lý tài khoản" trong User Menu trên Header.
