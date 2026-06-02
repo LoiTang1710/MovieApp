@@ -15,7 +15,7 @@ Tài liệu này tóm tắt các quyết định kỹ thuật, cấu trúc thư 
   - Thay đổi thanh Search tĩnh thành Dynamic Input với hiệu ứng Glassmorphism. Cố định vị trí Absolute cho dropdown để không đẩy các thẻ NavLinks sang bên trái.
   - Cập nhật đúng đường dẫn `navigate('/profiles')` cho menu Quản lý tài khoản.
 - **`client/src/hooks/useDebounce.jsx`**: 
-  - Tạo mới Custom Hook `useDebounce` để delay (1.5s - 3s) API call khi người dùng gõ phím tìm kiếm, giảm tải cho server.
+  - Tạo mới Custom Hook `useDebounce` để delay (500ms) API call khi người dùng gõ phím tìm kiếm, giảm tải cho server.
 - **`client/src/pages/Search/Search.jsx` & `SearchProvider.jsx`**: 
   - Tạo mới trang Tìm Kiếm nâng cao, kết hợp bộ lọc động (năm, thể loại) và phân trang tự động.
 - **`client/src/components/common/ActionButton/FavouriteButton/FavouriteButton.jsx`**: 
