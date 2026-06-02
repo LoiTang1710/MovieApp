@@ -245,7 +245,7 @@ export const AdvancedFilter = ({
         {/* Reset Button */}
         <button
           onClick={onReset}
-          className="flex items-center justify-center gap-2 px-4 py-2.5 bg-black/40 backdrop-blur-md hover:bg-black/60 rounded border border-white/10 transition-all duration-300 text-sm font-medium text-gray-200 hover:text-white focus:outline-none focus:ring-1 focus:ring-red-500/50"
+          className="flex items-center justify-center gap-2 px-4 py-2.5 bg-primary backdrop-blur-md hover:bg-primary/60 rounded border border-white/10 transition-all duration-300 text-sm font-medium text-gray-200 hover:text-white focus:outline-none focus:ring-1 focus:ring-red-500/50"
         >
           <X size={16} />
           <span>Đặt lại</span>

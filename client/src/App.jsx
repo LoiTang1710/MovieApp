@@ -7,6 +7,7 @@ import MainLayout from './components/layouts/MainLayout'
 import DetailProvider from './providers/DetailProvider'
 import { AuthProvider } from './providers/AuthProvider'
 import ScrollToTop from './utils/scrollToTop'
+import { ToastContainer } from 'react-toastify'
 
 const Home = lazy(() => import('./pages/Home'))
 const Login = lazy(() => import('./pages/Auth/Login/Login'))
@@ -31,6 +32,7 @@ const RootLayout = () => {
       <AuthProvider>
         <ScrollToTop />
         <Outlet />
+        <ToastContainer/>
       </AuthProvider>
     </AppProvider>
   )

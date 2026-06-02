@@ -46,7 +46,7 @@ export default function MediaCard_2({ media, isPremium }) {
 
         {/* Nhãn TV Series */}
         {type === 'tv' && (
-          <div className="absolute top-0 right-0 bg-red-600 text-white font-bold text-[10px] py-1 px-2 rounded-bl-lg z-10 uppercase tracking-wider shadow-lg">
+          <div className="absolute top-0 right-0 bg-red-600 text-white font-bold text-[10px] py-1 px-2 rounded-bl-lg z-5 uppercase tracking-wider shadow-lg">
             TV Series
           </div>
         )}
