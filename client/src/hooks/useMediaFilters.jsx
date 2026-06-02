@@ -1,15 +1,6 @@
 import { useSearchParams } from 'react-router-dom'
 import { useCallback, useMemo } from 'react'
 
-/**
- * useMediaFilters Hook
- *
- * Manages filters via URL search params instead of local state.
- * Automatically resets page to 1 when filters change.
- *
- * Data flow:
- * User interaction → onFilterChange → URL params updated → Component re-renders
- */
 export const useMediaFilters = () => {
   const [searchParams, setSearchParams] = useSearchParams()
 

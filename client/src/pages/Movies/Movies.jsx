@@ -30,9 +30,7 @@ const Movies = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }, [filters])
 
-  const handleToggleLike = (movieId) => {
-    console.log('Toggle like for:', movieId)
-  }
+  const handleToggleLike = () => {}
 
   if (isError) {
     return (

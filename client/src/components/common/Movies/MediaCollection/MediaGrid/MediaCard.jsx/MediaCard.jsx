@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom'
 import { createSlug } from '../../../../../../utils/formatters'
 
 const MediaCard = ({ item, isPremium }) => {
-  // console.log("item: " ,item)
   const mediaUrl = `/movie/${createSlug(item.name || item.title)}`
   return (
     <Link
@@ -15,6 +14,7 @@ const MediaCard = ({ item, isPremium }) => {
         src={`https://image.tmdb.org/t/p/original${item.poster_path}`}
         alt="poster"
         className="w-full object-cover"
+        loading="lazy"
       />
       <div className="backdrop-text-overplay">
         <p className="movie-card-title">{item.title || item.name}</p>

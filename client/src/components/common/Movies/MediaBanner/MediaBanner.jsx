@@ -40,6 +40,7 @@ const MediaBanner = () => {
             src={`https://image.tmdb.org/t/p/original${data.backdrop_path}`}
             alt="backdrop-banner"
             className="w-full max-h-96 md:max-h-128 lg:max-h-180 2xl:max-h-384 object-cover"
+            loading="lazy"
           />
         )}
 
@@ -51,8 +52,8 @@ const MediaBanner = () => {
               <img
                 src={`https://image.tmdb.org/t/p/w500${logoPath}`}
                 alt="media-logo"
-                // Thêm max-h-24 để khống chế chiều cao nếu gặp logo quá to
                 className="w-48 lg:w-64 max-h-24 object-contain"
+                loading="lazy"
               />
             ) : (
               <h1 className="text-xl lg:text-3xl font-bold tracking-tight">
