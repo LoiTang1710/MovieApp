@@ -1,25 +1,29 @@
 import { Outlet, createBrowserRouter, RouterProvider } from 'react-router-dom'
-import Home from './pages/Home'
-import Login from './pages/Auth/Login/Login'
-import Register from './pages/Auth/Register/Register'
-import ForgotPassword from './pages/Auth/ForgotPassword/ForgotPassword'
-import MyList from './pages/MyList/MyList'
-import Search from './pages/Search/Search'
-import Movies from './pages/Movies'
-import TVShows from './pages/TVShows'
-
-import { HomeProvider } from './providers/HomeProvider'
-import { AppProvider } from './providers/AppProvider'
+import { Suspense } from 'react'
+import { lazy } from 'react'
+import {HomeProvider} from './providers/HomeProvider'
+import AppProvider from './providers/AppProvider'
 import MainLayout from './components/layouts/MainLayout'
-import MediaDetails from './pages/MediaDetails/MediaDetails'
 import DetailProvider from './providers/DetailProvider'
-import MediaPlayer from './pages/MediaPlayer/MediaPlayer'
-import ScrollToTop from './utils/scrollToTop'
-import PremiumCheckout from './pages/PremiumCheckout/PremiumCheckout'
 import { AuthProvider } from './providers/AuthProvider'
-import ProfileSelection from './pages/Profile/ProfileSelection'
-import ProfileManage from './pages/Profile/ProfileManage'
-import ProfileForm from './pages/Profile/ProfileForm'
+import ScrollToTop from './utils/scrollToTop'
+
+const Home = lazy(() => import('./pages/Home'))
+const Login = lazy(() => import('./pages/Auth/Login/Login'))
+const Register = lazy(() => import('./pages/Auth/Register/Register'))
+const ForgotPassword = lazy(() => import('./pages/Auth/ForgotPassword/ForgotPassword'))
+const MyList = lazy(() => import('./pages/MyList/MyList'))
+const Search = lazy(() => import('./pages/Search/Search'))
+const Movies = lazy(() => import('./pages/Movies'))
+const TVShows = lazy(() => import('./pages/TVShows'))
+const MediaDetails = lazy(() => import('./pages/MediaDetails/MediaDetails'))
+const MediaPlayer = lazy(() => import('./pages/MediaPlayer/MediaPlayer'))
+const PremiumCheckout = lazy(() => import('./pages/PremiumCheckout/PremiumCheckout'))
+const ProfileSelection = lazy(() => import('./pages/Profile/ProfileSelection'))
+const ProfileManage = lazy(() => import('./pages/Profile/ProfileManage'))
+const ProfileForm = lazy(() => import('./pages/Profile/ProfileForm'))
+
+const PageLoader = () => <div className="min-h-screen flex items-center justify-center" />
 
 const RootLayout = () => {
   return (
@@ -31,92 +35,144 @@ const RootLayout = () => {
     </AppProvider>
   )
 }
+
 const router = createBrowserRouter([
   {
     path: '/',
     element: <RootLayout />,
     children: [
-      // === NHÓM 1: CÁC TRANG CÓ NAVBAR & FOOTER ===
       {
-        element: <MainLayout />, // Đặt khung Layout ở đây
+        element: <MainLayout />,
         children: [
           {
             path: '/',
             element: (
-              <HomeProvider>
-                <Home />
-              </HomeProvider>
+              <Suspense fallback={<PageLoader />}>
+                <HomeProvider>
+                  <Home />
+                </HomeProvider>
+              </Suspense>
             ),
           },
           {
             path: '/movie/:slug',
             element: (
-              <DetailProvider>
-                <MediaDetails />
-              </DetailProvider>
+              <Suspense fallback={<PageLoader />}>
+                <DetailProvider>
+                  <MediaDetails />
+                </DetailProvider>
+              </Suspense>
             ),
           },
           {
             path: '/video/:slug',
             element: (
-              <DetailProvider>
-                <MediaPlayer />
-              </DetailProvider>
+              <Suspense fallback={<PageLoader />}>
+                <DetailProvider>
+                  <MediaPlayer />
+                </DetailProvider>
+              </Suspense>
             ),
           },
           {
             path: '/my-list',
-            element: <MyList />,
+            element: (
+              <Suspense fallback={<PageLoader />}>
+                <MyList />
+              </Suspense>
+            ),
           },
           {
             path: '/premium',
-            element: <PremiumCheckout />,
+            element: (
+              <Suspense fallback={<PageLoader />}>
+                <PremiumCheckout />
+              </Suspense>
+            ),
           },
           {
             path: '/search',
-            element: <Search />,
+            element: (
+              <Suspense fallback={<PageLoader />}>
+                <Search />
+              </Suspense>
+            ),
           },
           {
             path: '/movies',
-            element: <Movies />,
+            element: (
+              <Suspense fallback={<PageLoader />}>
+                <Movies />
+              </Suspense>
+            ),
           },
           {
             path: '/tv-shows',
-            element: <TVShows />,
+            element: (
+              <Suspense fallback={<PageLoader />}>
+                <TVShows />
+              </Suspense>
+            ),
           },
         ],
       },
 
-      // === NHÓM 2: CÁC TRANG ĐỘC LẬP (KHÔNG CÓ NAVBAR/FOOTER) ===
       {
         path: '/login',
-        element: <Login />,
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <Login />
+          </Suspense>
+        ),
       },
       {
         path: '/register',
-        element: <Register />,
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <Register />
+          </Suspense>
+        ),
       },
       {
         path: '/forgot-password',
-        element: <ForgotPassword />,
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <ForgotPassword />
+          </Suspense>
+        ),
       },
 
-      // === NHÓM 3: PROFILE (KHÔNG CÓ NAVBAR/FOOTER) ===
       {
         path: '/profiles',
-        element: <ProfileSelection />,
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <ProfileSelection />
+          </Suspense>
+        ),
       },
       {
         path: '/profiles/manage',
-        element: <ProfileManage />,
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <ProfileManage />
+          </Suspense>
+        ),
       },
       {
         path: '/profiles/add',
-        element: <ProfileForm />,
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <ProfileForm />
+          </Suspense>
+        ),
       },
       {
         path: '/profiles/edit/:id',
-        element: <ProfileForm />,
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <ProfileForm />
+          </Suspense>
+        ),
       },
     ],
   },
@@ -131,3 +187,4 @@ const App = () => {
 }
 
 export default App
+

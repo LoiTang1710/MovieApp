@@ -74,9 +74,7 @@ const TVShows = () => {
     navigate(`/video/${show.id}`)
   }
 
-  const handleToggleLike = (showId) => {
-    console.log('Toggle like for:', showId)
-  }
+  const handleToggleLike = () => {}
 
   if (isError) {
     return (

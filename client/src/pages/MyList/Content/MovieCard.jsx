@@ -8,6 +8,7 @@ export default function MovieCard({ movie, onToggleLike }) {
           src={`https://image.tmdb.org/t/p/w500${movie.posterPath || movie.poster}`}
           alt={movie.title}
           className="w-full h-full object-cover"
+          loading="lazy"
           onError={(e) => {
             e.target.style.display = 'none'
           }}
@@ -23,7 +24,7 @@ export default function MovieCard({ movie, onToggleLike }) {
           <Heart size={15} fill={movie.liked ? 'currentColor' : 'none'} />
         </button>
       </div>
-      <p className="mt-2 text-sm font-semibold text-gray-100 leading-snug">
+      <p className="mt-2 text-sm font-medium text-gray-100 leading-snug">
         {movie.title}
       </p>
       <p className="mt-1 text-xs text-gray-400 flex items-center gap-1.5">

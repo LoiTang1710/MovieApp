@@ -1,12 +1,11 @@
 import axios from 'axios'
 import { resolveServerUrl } from '../utils/env.js'
 
-/** baseURL rỗng = dùng Vite proxy /api; có URL = gọi thẳng backend */
 const API_BASE = resolveServerUrl()
 
 export const authClient = axios.create({
   baseURL: API_BASE,
-  withCredentials: true, // Quan trọng: Cho phép gửi/nhận Cookie session
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -15,16 +14,34 @@ export const authClient = axios.create({
 authClient.interceptors.response.use(
   (response) => response,
   (error) => {
+    // Lấy thông tin về request gốc vừa bị lỗi
+    const originalRequest = error.config
+
     if (error.response?.status === 401) {
-      // Session hết hạn hoặc người dùng chưa đăng nhập
-      console.warn('Session expired or Unauthorized. Redirecting to login...')
-      // Bạn có thể thêm logic xóa dữ liệu user trong Global State hoặc redirect tại đây
-      // window.location.href = '/login';
+      // 1. CÁC ĐƯỜNG DẪN NGOẠI LỆ (Không redirect)
+      // Nếu API bị lỗi 401 là API dùng để "check auth" (như /auth/me hoặc /profiles)
+      // thì KHÔNG đá văng ra trang login.
+      if (
+        originalRequest.url.includes('/auth/me') ||
+        originalRequest.url.includes('/profiles')
+      ) {
+        // Chỉ đơn giản là trả về lỗi để UI tự xử lý (hiện nút Login)
+        return Promise.reject(error)
+      }
+
+      // 2. LOGIC ĐÁ VĂNG (Dành cho các API bắt buộc phải có quyền)
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login'
+      }
     }
+
+    if (error.response?.status >= 500) {
+      console.error('Server error:', error.response.status)
+    }
+
     return Promise.reject(error)
   },
 )
 
-/** Xuất thêm mediaClient để sử dụng trong các hooks như useMedias */
 export const mediaClient = authClient
 export const apiClient = authClient
