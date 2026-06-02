@@ -7,7 +7,10 @@ import Footer from './Footer'; // Tái sử dụng Footer của bạn
 export default function AuthLayout({ children }) {
   return (
     // Bọc toàn bộ trang, flex-col để đẩy footer xuống đáy và header lên đầu
-    <div className="min-h-screen text-white flex flex-col font-sans" style={{background: 'radial-gradient(ellipse at 50% 0%, #3d0000 0%, #1a0000 40%, #0d0000 100%)'}}>
+    <div className="min-h-screen text-white flex flex-col font-sans bg-bg-default relative overflow-hidden">
+      {/* Background glow effects to match global glassmorphism style */}
+      <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-primary/20 blur-[120px] rounded-full pointer-events-none"></div>
+      <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-primary/10 blur-[120px] rounded-full pointer-events-none"></div>
       
       {/* 1. Header có sẵn của bạn */}
       <Header />

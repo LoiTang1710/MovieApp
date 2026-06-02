@@ -36,8 +36,10 @@ export default function ProfileManage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex flex-col text-white"
-        style={{background: 'radial-gradient(ellipse at 50% 0%, #3d0000 0%, #1a0000 40%, #0d0000 100%)'}}>
+      <div className="min-h-screen flex flex-col text-white relative overflow-hidden bg-bg-default">
+      {/* Background glow effects */}
+      <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-primary/20 blur-[120px] rounded-full pointer-events-none"></div>
+      <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-primary/10 blur-[120px] rounded-full pointer-events-none"></div>
         <main className="grow flex items-center justify-center p-4">
           <div className="w-full max-w-lg bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl shadow-[0_0_50px_rgba(220,38,38,0.1)] p-10 md:p-14">
             <h1 className="text-3xl md:text-4xl font-medium mb-10">Quản lý hồ sơ</h1>
@@ -50,8 +52,10 @@ export default function ProfileManage() {
 
   if (isError) {
     return (
-      <div className="min-h-screen flex flex-col text-white"
-        style={{background: 'radial-gradient(ellipse at 50% 0%, #3d0000 0%, #1a0000 40%, #0d0000 100%)'}}>
+      <div className="min-h-screen flex flex-col text-white relative overflow-hidden bg-bg-default">
+      {/* Background glow effects */}
+      <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-primary/20 blur-[120px] rounded-full pointer-events-none"></div>
+      <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-primary/10 blur-[120px] rounded-full pointer-events-none"></div>
         <main className="grow flex items-center justify-center p-4">
           <div className="w-full max-w-lg bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl shadow-[0_0_50px_rgba(220,38,38,0.1)] p-10 md:p-14">
             <div className="flex items-center mb-10">
@@ -76,8 +80,10 @@ export default function ProfileManage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col text-white"
-      style={{background: 'radial-gradient(ellipse at 50% 0%, #3d0000 0%, #1a0000 40%, #0d0000 100%)'}}>
+    <div className="min-h-screen flex flex-col text-white relative overflow-hidden bg-bg-default">
+      {/* Background glow effects */}
+      <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-primary/20 blur-[120px] rounded-full pointer-events-none"></div>
+      <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-primary/10 blur-[120px] rounded-full pointer-events-none"></div>
       <main className="grow flex items-center justify-center p-4">
         <div className="w-full max-w-lg bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl shadow-[0_0_50px_rgba(220,38,38,0.1)] p-10 md:p-14">
         <div className="flex items-center mb-10">
