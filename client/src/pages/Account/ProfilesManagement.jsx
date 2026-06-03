@@ -99,7 +99,7 @@ export default function ProfilesManagement() {
                 ) : (
                   <>
                     <div className="w-12 h-12 rounded-full bg-zinc-800 flex items-center justify-center border-2 border-transparent hover:border-red-600 transition-colors">
-                      <User className="w-8 text-gray-300 stroke-1" />
+                      <User className="w-8 h-8 text-gray-300 stroke-1" />
                     </div>
                   </>
                 )}
