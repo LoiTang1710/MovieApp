@@ -77,7 +77,11 @@ export default function SecuritySettings() {
       newErrors.confirmPassword = 'Mật khẩu xác nhận không trùng khớp'
     }
 
-    if (formData.currentPassword === formData.newPassword) {
+    if (
+      formData.currentPassword &&
+      formData.newPassword &&
+      formData.currentPassword === formData.newPassword
+    ) {
       newErrors.newPassword = 'Mật khẩu mới phải khác mật khẩu hiện tại'
     }
 
