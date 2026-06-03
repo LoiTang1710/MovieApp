@@ -92,6 +92,11 @@ export const changePassword = catchAsync(async (req, res) => {
     throw new AppError('Mật khẩu hiện tại không chính xác', StatusCodes.UNAUTHORIZED)
   }
 
+  const isSameAsCurrent = await bcrypt.compare(newPassword, user.password)
+  if (isSameAsCurrent) {
+    throw new AppError('Mật khẩu mới phải khác mật khẩu hiện tại', StatusCodes.BAD_REQUEST)
+  }
+
   const hashedNewPassword = await bcrypt.hash(newPassword, 12)
 
   await prisma.user.update({
