@@ -8,8 +8,6 @@ import {
   fetchCollectionsApi,
 } from '../../../../api/collection.api.js'
 import { useAuth } from '../../../../hooks/useAuth.jsx'
-import { useHome } from '../../../../contexts/HomeContext.jsx'
-
 
 // THÊM prop variant vào đây (mặc định là 'detail')
 const FavouriteButton = ({ movie, variant = 'detail' }) => {
@@ -17,16 +15,14 @@ const FavouriteButton = ({ movie, variant = 'detail' }) => {
   const isHome = location.pathname === '/'
   const queryClient = useQueryClient()
   const [isModalOpen, setIsModalOpen] = useState(false)
-  
-  const { isAuthenticated } = useAuth()
-  const { setIsLoginModalOpen } = useHome()
+
+  const { isAuthenticated, isLoginModalOpen, setIsLoginModalOpen } = useAuth()
 
   const { data: collections = [], isLoading: isLoadingCollections } = useQuery({
     queryKey: ['collections'],
     queryFn: fetchCollectionsApi,
     enabled: isAuthenticated,
   })
-  
 
   const isLoved = useMemo(() => {
     if (!collections || collections.length === 0 || !movie?.id) return false
@@ -64,6 +60,7 @@ const FavouriteButton = ({ movie, variant = 'detail' }) => {
     e.stopPropagation()
     if (!isAuthenticated) {
       setIsLoginModalOpen(true)
+      return
     }
     if (!movie?.id) {
       toast.error('Không tìm thấy thông tin phim!')
@@ -119,8 +116,6 @@ const FavouriteButton = ({ movie, variant = 'detail' }) => {
           </p>
         </div>
       )}
-
-      
 
       {/* Modal chọn list */}
       {isModalOpen && (

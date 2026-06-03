@@ -1,38 +1,63 @@
 import { Outlet, createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { Suspense } from 'react'
 import { lazy } from 'react'
-import {HomeProvider} from './providers/HomeProvider'
+import { HomeProvider } from './providers/HomeProvider'
 import AppProvider from './providers/AppProvider'
 import MainLayout from './components/layouts/MainLayout'
 import DetailProvider from './providers/DetailProvider'
 import { AuthProvider } from './providers/AuthProvider'
 import ScrollToTop from './utils/scrollToTop'
 import { ToastContainer } from 'react-toastify'
+import { useAuth } from './hooks/useAuth.jsx'
+import RequireLoginModal from './components/common/Modals/RequireLoginModal.jsx'
 
 const Home = lazy(() => import('./pages/Home'))
 const Login = lazy(() => import('./pages/Auth/Login/Login'))
 const Register = lazy(() => import('./pages/Auth/Register/Register'))
-const ForgotPassword = lazy(() => import('./pages/Auth/ForgotPassword/ForgotPassword'))
+const ForgotPassword = lazy(
+  () => import('./pages/Auth/ForgotPassword/ForgotPassword'),
+)
 const MyList = lazy(() => import('./pages/MyList/MyList'))
 const Search = lazy(() => import('./pages/Search/Search'))
 const Movies = lazy(() => import('./pages/Movies'))
 const TVShows = lazy(() => import('./pages/TVShows'))
 const MediaDetails = lazy(() => import('./pages/MediaDetails/MediaDetails'))
 const MediaPlayer = lazy(() => import('./pages/MediaPlayer/MediaPlayer'))
-const PremiumCheckout = lazy(() => import('./pages/PremiumCheckout/PremiumCheckout'))
-const ProfileSelection = lazy(() => import('./pages/Profile/ProfileSelection'))
-const ProfileManage = lazy(() => import('./pages/Profile/ProfileManage'))
-const ProfileForm = lazy(() => import('./pages/Profile/ProfileForm'))
+const PremiumCheckout = lazy(
+  () => import('./pages/PremiumCheckout/PremiumCheckout'),
+)
+const AccountSettings = lazy(() => import('./pages/Account/AccountSettings'))
 
-const PageLoader = () => <div className="min-h-screen flex items-center justify-center" />
+const PageLoader = () => (
+  <div className="min-h-screen flex items-center justify-center" />
+)
 
+// 1. Tạo component con để xử lý UI và Gọi hook useAuth hợp lệ
+const AppContent = () => {
+  const { isLoginModalOpen, setIsLoginModalOpen } = useAuth()
+
+  return (
+    <>
+      <ScrollToTop />
+      <Outlet />
+      <ToastContainer position="bottom-right" autoClose={1000} theme="dark" />
+
+      {/* Modal nằm ở đây sẽ nhận được state từ AuthProvider toàn cục */}
+      <RequireLoginModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+        message="Bạn cần đăng nhập để lưu phim vào danh sách yêu thích."
+      />
+    </>
+  )
+}
+
+// 2. RootLayout đóng vai trò bọc Provider thiết lập môi trường
 const RootLayout = () => {
   return (
     <AppProvider>
       <AuthProvider>
-        <ScrollToTop />
-        <Outlet />
-        <ToastContainer/>
+        <AppContent />
       </AuthProvider>
     </AppProvider>
   )
@@ -104,9 +129,7 @@ const router = createBrowserRouter([
             path: '/movies',
             element: (
               <Suspense fallback={<PageLoader />}>
-
-                  <Movies />
-
+                <Movies />
               </Suspense>
             ),
           },
@@ -118,9 +141,16 @@ const router = createBrowserRouter([
               </Suspense>
             ),
           },
+          {
+            path: '/account',
+            element: (
+              <Suspense fallback={<PageLoader />}>
+                <AccountSettings />
+              </Suspense>
+            ),
+          },
         ],
       },
-
       {
         path: '/login',
         element: (
@@ -145,39 +175,6 @@ const router = createBrowserRouter([
           </Suspense>
         ),
       },
-
-      {
-        path: '/profiles',
-        element: (
-          <Suspense fallback={<PageLoader />}>
-            <ProfileSelection />
-          </Suspense>
-        ),
-      },
-      {
-        path: '/profiles/manage',
-        element: (
-          <Suspense fallback={<PageLoader />}>
-            <ProfileManage />
-          </Suspense>
-        ),
-      },
-      {
-        path: '/profiles/add',
-        element: (
-          <Suspense fallback={<PageLoader />}>
-            <ProfileForm />
-          </Suspense>
-        ),
-      },
-      {
-        path: '/profiles/edit/:id',
-        element: (
-          <Suspense fallback={<PageLoader />}>
-            <ProfileForm />
-          </Suspense>
-        ),
-      },
     ],
   },
 ])
@@ -191,4 +188,3 @@ const App = () => {
 }
 
 export default App
-

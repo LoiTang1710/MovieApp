@@ -6,9 +6,11 @@ import { useMyPremiumSubscription } from '../../../hooks/usePremium.jsx'
 import { useDebounce } from '../../../hooks/useDebounce.jsx'
 import { useSearch } from '../../../hooks/useSearch.jsx'
 import { createSlug } from '../../../utils/formatters.js'
+import { useQueryClient } from '@tanstack/react-query'
 
 const AppBar = () => {
   const { user, isAuthenticated: isLogged, logout } = useAuth()
+  const queryClient = useQueryClient()
   const { data: premiumSubscription } = useMyPremiumSubscription({
     enabled: isLogged,
   })
@@ -66,7 +68,16 @@ const AppBar = () => {
       setSearchTerm('')
     }
   }
-
+  const handleLogoutClick = async () => {
+    try {
+      await logout()
+      queryClient.clear()
+      setIsUserMenuOpen(false)
+      navigate('/')
+    } catch (error) {
+      console.log("Lỗi khi đăng xuất: ", error)
+    }
+  }
   return (
     <div id="AppBar" className="relative w-full">
       <div className="flex border-b border-white/10 justify-between items-center px-8 h-15 bg-black/95 backdrop-blur-md top-0 w-full z-50">
@@ -238,7 +249,7 @@ const AppBar = () => {
               {/* Dropdown Menu */}
               {isUserMenuOpen && (
                 <div className="absolute top-[130%] right-0 mt-3 w-72 bg-[#141414]/95 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-2xl z-50 overflow-hidden ring-1 ring-black/50 transform transition-all animate-in fade-in slide-in-from-top-2">
-                  <div className="p-5 bg-gradient-to-b from-white/[0.04] to-transparent border-b border-white/5">
+                  <div className="p-5 bg-linear-to-b from-white/4 to-transparent border-b border-white/5">
                     <div className="flex items-center gap-4">
                       <div className="relative shrink-0">
                         {getAvatarUrl() ? (
@@ -297,7 +308,7 @@ const AppBar = () => {
                   <div className="p-2 flex flex-col gap-1">
                     <button
                       onClick={() => {
-                        navigate('/profiles')
+                        navigate('/account')
                         setIsUserMenuOpen(false)
                       }}
                       className="w-full px-4 py-2.5 text-sm font-medium text-gray-300 hover:text-white hover:bg-white/10 rounded-xl transition-all flex items-center gap-3 group"
@@ -312,11 +323,7 @@ const AppBar = () => {
                     <div className="h-px bg-white/5 my-1 mx-3"></div>
 
                     <button
-                      onClick={async () => {
-                        await logout()
-                        setIsUserMenuOpen(false)
-                        navigate('/login')
-                      }}
+                      onClick={handleLogoutClick}
                       className="w-full px-4 py-2.5 text-sm font-medium text-red-400 hover:text-white hover:bg-red-600/90 rounded-xl transition-all flex items-center gap-3 group"
                     >
                       <LogOut

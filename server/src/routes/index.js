@@ -9,11 +9,12 @@ import commentRoutes from './comment.route.js'
 import devRoutes from './dev.route.js'
 import profileRoutes from './profile.route.js'
 import collectionsRoutes from './collection.route.js'
-
+import userRoutes from './user.route.js'
 
 const apiRouter = express.Router()
 
 apiRouter.use('/auth', authRoutes)
+apiRouter.use('/users', userRoutes)
 apiRouter.use('/stats', statsRoutes) 
 apiRouter.use('/medias', mediasRoutes)
 apiRouter.use('/premium', premiumRoutes)
