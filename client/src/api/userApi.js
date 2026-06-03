@@ -5,11 +5,11 @@ export const getUserProfileApi = () =>
 
 export const updateUserProfileApi = (data) => {
   const formData = new FormData()
-  if (data.fullName) formData.append('fullName', data.fullName)
-  if (data.phone) formData.append('phone', data.phone)
-  if (data.dateOfBirth) formData.append('dateOfBirth', data.dateOfBirth)
-  if (data.gender) formData.append('gender', data.gender)
-  if (data.avatar) formData.append('avatar', data.avatar)
+  if (data.fullName !== undefined) formData.append('fullName', data.fullName)
+  if (data.phone !== undefined) formData.append('phone', data.phone)
+  if (data.dateOfBirth !== undefined) formData.append('dateOfBirth', data.dateOfBirth)
+  if (data.gender !== undefined) formData.append('gender', data.gender)
+  if (data.avatar !== undefined) formData.append('avatar', data.avatar)
 
   return apiClient.put('/users/profile', formData, {
     headers: {
