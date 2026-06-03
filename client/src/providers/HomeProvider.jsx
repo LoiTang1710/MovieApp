@@ -6,15 +6,18 @@ export const HomeProvider = ({ children }) => {
   const [loved, setLoved] = useState(false)
   const [mediasWatching, setMediasWatching] = useState([])
   const [selectedMediaId, setSelectedMediaId] = useState(null)
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false)
 
+  const {
+    mediasCollection,
+    bannerTrailers,
+    bannerLogos,
+    isLoading,
+    isError,
+    error,
+  } = useMedias()
 
-  const { mediasCollection, bannerTrailers, bannerLogos, isLoading, isError, error } = useMedias()
-
-  
   const activeMediaId =
     selectedMediaId || mediasCollection?.mediaBanner?.[0]?.id
-
 
   return (
     <HomeContext.Provider
@@ -35,8 +38,6 @@ export const HomeProvider = ({ children }) => {
         isLoading,
         isError,
         error,
-        isLoginModalOpen,
-        setIsLoginModalOpen,
       }}
     >
       {children}

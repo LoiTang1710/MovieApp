@@ -3,9 +3,7 @@ import MediaBanner from '../../components/common/Movies/MediaBanner/MediaBanner'
 import MediaCollection from '../../components/common/Movies/MediaCollection/MediaCollection'
 import { useHome } from '../../contexts/HomeContext'
 import HomeSkeleton from './HomeSkeleton'
-import RequireLoginModal from '../../components/common/Modals/RequireLoginModal.jsx'
 import { useState } from 'react'
-
 
 const Home = () => {
   const {
@@ -16,8 +14,6 @@ const Home = () => {
     activeMediaId,
     mediasPopular,
     mediasReleased,
-    isLoginModalOpen,
-    setIsLoginModalOpen,
   } = useHome()
   const [isOpen, setIsOpen] = useState(false)
 
@@ -66,13 +62,7 @@ const Home = () => {
         <MediaBanner key={activeMediaId} />
       )}
       <MediaCollection />
-      {isOpen && <Sidebar onClick={() => setIsOpen(!isOpen)} />}
-      {/* Modal đăng nhập */}
-      <RequireLoginModal
-        isOpen={isLoginModalOpen}
-        onClose={() => setIsLoginModalOpen(false)}
-        message="Bạn cần đăng nhập để lưu phim vào danh sách yêu thích."
-      />
+      {isOpen && <Sidebar onClick={() => setIsOpen(!isOpen)} />}      
     </div>
   )
 }

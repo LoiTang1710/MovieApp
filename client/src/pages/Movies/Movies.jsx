@@ -7,8 +7,11 @@ import { AdvancedFilter } from '../../components/common/Filters/AdvancedFilter'
 import { Pagination } from '../../components/common/Pagination/Pagination'
 import { MovieListSkeletonGrid } from '../../components/common/Skeletons/MovieCardSkeleton'
 import MediaCard_2 from '../../components/common/Movies/MediaCollection/MediaGrid/MediaCard.jsx/MediaCard_2.jsx'
+import RequireLoginModal from '../../components/common/Modals/RequireLoginModal.jsx'
+import { useHome } from '../../contexts/HomeContext.jsx'
 
 const Movies = () => {
+  const { isLoginModalOpen, setIsLoginModalOpen } = useHome()
   // 1. Quản lý State qua URL
   const { filters, updateFilters, resetFilters, setPage } = useMediaFilters()
 
@@ -92,6 +95,11 @@ const Movies = () => {
           </div>
         )}
       </div>
+      <RequireLoginModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+        message="Bạn cần đăng nhập để lưu phim vào danh sách yêu thích."
+      />
     </div>
   )
 }
