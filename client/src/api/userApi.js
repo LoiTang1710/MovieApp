@@ -11,11 +11,7 @@ export const updateUserProfileApi = (data) => {
   if (data.gender !== undefined) formData.append('gender', data.gender)
   if (data.avatar !== undefined) formData.append('avatar', data.avatar)
 
-  return apiClient.put('/users/profile', formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  }).then((res) => res.data.data)
+  return apiClient.put('/users/profile', formData).then((res) => res.data.data)
 }
 
 export const changePasswordApi = (data) =>

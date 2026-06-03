@@ -161,7 +161,7 @@ export default function PersonalInfo() {
                 id="fullName"
                 type="text"
                 name="fullName"
-                value={formData.fullName || displayName}
+                value={formData.fullName}
                 onChange={handleInputChange}
                 placeholder="Nhập họ và tên"
                 className="w-full px-4 py-2.5 bg-bg-default/50 border border-white/10 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500/30 transition-colors duron-200"
@@ -179,7 +179,7 @@ export default function PersonalInfo() {
                 id="phone"
                 type="tel"
                 name="phone"
-                value={formData.phone || displayPhone}
+                value={formData.phone}
                 onChange={handleInputChange}
                 placeholder="Nhập số điện thoại"
                 className="w-full px-4 py-2.5 bg-bg-default/50 border border-white/10 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500/30 transition-colors duration-200"
@@ -197,7 +197,7 @@ export default function PersonalInfo() {
                 id="dateOfBirth"
                 type="date"
                 name="dateOfBirth"
-                value={formData.dateOfBirth || displayDateOfBirth}
+                value={formData.dateOfBirth}
                 onChange={handleInputChange}
                 className="w-full px-4 py-2.5 bg-bg-default/50 border border-white/10 rounded-lg text-white focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500/30 transition-colors duration-200"
               />
@@ -213,7 +213,7 @@ export default function PersonalInfo() {
               <select
                 id="gender"
                 name="gender"
-                value={formData.gender || displayGender}
+                value={formData.gender}
                 onChange={handleInputChange}
                 className="w-full px-4 py-2.5 bg-bg-default/50 border border-white/10 rounded-lg text-white focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500/30 transition-colors duration-200"
               >
@@ -222,7 +222,7 @@ export default function PersonalInfo() {
                 <option value="OTHER">Khác</option>
               </select>
             </div>
-          </div>
+          </div> 
 
           <div className="mt-8 flex justify-end">
             <button
