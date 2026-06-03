@@ -20,9 +20,7 @@ const TVShows = lazy(() => import('./pages/TVShows'))
 const MediaDetails = lazy(() => import('./pages/MediaDetails/MediaDetails'))
 const MediaPlayer = lazy(() => import('./pages/MediaPlayer/MediaPlayer'))
 const PremiumCheckout = lazy(() => import('./pages/PremiumCheckout/PremiumCheckout'))
-const ProfileSelection = lazy(() => import('./pages/Profile/ProfileSelection'))
-const ProfileManage = lazy(() => import('./pages/Profile/ProfileManage'))
-const ProfileForm = lazy(() => import('./pages/Profile/ProfileForm'))
+const AccountSettings = lazy(() => import('./pages/Account/AccountSettings'))
 
 const PageLoader = () => <div className="min-h-screen flex items-center justify-center" />
 
@@ -32,7 +30,7 @@ const RootLayout = () => {
       <AuthProvider>
         <ScrollToTop />
         <Outlet />
-        <ToastContainer/>
+        <ToastContainer position='bottom-right' autoClose={1000} theme='dark'/>
       </AuthProvider>
     </AppProvider>
   )
@@ -118,6 +116,14 @@ const router = createBrowserRouter([
               </Suspense>
             ),
           },
+          {
+            path: '/account',
+            element: (
+              <Suspense fallback={<PageLoader />}>
+                <AccountSettings />
+              </Suspense>
+            ),
+          },
         ],
       },
 
@@ -142,39 +148,6 @@ const router = createBrowserRouter([
         element: (
           <Suspense fallback={<PageLoader />}>
             <ForgotPassword />
-          </Suspense>
-        ),
-      },
-
-      {
-        path: '/profiles',
-        element: (
-          <Suspense fallback={<PageLoader />}>
-            <ProfileSelection />
-          </Suspense>
-        ),
-      },
-      {
-        path: '/profiles/manage',
-        element: (
-          <Suspense fallback={<PageLoader />}>
-            <ProfileManage />
-          </Suspense>
-        ),
-      },
-      {
-        path: '/profiles/add',
-        element: (
-          <Suspense fallback={<PageLoader />}>
-            <ProfileForm />
-          </Suspense>
-        ),
-      },
-      {
-        path: '/profiles/edit/:id',
-        element: (
-          <Suspense fallback={<PageLoader />}>
-            <ProfileForm />
           </Suspense>
         ),
       },

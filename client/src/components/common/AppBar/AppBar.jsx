@@ -238,7 +238,7 @@ const AppBar = () => {
               {/* Dropdown Menu */}
               {isUserMenuOpen && (
                 <div className="absolute top-[130%] right-0 mt-3 w-72 bg-[#141414]/95 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-2xl z-50 overflow-hidden ring-1 ring-black/50 transform transition-all animate-in fade-in slide-in-from-top-2">
-                  <div className="p-5 bg-gradient-to-b from-white/[0.04] to-transparent border-b border-white/5">
+                  <div className="p-5 bg-linear-to-b from-white/4 to-transparent border-b border-white/5">
                     <div className="flex items-center gap-4">
                       <div className="relative shrink-0">
                         {getAvatarUrl() ? (
@@ -297,7 +297,7 @@ const AppBar = () => {
                   <div className="p-2 flex flex-col gap-1">
                     <button
                       onClick={() => {
-                        navigate('/profiles')
+                        navigate('/account')
                         setIsUserMenuOpen(false)
                       }}
                       className="w-full px-4 py-2.5 text-sm font-medium text-gray-300 hover:text-white hover:bg-white/10 rounded-xl transition-all flex items-center gap-3 group"
