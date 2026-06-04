@@ -1,13 +1,14 @@
 import axios from 'axios'
 
-const API_URL = `${import.meta.env.VITE_SERVER_URL || 'http://localhost:5000'}/api`
+// Sử dụng đường dẫn tương đối để đồng bộ với server production
+const API_URL =
+  import.meta.env.MODE === 'production' ? '/api' : 'http://localhost:5000/api' 
 
 const adminApi = axios.create({
   baseURL: API_URL,
   headers: { 'Content-Type': 'application/json' },
   withCredentials: true,
 })
-
 
 const unwrap = (res) => res.data.data
 
@@ -18,7 +19,9 @@ export const fetchViewsReport = (type = 'by_movie') =>
   adminApi.get('/admin/stats/views', { params: { type } }).then(unwrap)
 
 export const exportReport = async () => {
-  const res = await adminApi.get('/admin/stats/export', { responseType: 'blob' })
+  const res = await adminApi.get('/admin/stats/export', {
+    responseType: 'blob',
+  })
   const url = window.URL.createObjectURL(new Blob([res.data]))
   const link = document.createElement('a')
   link.href = url
@@ -56,7 +59,8 @@ export const usersApi = {
 export const promotionsApi = {
   list: (params) => adminApi.get('/admin/promotions', { params }).then(unwrap),
   create: (body) => adminApi.post('/admin/promotions', body).then(unwrap),
-  update: (id, body) => adminApi.put(`/admin/promotions/${id}`, body).then(unwrap),
+  update: (id, body) =>
+    adminApi.put(`/admin/promotions/${id}`, body).then(unwrap),
   remove: (id) => adminApi.delete(`/admin/promotions/${id}`),
 }
 
