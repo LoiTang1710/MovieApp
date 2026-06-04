@@ -52,9 +52,13 @@ export const createApp = () => {
 
   if (isProduction) {
     const clientDistPath = path.join(__dirname, '../../client/dist')
+    const adminDistPath = path.join(__dirname, '../../admin/dist')
     app.use(express.static(clientDistPath))
-
+    app.use('/admin', express.static(adminDistPath))
     // Thay thế '/*p' lỗi bằng cú pháp tham số bắt chuỗi chuẩn của Express 5
+    app.get('/admin/*p', (req, res) => {
+      res.sendFile(path.join(adminDistPath, 'index.html'))
+    })
     app.get('/*p', (req, res) => {
       res.sendFile(path.join(clientDistPath, 'index.html'))
     })
