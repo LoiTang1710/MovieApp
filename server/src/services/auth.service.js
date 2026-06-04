@@ -13,11 +13,17 @@ const verificationCodes = new Map()
 
 // TẠO "NGƯỜI VẬN CHUYỂN" EMAIL (Khởi tạo 1 lần ở ngoài để tối ưu hiệu suất)
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: 'smtp.gmail.com', // Bắt buộc khai báo host thay vì dùng 'service'
+  port: 465, // Sử dụng cổng bảo mật SSL
+  secure: true, // Bật chế độ an toàn
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
+  // Thiết lập Timeout để tránh bị treo (Pending)
+  connectionTimeout: 10000,
+  greetingTimeout: 10000,
+  socketTimeout: 10000,
 })
 
 export const login = async ({ email, password }) => {
