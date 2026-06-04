@@ -83,6 +83,10 @@ export default function PersonalInfo() {
     )
   }
   const displayAvatar = avatarPreview || user?.avatarUrl
+  const displayFullName = user?.fullName || formData.fullName
+  const displayPhone = user?.phone || formData.phone
+  const displayDateOfBirth = user?.dateOfBirth || formData.dateOfBirth
+  const displayGender = user?.gender || formData.gender
 
   return (
     <div className="space-y-8 max-w-2xl">
@@ -155,7 +159,7 @@ export default function PersonalInfo() {
                 id="fullName"
                 type="text"
                 name="fullName"
-                value={formData.fullName}
+                value={displayFullName}
                 onChange={handleInputChange}
                 placeholder="Nhập họ và tên"
                 className="w-full px-4 py-2.5 bg-bg-default/50 border border-white/10 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500/30 transition-colors duron-200"
@@ -173,7 +177,7 @@ export default function PersonalInfo() {
                 id="phone"
                 type="tel"
                 name="phone"
-                value={formData.phone}
+                value={displayPhone}
                 onChange={handleInputChange}
                 placeholder="Nhập số điện thoại"
                 className="w-full px-4 py-2.5 bg-bg-default/50 border border-white/10 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500/30 transition-colors duration-200"
@@ -191,7 +195,7 @@ export default function PersonalInfo() {
                 id="dateOfBirth"
                 type="date"
                 name="dateOfBirth"
-                value={formData.dateOfBirth}
+                value={displayDateOfBirth}
                 onChange={handleInputChange}
                 className="w-full px-4 py-2.5 bg-bg-default/50 border border-white/10 rounded-lg text-white focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500/30 transition-colors duration-200"
               />
@@ -207,7 +211,7 @@ export default function PersonalInfo() {
               <select
                 id="gender"
                 name="gender"
-                value={formData.gender}
+                value={displayGender}
                 onChange={handleInputChange}
                 className="w-full px-4 py-2.5 bg-bg-default/50 border border-white/10 rounded-lg text-white focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500/30 transition-colors duration-200"
               >

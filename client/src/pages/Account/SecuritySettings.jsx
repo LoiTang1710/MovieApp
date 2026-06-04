@@ -97,15 +97,20 @@ export default function SecuritySettings() {
 
   return (
     <div className="space-y-6 max-w-2xl">
-      <div className="bg-slate-900/50 backdrop-blur-sm border border-white/10 rounded-xl p-6 md:p-8">
-        <h3 className="text-lg font-semibold text-white mb-2">Bảo mật tài khoản</h3>
+      <div className="bg-bg-secondary backdrop-blur-sm border border-white/10 rounded-xl p-6 md:p-8">
+        <h3 className="text-lg font-semibold text-white mb-2">
+          Bảo mật tài khoản
+        </h3>
         <p className="text-sm text-white/60 mb-6">
           Cập nhật mật khẩu để bảo vệ tài khoản của bạn
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="currentPassword" className="block text-sm font-medium text-white mb-2">
+            <label
+              htmlFor="currentPassword"
+              className="block text-sm font-medium text-white mb-2"
+            >
               Mật khẩu hiện tại
             </label>
             <div className="relative">
@@ -116,7 +121,7 @@ export default function SecuritySettings() {
                 value={formData.currentPassword}
                 onChange={handleInputChange}
                 placeholder="Nhập mật khẩu hiện tại"
-                className={`w-full px-4 py-2.5 pr-12 bg-slate-800/50 border rounded-lg text-white placeholder-white/40 focus:outline-none transition-colors duration-200 ${
+                className={`w-full px-4 py-2.5 pr-12 bg-bg-default/50 border rounded-lg text-white placeholder-white/40 focus:outline-none transition-colors duration-200 ${
                   errors.currentPassword
                     ? 'border-red-500/50 focus:border-red-500 focus:ring-1 focus:ring-red-500/30'
                     : 'border-white/10 focus:border-red-500 focus:ring-1 focus:ring-red-500/30'
@@ -135,12 +140,17 @@ export default function SecuritySettings() {
               </button>
             </div>
             {errors.currentPassword && (
-              <p className="mt-1.5 text-sm text-red-400">{errors.currentPassword}</p>
+              <p className="mt-1.5 text-sm text-red-400">
+                {errors.currentPassword}
+              </p>
             )}
           </div>
 
           <div>
-            <label htmlFor="newPassword" className="block text-sm font-medium text-white mb-2">
+            <label
+              htmlFor="newPassword"
+              className="block text-sm font-medium text-white mb-2"
+            >
               Mật khẩu mới
             </label>
             <div className="relative">
@@ -151,7 +161,7 @@ export default function SecuritySettings() {
                 value={formData.newPassword}
                 onChange={handleInputChange}
                 placeholder="Nhập mật khẩu mới (tối thiểu 6 ký tự)"
-                className={`w-full px-4 py-2.5 pr-12 bg-slate-800/50 border rounded-lg text-white placeholder-white/40 focus:outline-none transition-colors duration-200 ${
+                className={`w-full px-4 py-2.5 pr-12 bg-bg-default/50 border rounded-lg text-white placeholder-white/40 focus:outline-none transition-colors duration-200 ${
                   errors.newPassword
                     ? 'border-red-500/50 focus:border-red-500 focus:ring-1 focus:ring-red-500/30'
                     : 'border-white/10 focus:border-red-500 focus:ring-1 focus:ring-red-500/30'
@@ -170,12 +180,17 @@ export default function SecuritySettings() {
               </button>
             </div>
             {errors.newPassword && (
-              <p className="mt-1.5 text-sm text-red-400">{errors.newPassword}</p>
+              <p className="mt-1.5 text-sm text-red-400">
+                {errors.newPassword}
+              </p>
             )}
           </div>
 
           <div>
-            <label htmlFor="confirmPassword" className="block text-sm font-medium text-white mb-2">
+            <label
+              htmlFor="confirmPassword"
+              className="block text-sm font-medium text-white mb-2"
+            >
               Xác nhận mật khẩu mới
             </label>
             <div className="relative">
@@ -186,7 +201,7 @@ export default function SecuritySettings() {
                 value={formData.confirmPassword}
                 onChange={handleInputChange}
                 placeholder="Nhập lại mật khẩu mới"
-                className={`w-full px-4 py-2.5 pr-12 bg-slate-800/50 border rounded-lg text-white placeholder-white/40 focus:outline-none transition-colors duration-200 ${
+                className={`w-full px-4 py-2.5 pr-12 bg-bg-default/50 border rounded-lg text-white placeholder-white/40 focus:outline-none transition-colors duration-200 ${
                   errors.confirmPassword
                     ? 'border-red-500/50 focus:border-red-500 focus:ring-1 focus:ring-red-500/30'
                     : 'border-white/10 focus:border-red-500 focus:ring-1 focus:ring-red-500/30'
@@ -205,7 +220,9 @@ export default function SecuritySettings() {
               </button>
             </div>
             {errors.confirmPassword && (
-              <p className="mt-1.5 text-sm text-red-400">{errors.confirmPassword}</p>
+              <p className="mt-1.5 text-sm text-red-400">
+                {errors.confirmPassword}
+              </p>
             )}
           </div>
 
@@ -222,10 +239,13 @@ export default function SecuritySettings() {
         </form>
       </div>
 
-      <div className="bg-slate-900/50 backdrop-blur-sm border border-white/10 rounded-xl p-6 md:p-8">
-        <h3 className="text-lg font-semibold text-white mb-2">Các phiên đăng nhập khác</h3>
+      <div className="bg-bg-secondary backdrop-blur-sm border border-white/10 rounded-xl p-6 md:p-8">
+        <h3 className="text-lg font-semibold text-white mb-2">
+          Các phiên đăng nhập khác
+        </h3>
         <p className="text-sm text-white/60 mb-4">
-          Nếu bạn không nhận ra một phiên đăng nhập, bạn có thể đăng xuất khỏi tất cả các phiên khác.
+          Nếu bạn không nhận ra một phiên đăng nhập, bạn có thể đăng xuất khỏi
+          tất cả các phiên khác.
         </p>
         <button
           type="button"

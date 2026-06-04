@@ -64,23 +64,23 @@ export default function SubscriptionHistory() {
   return (
     <div className="space-y-8 max-w-4xl">
       {currentPlan && (
-        <div className="bg-slate-900/50 backdrop-blur-sm border border-white/10 rounded-xl p-6 md:p-8">
+        <div className="bg-bg-secondary backdrop-blur-sm border border-white/10 rounded-xl p-6 md:p-8">
           <h3 className="text-lg font-semibold text-white mb-6">Gói dịch vụ hiện tại</h3>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-slate-800/30 rounded-lg p-4 border border-white/5">
+            <div className="bg-bg-default/30 rounded-lg p-4 border border-white/5">
               <p className="text-sm text-white/60 mb-1">Gói</p>
               <p className="text-lg font-semibold text-white">{currentPlan.name}</p>
             </div>
 
-            <div className="bg-slate-800/30 rounded-lg p-4 border border-white/5">
+            <div className="bg-bg-default/30 rounded-lg p-4 border border-white/5">
               <p className="text-sm text-white/60 mb-1">Giá</p>
               <p className="text-lg font-semibold text-white">
                 {formatCurrency(currentPlan.price)}
               </p>
             </div>
 
-            <div className="bg-slate-800/30 rounded-lg p-4 border border-white/5">
+            <div className="bg-bg-default/30 rounded-lg p-4 border border-white/5">
               <p className="text-sm text-white/60 mb-1">Trạng thái</p>
               <div className="flex items-center gap-2">
                 <div className={`w-2 h-2 rounded-full ${
@@ -107,7 +107,7 @@ export default function SubscriptionHistory() {
         </div>
       )}
 
-      <div className="bg-slate-900/50 backdrop-blur-sm border border-white/10 rounded-xl p-6 md:p-8">
+      <div className="bg-bg-secondary backdrop-blur-sm border border-white/10 rounded-xl p-6 md:p-8">
         <h3 className="text-lg font-semibold text-white mb-6">Lịch sử giao dịch</h3>
 
         {history && history.length > 0 ? (
