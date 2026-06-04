@@ -7,7 +7,7 @@
     "doc": "docs"
   },
   "scripts": {
-    "build": "npm install --prefix client && npm install --prefix server && npm run build --prefix client && cd server && npx prisma db push && npm run db:seed && npx prisma generate",
+    "build": "npm install --prefix client && npm install --prefix server && npm run build --prefix client && cd server && npx prisma db push && npx prisma generate  && npm run db:seed",
     "start": "npm run start --prefix server"
   },
   "repository": {
