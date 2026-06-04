@@ -85,18 +85,16 @@ export const generateAndSendVerificationCode = async (email, type) => {
   verificationCodes.set(email, { code, expiresAt, type })
 
   // 1. Vẫn giữ lại Log cho môi trường Development để test dưới máy Local cho nhanh
-  if (process.env.NODE_ENV !== 'production') {
-    const timestamp = new Date().toLocaleString('vi-VN')
-    console.log(`\n${'='.repeat(60)}`)
-    console.log(`📧 VERIFICATION CODE GENERATED`)
-    console.log(`${'='.repeat(60)}`)
-    console.log(`⏰ Time: ${timestamp}`)
-    console.log(`📨 Email: ${email}`)
-    console.log(`🔐 Code: ${code}`)
-    console.log(`📝 Type: ${type}`)
-    console.log(`⏳ Expires in: 10 minutes`)
-    console.log(`${'='.repeat(60)}\n`)
-  }
+  const timestamp = new Date().toLocaleString('vi-VN')
+  console.log(`\n${'='.repeat(60)}`)
+  console.log(`📧 VERIFICATION CODE GENERATED`)
+  console.log(`${'='.repeat(60)}`)
+  console.log(`⏰ Time: ${timestamp}`)
+  console.log(`📨 Email: ${email}`)
+  console.log(`🔐 Code: ${code}`)
+  console.log(`📝 Type: ${type}`)
+  console.log(`⏳ Expires in: 10 minutes`)
+  console.log(`${'='.repeat(60)}\n`)
 
   // 2. Logic gửi Email thực tế có bọc try...catch
   try {
