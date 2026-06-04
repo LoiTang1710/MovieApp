@@ -5,15 +5,9 @@ const API_URL = `${import.meta.env.VITE_SERVER_URL || 'http://localhost:5000'}/a
 const adminApi = axios.create({
   baseURL: API_URL,
   headers: { 'Content-Type': 'application/json' },
+  withCredentials: true,
 })
 
-adminApi.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token')
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
-  }
-  return config
-})
 
 const unwrap = (res) => res.data.data
 

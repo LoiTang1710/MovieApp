@@ -76,7 +76,7 @@ export default function ProfilesManagement() {
 
   return (
     <div className="space-y-6 max-w-4xl">
-      <div className="bg-slate-900/50 backdrop-blur-sm border border-white/10 rounded-xl p-6 md:p-8">
+      <div className="bg-bg-secondary backdrop-blur-sm border border-white/10 rounded-xl p-6 md:p-8">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-lg font-semibold text-white">
             Hồ sơ xem chung ({profiles.length}/5)
@@ -142,7 +142,7 @@ export default function ProfilesManagement() {
           {canAddMore && (
             <button
               onClick={() => setShowModal(true)}
-              className="aspect-square rounded-lg bg-slate-800/50 border-2 border-dashed border-white/20 hover:border-red-500/50 flex flex-col items-center justify-center text-center transition-all duration-200 group"
+              className="aspect-square rounded-lg bg-white/10 border-2 border-dashed border-white/20 hover:border-red-500/50 flex flex-col items-center justify-center text-center transition-all duration-200 group"
             >
               <Plus className="w-8 h-8 text-white/40 group-hover:text-red-500 transition-colors mb-2" />
               <p className="text-xs text-white/40 group-hover:text-red-500 transition-colors font-medium">

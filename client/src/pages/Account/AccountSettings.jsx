@@ -35,7 +35,7 @@ export default function AccountSettings() {
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-white mb-2">Cài đặt tài khoản</h1>
-          <p className="text-slate-400">Quản lý thông tin, bảo mật và các gói dịch vụ của bạn</p>
+          <p className="text-white/50">Quản lý thông tin, bảo mật và các gói dịch vụ của bạn</p>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-8">
@@ -50,12 +50,15 @@ export default function AccountSettings() {
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
                     className={`flex items-center gap-3 px-4 py-3 rounded transition-all duration-200 whitespace-nowrap lg:whitespace-normal
-                      ${isActive 
-                        ? 'bg-red-500/10 text-red-500 border border-red-500/20' 
-                        : 'text-slate-400 hover:bg-white/5 hover:text-slate-200 border border-transparent'
+                      ${
+                        isActive
+                          ? 'bg-red-500/10 text-red-500 border border-red-500/20'
+                          : 'text-white/40 hover:bg-white/5 hover:text-slate-200 border border-transparent'
                       }`}
                   >
-                    <Icon className={`w-5 h-5 ${isActive ? 'text-red-500' : 'text-slate-400'}`} />
+                    <Icon
+                      className={`w-5 h-5 ${isActive ? 'text-red-500' : 'text-white/40'}`}
+                    />
                     <span className="font-medium text-sm">{tab.label}</span>
                   </button>
                 )
