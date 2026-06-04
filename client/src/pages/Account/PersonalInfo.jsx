@@ -25,6 +25,7 @@ export default function PersonalInfo() {
 
   const { mutate: updateProfile, isPending: isUpdating } = useMutation({
     mutationFn: (data) => updateUserProfileApi(data),
+    // eslint-disable-next-line no-unused-vars
     onSuccess: (data) => {
       toast.success('Cập nhật thông tin thành công')
       queryClient.invalidateQueries({ queryKey: ['userProfile'] })
@@ -81,14 +82,7 @@ export default function PersonalInfo() {
       </div>
     )
   }
-
   const displayAvatar = avatarPreview || user?.avatarUrl
-  const displayName = user?.fullName || ''
-  const displayPhone = user?.phone || ''
-  const displayDateOfBirth = user?.dateOfBirth
-    ? user.dateOfBirth.split('T')[0]
-    : ''
-  const displayGender = user?.gender || 'MALE'
 
   return (
     <div className="space-y-8 max-w-2xl">
