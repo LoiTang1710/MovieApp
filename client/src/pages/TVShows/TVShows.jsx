@@ -1,63 +1,32 @@
 import { useEffect } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import axios from 'axios'
 
 import { useMediaFilters } from '../../hooks/useMediaFilters'
 import { AdvancedFilter } from '../../components/common/Filters/AdvancedFilter'
 import { Pagination } from '../../components/common/Pagination/Pagination'
 import { MovieListSkeletonGrid } from '../../components/common/Skeletons/MovieCardSkeleton'
 import MediaCard_2 from '../../components/common/Movies/MediaCollection/MediaGrid/MediaCard.jsx/MediaCard_2.jsx'
+import { useTVGenres, useTVShowsList } from '../../hooks/useTVShows.jsx'
 
-// Lưu ý: Đảm bảo biến môi trường này trỏ đúng vào API của bạn
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api'
+// 1. IMPORT HAI HOOK BẠN ĐÃ VIẾT (Nhớ sửa đường dẫn nếu file useTVShows.js nằm ở thư mục khác)
+
 
 const TVShows = () => {
-  // 1. Quản lý toàn bộ State qua URL thông qua Hook
   const { filters, updateFilters, resetFilters, setPage } = useMediaFilters()
 
-  // 2. Fetch danh sách thể loại TV Shows
-  const { data: genresData, isLoading: isGenresLoading } = useQuery({
-    queryKey: ['tv-genres'],
-    queryFn: async () => {
-      const response = await axios.get(`${API_BASE_URL}/medias/genres/tv`)
-      return response.data.genres || response.data || []
+  // 2. DÙNG HOOK LẤY THỂ LOẠI (Rất ngắn gọn và sạch sẽ)
+  const { data: genresData, isLoading: isGenresLoading } = useTVGenres()
+
+  // 3. DÙNG HOOK LẤY DANH SÁCH TV SHOWS DỰA TRÊN FILTERS
+  const { data, isLoading, isError, error } = useTVShowsList(
+    filters.page || 1,
+    {
+      year: filters.year,
+      genres: filters.genres,
+      minRating: filters.minRating,
     },
-    staleTime: 24 * 60 * 60 * 1000, // Cache 24 tiếng vì thể loại hiếm khi đổi
-    gcTime: 30 * 60 * 60 * 1000,
-  })
+  )
 
-  // 3. Fetch dữ liệu TV Shows dựa trên URL Params
-  const { data, isLoading, isError, error } = useQuery({
-    // queryKey chứa toàn bộ filters. Bất cứ khi nào URL đổi, TanStack sẽ tự gọi lại API.
-    queryKey: [
-      'tvshows',
-      filters.year,
-      filters.genres,
-      filters.minRating,
-      filters.page,
-    ],
-    queryFn: async () => {
-      const params = new URLSearchParams()
-      params.append('page', filters.page || 1)
-
-      if (filters.year) params.append('year', filters.year)
-      if (filters.genres?.length > 0) {
-        filters.genres.forEach((g) => params.append('genres', g))
-      }
-      if (filters.minRating) params.append('minRating', filters.minRating)
-
-      // GỌI ĐÚNG ENDPOINT DÀNH CHO TV SHOWS
-      const response = await axios.get(
-        `${API_BASE_URL}/medias/tv-shows?${params}`,
-      )
-      return response.data
-    },
-    staleTime: 5 * 60 * 1000, // 5 phút
-    gcTime: 10 * 60 * 1000,
-    placeholderData: (previousData) => previousData, // Giữ data cũ mượt mà trong lúc tải data mới
-  })
-
+  // Dữ liệu bóc tách an toàn
   const shows = data?.results || []
   const totalPages = data?.totalPages || 1
   const genres = genresData || []
@@ -82,7 +51,6 @@ const TVShows = () => {
   return (
     <div className="min-h-screen pb-20">
       <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-white mb-2">
             Chương trình TV
@@ -92,7 +60,6 @@ const TVShows = () => {
           </p>
         </div>
 
-        {/* Filter Component */}
         {!isGenresLoading && (
           <AdvancedFilter
             genresList={genres}
@@ -102,7 +69,6 @@ const TVShows = () => {
           />
         )}
 
-        {/* Shows Grid */}
         {isLoading ? (
           <MovieListSkeletonGrid count={20} />
         ) : shows.length > 0 ? (
@@ -117,10 +83,9 @@ const TVShows = () => {
               ))}
             </div>
 
-            {/* Pagination */}
             <Pagination
               currentPage={filters.page || 1}
-              totalPages={Math.min(totalPages, 500)} // Giới hạn API của TMDB thường là 500 trang
+              totalPages={Math.min(totalPages, 500)}
               onPageChange={setPage}
             />
           </>
