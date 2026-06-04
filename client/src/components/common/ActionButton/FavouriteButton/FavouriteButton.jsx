@@ -16,7 +16,7 @@ const FavouriteButton = ({ movie, variant = 'detail' }) => {
   const queryClient = useQueryClient()
   const [isModalOpen, setIsModalOpen] = useState(false)
 
-  const { isAuthenticated, isLoginModalOpen, setIsLoginModalOpen } = useAuth()
+  const { isAuthenticated, setIsLoginModalOpen } = useAuth()
 
   const { data: collections = [], isLoading: isLoadingCollections } = useQuery({
     queryKey: ['collections'],

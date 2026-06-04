@@ -1,0 +1,24 @@
+{
+  "name": "movieapp",
+  "version": "1.0.0",
+  "description": "Chào mừng các bạn đến với đồ án môn **Software Engineering (SE)**. Repo này chứa toàn bộ mã nguồn frontend và backend của ứng dụng MovieApp, được tổ chức theo mô hình **MVC** cho backend và **component-based** cho frontend.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "build": "npm install --prefix client && npm install --prefix server && npm run build --prefix client && npx prisma generate --schema=./server/prisma/schema.prisma",
+    "start": "npm run start --prefix server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LoiTang1710/MovieApp.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/LoiTang1710/MovieApp/issues"
+  },
+  "homepage": "https://github.com/LoiTang1710/MovieApp#readme"
+}
