@@ -1,8 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
-import axios from 'axios'
+// 1. IMPORT mediaClient CHUẨN CỦA DỰ ÁN
+import { mediaClient } from '../api/axiosClient'
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api'
-
+// ==========================================
+// 1. HOOK LẤY DANH SÁCH TV SHOWS
+// ==========================================
 export const useTVShowsList = (page = 1, filters = {}) => {
   const { year, genres, minRating } = filters
 
@@ -17,9 +19,8 @@ export const useTVShowsList = (page = 1, filters = {}) => {
       }
       if (minRating) params.append('minRating', minRating)
 
-      const response = await axios.get(
-        `${API_BASE_URL}/medias/tv-shows?${params}`
-      )
+      // 2. Dùng mediaClient, bỏ hoàn toàn API_BASE_URL
+      const response = await mediaClient.get(`/medias/tv-shows?${params}`)
       return response.data
     },
     staleTime: 5 * 60 * 1000,
@@ -27,14 +28,20 @@ export const useTVShowsList = (page = 1, filters = {}) => {
   })
 }
 
+// ==========================================
+// 2. HOOK LẤY THỂ LOẠI TV SHOWS
+// ==========================================
 export const useTVGenres = () => {
   return useQuery({
     queryKey: ['tv-genres'],
     queryFn: async () => {
-      const response = await axios.get(`${API_BASE_URL}/medias/genres/tv`)
-      return response.data.genres || []
+      // 3. Dùng mediaClient cho gọi thể loại
+      const response = await mediaClient.get('/medias/genres/tv')
+
+      // Đề phòng API trả về bọc trong data.genres hoặc trả trực tiếp mảng
+      return response.data?.genres || response.data || []
     },
-    staleTime: 24 * 60 * 60 * 1000, // 24 hours
-    gcTime: 30 * 60 * 60 * 1000, // 30 hours
+    staleTime: 24 * 60 * 60 * 1000, // Cache 24h
+    gcTime: 30 * 60 * 60 * 1000,
   })
 }
