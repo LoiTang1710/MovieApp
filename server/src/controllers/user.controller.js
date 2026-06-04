@@ -1,6 +1,6 @@
 import { StatusCodes } from 'http-status-codes'
 import bcrypt from 'bcryptjs'
-import { AppError } from '../utils/appError.js'
+import { AppError } from '../utils/AppError.js'
 import { catchAsync } from '../utils/catchAsync.js'
 import prisma from '../config/database.config.js'
 
