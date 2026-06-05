@@ -7,11 +7,7 @@ import {
   createCollectionApi,
   deleteCollectionApi,
   toggleFavoriteApi,
-<<<<<<< Updated upstream
 } from '../api/collection.api'
-=======
-} from '../services/collection.service'
->>>>>>> Stashed changes
 
 export const ICON_OPTIONS = [
   { key: 'heart', label: 'Heart' },
@@ -62,10 +58,7 @@ export function useMyList() {
     queryFn: () => fetchMoviesByCollectionApi(resolvedCollectionId),
     enabled: !!resolvedCollectionId, // Chỉ chạy API khi đã có ID
   })
-<<<<<<< Updated upstream
   console.log('Data phim từ API:', movies)
-=======
->>>>>>> Stashed changes
 
   // 3. CÁC MUTATION (THÊM, XÓA, SỬA)
   const createMutation = useMutation({
@@ -129,10 +122,7 @@ export function useMyList() {
         rating: movie.rating || 0,
         year: movie.year || new Date().getFullYear(),
         mediaType: movie.mediaType || 'movie',
-<<<<<<< Updated upstream
         overview: movie.overview || 'Chưa có thông tin mô tả cho phim này.',
-=======
->>>>>>> Stashed changes
       },
     })
   }
