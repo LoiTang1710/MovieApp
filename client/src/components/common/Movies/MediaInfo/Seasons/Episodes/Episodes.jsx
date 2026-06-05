@@ -3,6 +3,7 @@ import { useTvEpisodes } from '../../../../../../hooks/useTvEpisodes'
 import { Link, useLocation } from 'react-router-dom'
 import { createSlug } from '../../../../../../utils/formatters'
 import { useState } from 'react'
+import { moviesApi } from '../../../../../../apis/movie.api'
 
 // ==========================================
 // 1. COMPONENT CON: CHỈ CHỊU TRÁCH NHIỆM RENDER TẬP PHIM
@@ -78,7 +79,15 @@ const EpisodeList = () => {
             isWatching && activeEpisode === episode.episode_number
           return (
             <Link
-              onClick={() => setActiveEpisode(episode.episode_number)}
+              onClick={async () => {
+                setActiveEpisode(episode.episode_number);
+                try {
+                  // Gọi API tăng view khi click vào tập phim
+                  await moviesApi.incrementView(mediaId);
+                } catch (err) {
+                  console.error("Lỗi ghi nhận view:", err);
+                }
+              }}
               key={episode.id}
               to={videoURL}
               state={{

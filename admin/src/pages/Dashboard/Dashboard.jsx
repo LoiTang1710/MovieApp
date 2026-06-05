@@ -28,6 +28,7 @@ export default function Dashboard() {
   const { data, isLoading, isError, isFetching } = useQuery({
     queryKey: ['admin-overview', filter.month, filter.year],
     queryFn: () => fetchAdminOverview({ month: filter.month, year: filter.year }),
+    refetchInterval: 30000, // Tự động cập nhật mỗi 30 giây để theo dõi lượt xem "live"
   })
 
   const handleExport = () => {

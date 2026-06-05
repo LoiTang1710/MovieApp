@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Plus, Pencil, Trash2, Search, Film, ChevronDown } from 'lucide-react'
+import { Plus, Pencil, Trash2, Search, Film, ChevronDown, Eye } from 'lucide-react'
 import PageHeader from '../../components/common/PageHeader'
 import Modal from '../../components/common/Modal'
 import StatusBadge from '../../components/common/StatusBadge'
 import adminApi, { moviesApi } from '../../apis/admin.api'
+import { formatViews } from '../../utils/formatters'
 
 const emptyForm = {
   tmdbId: '',
@@ -174,7 +175,7 @@ export default function Movies() {
               <tr className="text-left text-gray-500 border-b border-white/5">
                 <th className="px-6 py-4 font-semibold">Phim</th>
                 <th className="px-4 py-4 font-semibold">Loại</th>
-                <th className="px-4 py-4 font-semibold">Lượt xem</th>
+                <th className="px-4 py-4 font-semibold flex items-center gap-1">Lượt xem <Eye size={14}/></th>
                 <th className="px-4 py-4 font-semibold">Phân quyền</th>
                 <th className="px-4 py-4 font-semibold">Trạng thái</th>
                 <th className="px-6 py-4 font-semibold text-right">Thao tác</th>
@@ -223,7 +224,7 @@ export default function Movies() {
                       {movie.mediaType === 'movie' ? 'Phim lẻ' : 'Phim bộ'}
                     </td>
                     <td className="px-4 py-4 text-gray-300">
-                      {movie.views?.toLocaleString('vi-VN') || 0}
+                      {formatViews(movie.views)}
                     </td>
                     <td className="px-4 py-4">
                       <span
