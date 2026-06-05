@@ -17,6 +17,7 @@ const LoginPage = () => {
   const [successMsg, setSuccessMsg] = useState('');
 
   const loginMutation = useMutation({
+<<<<<<< Updated upstream
     mutationFn: loginApi,
     onSuccess: async (response) => {
       // loginApi returns the user object directly
@@ -33,6 +34,13 @@ const LoginPage = () => {
       //  Gọi login từ AuthContext để lưu user vào state
       login(userData);
       
+=======
+    mutationFn: async (data) => {
+      const res = await axiosInstance.post('auth/login', data);
+      return res.data;
+    },
+    onSuccess: () => {
+>>>>>>> Stashed changes
       setSuccessMsg('Đăng nhập thành công! Đang chuyển hướng...');
       setTimeout(
         () =>

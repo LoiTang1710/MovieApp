@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 import Episodes from '../../components/common/Movies/MediaInfo/Seasons/Episodes/Episodes'
 import Seasons from '../../components/common/Movies/MediaInfo/Seasons/Seasons'
 
-import FavouriteButton from '../../components/common/ActionButton/FavouriteButton/FavouriteButton'
+// import FavouriteButton from '../../components/common/ActionButton/FavouriteButton/FavouriteButton'
 import SendButton from '../../components/common/ActionButton/SendButton/SendButton'
 import CommentButton from '../../components/common/ActionButton/CommentButton/CommentButton'
 import IMDbScore from '../../components/common/Movies/MediaInfo/IMDbScore/IMDbScore'
@@ -15,7 +15,7 @@ import Poster from '../../components/common/Movies/MediaInfo/Poster/Poster'
 import Casts from '../../components/common/Movies/MediaInfo/Casts/Casts'
 import { createSlug } from '../../utils/formatters'
 import PremiumContentGate from '../../components/common/PremiumContentGate/PremiumContentGate'
-import { useMediaDetails } from '../../hooks/useMediaDetail.jsx'
+import FavouriteButton from '../../components/common/ActionButton/FavouriteButton/FavouriteButton.jsx'
 
 const MediaPlayer = () => {
   const location = useLocation()

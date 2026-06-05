@@ -151,7 +151,6 @@ const seedTestUsers = async () => {
 try {
   await seedPremiumPlans()
   await seedAdminUser()
-  await seedMovies() // <--- Đã sửa thành hàm mới
   await seedPromotions()
   await seedTestUsers()
   console.log('Seed completed: admin, users, movies, promotions.')
