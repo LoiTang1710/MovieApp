@@ -3,7 +3,7 @@ import { useTvEpisodes } from '../../../../../../hooks/useTvEpisodes'
 import { Link, useLocation } from 'react-router-dom'
 import { createSlug } from '../../../../../../utils/formatters'
 import { useState } from 'react'
-import { moviesApi } from '../../../../../../apis/movie.api'
+import { moviesApi } from '../../../../../../api/movie.api'
 
 // ==========================================
 // 1. COMPONENT CON: CHỈ CHỊU TRÁCH NHIỆM RENDER TẬP PHIM
