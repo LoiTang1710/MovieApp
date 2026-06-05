@@ -22,11 +22,11 @@ export const createApp = () => {
         'http://127.0.0.1:5173',
         'http://localhost:5174',
         'http://127.0.0.1:5174',
-      ],
+        process.env.CLIENT_URL, // Thêm biến này vào để điền link deploy thật trên Render của bạn
+      ].filter(Boolean), // Lọc bỏ các giá trị undefined nếu ở local không có
       credentials: true,
     }),
   )
-
   app.use(express.json({ limit: '10mb' }))
   app.use(cookieParser())
   app.use(
@@ -80,9 +80,13 @@ export const createApp = () => {
 const app = createApp()
 
 const START_SERVER = () => {
-  const server = app.listen(env.APP_PORT, () => {
+  // Ưu tiên biến PORT của hệ thống Render trước, nếu không có (ở local) thì mới dùng env.APP_PORT
+  const PORT = process.env.PORT || env.APP_PORT || 3000
+
+  // Bắt buộc thêm '0.0.0.0' để Render có thể kết nối và scan port thành công
+  const server = app.listen(PORT, '0.0.0.0', () => {
     console.log(
-      `Server is running on port ${env.APP_PORT} [Mode: ${process.env.NODE_ENV || 'development'}]`,
+      `🚀 Server đang chạy thành công tại cổng ${PORT} [Chế độ: ${process.env.NODE_ENV || 'development'}]`,
     )
     if (env.ALLOW_DEV_AUTH === 'true') {
       console.log('3. Dev auth: POST /api/dev/token')
