@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 
 // Đã trỏ đúng về nhà mới
 import { AuthContext } from '../contexts/AuthContext.jsx'
 import { getCurrentUserApi, logoutApi } from '../api/auth.api.js'
 
 export const AuthProvider = ({ children }) => {
+  const queryClient = useQueryClient()
   const [user, setUser] = useState(null)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
@@ -37,6 +39,9 @@ export const AuthProvider = ({ children }) => {
   const login = (userData) => {
     setUser(userData)
     setIsAuthenticated(true)
+    queryClient.invalidateQueries({
+      predicate: (q) => q.queryKey[0] === 'comments' || q.queryKey[0] === 'reviews',
+    })
   }
 
   // Logout: Gọi API để destroy session
@@ -48,6 +53,10 @@ export const AuthProvider = ({ children }) => {
     } finally {
       setUser(null)
       setIsAuthenticated(false)
+      window.dispatchEvent(new Event('auth:logout'))
+      queryClient.invalidateQueries({
+        predicate: (q) => q.queryKey[0] === 'comments' || q.queryKey[0] === 'reviews',
+      })
     }
   }
 

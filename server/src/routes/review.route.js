@@ -1,11 +1,10 @@
 import express from 'express'
-import { verifyToken } from '../middlewares/auth.middleware.js'
-import { optionalVerifyToken } from '../middlewares/optionalAuth.middleware.js'
+import { verifyUserSession, optionalVerifyUserSession } from '../middlewares/userAuth.middleware.js'
 import { getSummary, upsertRating } from '../controllers/review.controller.js'
 
 const router = express.Router()
 
-router.get('/:tmdbId/summary', optionalVerifyToken, getSummary)
-router.put('/:tmdbId', verifyToken, upsertRating)
+router.get('/:tmdbId/summary', optionalVerifyUserSession, getSummary)
+router.put('/:tmdbId', verifyUserSession, upsertRating)
 
 export default router

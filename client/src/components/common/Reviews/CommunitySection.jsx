@@ -1,10 +1,9 @@
 import { useState } from 'react'
 import { useDetail } from '../../../contexts/DetailContext'
-import { useDevAuth } from '../../../contexts/DevAuthContext'
+import { useAuth } from '../../../hooks/useAuth.jsx'
 import { useComments, useCreateComment } from '../../../hooks/useComments'
 import { useRatingSummary } from '../../../hooks/useReviews'
 import { getApiErrorMessage } from '../../../utils/apiError'
-import DevAuthBanner from './DevAuthBanner'
 import StarRating from './StarRating'
 import CommentItem from './CommentItem'
 
@@ -12,21 +11,25 @@ const CommunitySection = () => {
   const { mediaId, type, commentsSectionRef } = useDetail()
   const { data: summary } = useRatingSummary(mediaId, type)
   const { data, isLoading, isError } = useComments(mediaId, type)
-  const { isLoggedIn } = useDevAuth()
+  const { isAuthenticated, setIsLoginModalOpen } = useAuth()
   const createComment = useCreateComment(mediaId, type)
   const [content, setContent] = useState('')
   const [error, setError] = useState('')
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!isLoggedIn) {
-      setError('Vui lòng bấm "Đăng nhập User" hoặc "Đăng nhập Admin" ở cột trái trước.')
+
+    if (!isAuthenticated) {
+      setIsLoginModalOpen(true)
+      setError('Vui lòng đăng nhập trước khi bình luận.')
       return
     }
+
     if (content.trim().length < 3) {
       setError('Bình luận phải có ít nhất 3 ký tự.')
       return
     }
+
     setError('')
     try {
       await createComment.mutateAsync(content.trim())
@@ -43,8 +46,6 @@ const CommunitySection = () => {
       className="mt-10 pt-8 border-t border-white/10"
     >
       <h2 className="text-2xl font-bold mb-2">Cộng đồng</h2>
-
-      <DevAuthBanner />
 
       <div className="mb-6 mt-6 flex items-center gap-3 text-sm">
         <StarRating value={Math.round(summary?.averageStars || 0)} readonly size={20} />

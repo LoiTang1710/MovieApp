@@ -5,7 +5,6 @@ import Overview from '../../../MediaInfo/Overview/Overview'
 import Poster from '../../../MediaInfo/Poster/Poster'
 import Title from '../../../MediaInfo/Title/Title'
 import RatingModal from '../../../../Reviews/RatingModal'
-import DevQuickLogin from '../../../../Reviews/DevQuickLogin'
 import { useRatingSummary } from '../../../../../../hooks/useReviews'
 import StarRating from '../../../../Reviews/StarRating'
 
@@ -52,8 +51,6 @@ const ContentLeft = () => {
           Cộng đồng: {communityRating?.averageStars?.toFixed(1) ?? '0.0'} ({communityRating?.totalRatings ?? 0})
         </span>
       </div>
-
-      <DevQuickLogin />
 
       <button
         type="button"
