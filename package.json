@@ -7,8 +7,8 @@
     "doc": "docs"
   },
   "scripts": {
-    "build": "npm install --prefix client && npm install --prefix admin && npm install --prefix server && npm run build --prefix client && npm run build --prefix admin && cd server && npx prisma db push && npx prisma generate  && npm run db:seed",
-    "start": "npm run start --prefix server"
+    "build": "npm install --prefix client && npm install --prefix admin && npm install --prefix server && npm run build --prefix client && npm run build --prefix admin && npm run generate --prefix server",
+    "start": "cd server && npx prisma db push && npm run db:seed && npm run start"
   },
   "repository": {
     "type": "git",
