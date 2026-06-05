@@ -1,3 +1,4 @@
+import prisma from '../config/database.config.js'
 import { tmdbFetch } from '../utils/tmdbFetch.js'
 
 const tmdbFetchAll = async (movie_endpoint, tv_endpoint, option) => {
@@ -16,8 +17,22 @@ export const getImagesPopular = async (type, id) => {
   return tmdbFetch(`/${type}/${id}/images?include_image_language=vi-VN,en-US`)
 }
 export const getMediaDetail = async (id, type) => {
-  return tmdbFetch(`/${type}/${id}?language=vi-VN&append_to_response=credits`)
-}
+  const data = await tmdbFetch(
+    `/${type}/${id}?language=vi-VN&append_to_response=credits`,
+  )
+  const localMovie = await prisma.movie.findUnique({
+    where: {
+      tmdbId_mediaType: {
+        tmdbId: parseInt(id),
+        mediaType: type,
+      },
+    },
+    select: { isPremium: true },
+  })
+  const isPremium = localMovie ? localMovie.isPremium : false
+  data.isPremium = isPremium
+  return data
+} 
 export const getDetailEpisodes = async(id, type, seasonNumber = 1) => {
   return tmdbFetch(`/tv/${id}/season/${seasonNumber}?language=vi-VN`)
 }

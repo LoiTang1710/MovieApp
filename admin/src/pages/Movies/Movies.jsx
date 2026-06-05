@@ -1,24 +1,18 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Plus, Pencil, Trash2, Search, Film } from 'lucide-react'
+import { Plus, Pencil, Trash2, Search, Film, ChevronDown } from 'lucide-react'
 import PageHeader from '../../components/common/PageHeader'
 import Modal from '../../components/common/Modal'
 import StatusBadge from '../../components/common/StatusBadge'
-import { moviesApi } from '../../apis/admin.api'
+import adminApi, { moviesApi } from '../../apis/admin.api'
 
 const emptyForm = {
+  tmdbId: '',
+  mediaType: 'movie',
   title: '',
-  description: '',
-  releaseYear: new Date().getFullYear(),
-  country: '',
-  duration: '',
   posterUrl: '',
-  trailerUrl: '',
-  videoUrl: '',
+  isPremium: false,
   status: 'AVAILABLE',
-  rating: '0',
-  views: '0',
-  genres: '',
 }
 
 const inputClass =
@@ -32,6 +26,27 @@ export default function Movies() {
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState(null)
   const [form, setForm] = useState(emptyForm)
+  const [fetchingTmdb, setFetchingTmdb] = useState(false)
+
+  const handleFetchTmdb = async () => {
+    if (!form.tmdbId) return alert('Vui lòng nhập TMDB ID')
+    try {
+      setFetchingTmdb(true)
+      const res = await adminApi.get('/admin/movies/tmdb/info', {
+        params: { tmdbId: form.tmdbId, mediaType: form.mediaType },
+      })
+      setForm((prev) => ({
+        ...prev,
+        title: res.data.data.title || '',
+        posterUrl: res.data.data.posterUrl || '',
+      }))
+    } catch (err) {
+      alert('Không tìm thấy phim trên TMDB với ID này!')
+      console.log(err)
+    } finally {
+      setFetchingTmdb(false)
+    }
+  }
 
   const { data, isLoading } = useQuery({
     queryKey: ['admin-movies', page, search, statusFilter],
@@ -46,7 +61,9 @@ export default function Movies() {
 
   const saveMutation = useMutation({
     mutationFn: (payload) =>
-      editing ? moviesApi.update(editing.id, payload) : moviesApi.create(payload),
+      editing
+        ? moviesApi.update(editing.id, payload)
+        : moviesApi.create(payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-movies'] })
       closeModal()
@@ -56,7 +73,8 @@ export default function Movies() {
 
   const deleteMutation = useMutation({
     mutationFn: moviesApi.remove,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin-movies'] }),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ['admin-movies'] }),
     onError: (err) => alert(err.response?.data?.message || 'Không thể xóa'),
   })
 
@@ -66,21 +84,16 @@ export default function Movies() {
     setModalOpen(true)
   }
 
+  // ✅ Đã dọn dẹp các trường cũ, chỉ map dữ liệu đúng với Schema hiện tại
   const openEdit = (movie) => {
     setEditing(movie)
     setForm({
-      title: movie.title,
-      description: movie.description,
-      releaseYear: movie.releaseYear,
-      country: movie.country || '',
-      duration: movie.duration?.toString() || '',
+      tmdbId: movie.tmdbId?.toString() || '',
+      mediaType: movie.mediaType || 'movie',
+      title: movie.title || '',
       posterUrl: movie.posterUrl || '',
-      trailerUrl: movie.trailerUrl || '',
-      videoUrl: movie.videoUrl || '',
-      status: movie.status,
-      rating: movie.rating?.toString() || '0',
-      views: movie.views?.toString() || '0',
-      genres: movie.genres?.map((g) => g.name).join(', ') || '',
+      isPremium: movie.isPremium || false,
+      status: movie.status || 'AVAILABLE',
     })
     setModalOpen(true)
   }
@@ -91,12 +104,10 @@ export default function Movies() {
     setForm(emptyForm)
   }
 
+  // ✅ Đã sửa lỗi sập form: Không còn code xử lý genres nữa
   const handleSubmit = (e) => {
     e.preventDefault()
-    saveMutation.mutate({
-      ...form,
-      genres: form.genres.split(',').map((g) => g.trim()).filter(Boolean),
-    })
+    saveMutation.mutate(form)
   }
 
   const handleDelete = (id, title) => {
@@ -107,7 +118,7 @@ export default function Movies() {
     <div className="max-w-7xl mx-auto">
       <PageHeader
         title="Quản lý phim"
-        subtitle="Thêm, sửa, ẩn phim trong thư viện nội bộ"
+        subtitle="Quản lý thư viện phim (Tích hợp TMDB & Vidsrc)"
         action={
           <button
             onClick={openCreate}
@@ -120,10 +131,13 @@ export default function Movies() {
 
       <div className="flex flex-col sm:flex-row gap-3 mb-6">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
+          <Search
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"
+            size={18}
+          />
           <input
             className={`${inputClass} pl-10`}
-            placeholder="Tìm theo tên, quốc gia..."
+            placeholder="Tìm theo tên phim..."
             value={search}
             onChange={(e) => {
               setSearch(e.target.value)
@@ -131,18 +145,26 @@ export default function Movies() {
             }}
           />
         </div>
-        <select
-          className={inputClass + ' sm:w-40'}
-          value={statusFilter}
-          onChange={(e) => {
-            setStatusFilter(e.target.value)
-            setPage(1)
-          }}
-        >
-          <option value="">Tất cả trạng thái</option>
-          <option value="AVAILABLE">AVAILABLE</option>
-          <option value="HIDDEN">HIDDEN</option>
-        </select>
+
+        {/* ✅ Select Filter đã được bọc lại và đổi Icon */}
+        <div className="relative sm:w-40">
+          <select
+            className={`${inputClass} appearance-none pr-10`}
+            value={statusFilter}
+            onChange={(e) => {
+              setStatusFilter(e.target.value)
+              setPage(1)
+            }}
+          >
+            <option value="">Tất cả trạng thái</option>
+            <option value="AVAILABLE">AVAILABLE</option>
+            <option value="HIDDEN">HIDDEN</option>
+          </select>
+          <ChevronDown
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"
+            size={16}
+          />
+        </div>
       </div>
 
       <div className="bg-[#121212] border border-white/5 rounded-2xl overflow-hidden">
@@ -151,9 +173,9 @@ export default function Movies() {
             <thead>
               <tr className="text-left text-gray-500 border-b border-white/5">
                 <th className="px-6 py-4 font-semibold">Phim</th>
-                <th className="px-4 py-4 font-semibold">Năm</th>
+                <th className="px-4 py-4 font-semibold">Loại</th>
                 <th className="px-4 py-4 font-semibold">Lượt xem</th>
-                <th className="px-4 py-4 font-semibold">Đánh giá</th>
+                <th className="px-4 py-4 font-semibold">Phân quyền</th>
                 <th className="px-4 py-4 font-semibold">Trạng thái</th>
                 <th className="px-6 py-4 font-semibold text-right">Thao tác</th>
               </tr>
@@ -161,13 +183,19 @@ export default function Movies() {
             <tbody>
               {isLoading ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
+                  <td
+                    colSpan={6}
+                    className="px-6 py-12 text-center text-gray-500"
+                  >
                     Đang tải...
                   </td>
                 </tr>
               ) : data?.items?.length ? (
                 data.items.map((movie) => (
-                  <tr key={movie.id} className="border-b border-white/5 hover:bg-white/[0.02]">
+                  <tr
+                    key={movie.id}
+                    className="border-b border-white/5 hover:bg-white/[0.02]"
+                  >
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         {movie.posterUrl ? (
@@ -182,18 +210,28 @@ export default function Movies() {
                           </div>
                         )}
                         <div>
-                          <p className="font-semibold text-white">{movie.title}</p>
-                          <p className="text-xs text-gray-500 line-clamp-1">
-                            {movie.genres?.map((g) => g.name).join(', ') || '—'}
+                          <p className="font-semibold text-white">
+                            {movie.title}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            TMDB ID: {movie.tmdbId}
                           </p>
                         </div>
                       </div>
                     </td>
-                    <td className="px-4 py-4 text-gray-300">{movie.releaseYear}</td>
                     <td className="px-4 py-4 text-gray-300">
-                      {movie.views?.toLocaleString('vi-VN')}
+                      {movie.mediaType === 'movie' ? 'Phim lẻ' : 'Phim bộ'}
                     </td>
-                    <td className="px-4 py-4 text-yellow-400">{movie.rating}</td>
+                    <td className="px-4 py-4 text-gray-300">
+                      {movie.views?.toLocaleString('vi-VN') || 0}
+                    </td>
+                    <td className="px-4 py-4">
+                      <span
+                        className={`px-2 py-1 text-xs rounded-full font-semibold ${movie.isPremium ? 'bg-yellow-500/20 text-yellow-500' : 'bg-green-500/20 text-green-500'}`}
+                      >
+                        {movie.isPremium ? 'Premium' : 'Free'}
+                      </span>
+                    </td>
                     <td className="px-4 py-4">
                       <StatusBadge status={movie.status} />
                     </td>
@@ -217,7 +255,10 @@ export default function Movies() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
+                  <td
+                    colSpan={6}
+                    className="px-6 py-12 text-center text-gray-500"
+                  >
                     Chưa có phim nào
                   </td>
                 </tr>
@@ -257,60 +298,130 @@ export default function Movies() {
         title={editing ? 'Sửa phim' : 'Thêm phim mới'}
         wide
       >
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="md:col-span-2">
-            <label className="text-xs text-gray-500 mb-1 block">Tên phim *</label>
-            <input className={inputClass} required value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
+        <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-4">
+          <div className="flex items-end gap-3">
+            <div className="flex-1">
+              <label className="text-xs text-gray-500 mb-1 block">
+                TMDB ID *
+              </label>
+              <input
+                type="number"
+                required
+                className={inputClass}
+                value={form.tmdbId}
+                onChange={(e) => setForm({ ...form, tmdbId: e.target.value })}
+                disabled={!!editing}
+              />
+            </div>
+
+            {/* ✅ Select Loại hình đã được bọc lại */}
+            <div className="w-1/3">
+              <label className="text-xs text-gray-500 mb-1 block">
+                Loại hình
+              </label>
+              <div className="relative">
+                <select
+                  className={`${inputClass} appearance-none pr-10`}
+                  value={form.mediaType}
+                  onChange={(e) =>
+                    setForm({ ...form, mediaType: e.target.value })
+                  }
+                  disabled={!!editing}
+                >
+                  <option value="movie">Phim lẻ (Movie)</option>
+                  <option value="tv">Phim bộ (TV Show)</option>
+                </select>
+                <ChevronDown
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"
+                  size={16}
+                />
+              </div>
+            </div>
+
+            {!editing && (
+              <button
+                type="button"
+                onClick={handleFetchTmdb}
+                disabled={fetchingTmdb}
+                className="px-4 py-2.5 h-[42px] bg-white/10 hover:bg-white/20 rounded-lg text-sm font-bold text-white transition-colors"
+              >
+                {fetchingTmdb ? 'Đang dò...' : 'Lấy thông tin'}
+              </button>
+            )}
           </div>
-          <div className="md:col-span-2">
-            <label className="text-xs text-gray-500 mb-1 block">Mô tả</label>
-            <textarea className={inputClass + ' min-h-20'} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
-          </div>
+
           <div>
-            <label className="text-xs text-gray-500 mb-1 block">Năm phát hành</label>
-            <input type="number" className={inputClass} value={form.releaseYear} onChange={(e) => setForm({ ...form, releaseYear: e.target.value })} />
+            <label className="text-xs text-gray-500 mb-1 block">
+              Tên phim (Tự động)
+            </label>
+            <input
+              className={inputClass}
+              placeholder="Bấm nút 'Lấy thông tin' ở trên..."
+              value={form.title}
+              readOnly
+            />
           </div>
-          <div>
-            <label className="text-xs text-gray-500 mb-1 block">Quốc gia</label>
-            <input className={inputClass} value={form.country} onChange={(e) => setForm({ ...form, country: e.target.value })} />
+
+          <div className="flex gap-4 border-t border-white/10 pt-4 mt-2">
+            {/* ✅ Select Phân quyền xem đã được bọc lại */}
+            <div className="flex-1">
+              <label className="text-xs text-gray-500 mb-1 block">
+                Phân quyền xem
+              </label>
+              <div className="relative">
+                <select
+                  className={`${inputClass} appearance-none pr-10`}
+                  value={form.isPremium}
+                  onChange={(e) =>
+                    setForm({ ...form, isPremium: e.target.value === 'true' })
+                  }
+                >
+                  <option value={false}>Miễn phí (Free)</option>
+                  <option value={true}>Tài khoản Premium (VIP)</option>
+                </select>
+                <ChevronDown
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"
+                  size={16}
+                />
+              </div>
+            </div>
+
+            {/* ✅ Select Trạng thái phát sóng đã được bọc lại */}
+            <div className="flex-1">
+              <label className="text-xs text-gray-500 mb-1 block">
+                Trạng thái phát sóng
+              </label>
+              <div className="relative">
+                <select
+                  className={`${inputClass} appearance-none pr-10`}
+                  value={form.status}
+                  onChange={(e) => setForm({ ...form, status: e.target.value })}
+                >
+                  <option value="AVAILABLE">Đang chiếu</option>
+                  <option value="HIDDEN">Đã ẩn</option>
+                </select>
+                <ChevronDown
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"
+                  size={16}
+                />
+              </div>
+            </div>
           </div>
-          <div>
-            <label className="text-xs text-gray-500 mb-1 block">Thời lượng (phút)</label>
-            <input className={inputClass} value={form.duration} onChange={(e) => setForm({ ...form, duration: e.target.value })} />
-          </div>
-          <div>
-            <label className="text-xs text-gray-500 mb-1 block">Trạng thái</label>
-            <select className={inputClass} value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })}>
-              <option value="AVAILABLE">AVAILABLE</option>
-              <option value="HIDDEN">HIDDEN</option>
-            </select>
-          </div>
-          <div>
-            <label className="text-xs text-gray-500 mb-1 block">Điểm đánh giá</label>
-            <input className={inputClass} value={form.rating} onChange={(e) => setForm({ ...form, rating: e.target.value })} />
-          </div>
-          <div>
-            <label className="text-xs text-gray-500 mb-1 block">Lượt xem</label>
-            <input className={inputClass} value={form.views} onChange={(e) => setForm({ ...form, views: e.target.value })} />
-          </div>
-          <div className="md:col-span-2">
-            <label className="text-xs text-gray-500 mb-1 block">Thể loại (phân cách bằng dấu phẩy)</label>
-            <input className={inputClass} placeholder="Hành động, Tình cảm" value={form.genres} onChange={(e) => setForm({ ...form, genres: e.target.value })} />
-          </div>
-          <div className="md:col-span-2">
-            <label className="text-xs text-gray-500 mb-1 block">URL Poster</label>
-            <input className={inputClass} value={form.posterUrl} onChange={(e) => setForm({ ...form, posterUrl: e.target.value })} />
-          </div>
-          <div className="md:col-span-2 flex gap-3 justify-end pt-2">
-            <button type="button" onClick={closeModal} className="px-4 py-2 text-sm text-gray-400 hover:text-white">
+
+          <div className="flex gap-3 justify-end pt-4">
+            <button
+              type="button"
+              onClick={closeModal}
+              className="px-4 py-2 text-sm text-gray-400 hover:text-white"
+            >
               Hủy
             </button>
             <button
               type="submit"
-              disabled={saveMutation.isPending}
+              disabled={saveMutation.isPending || (!editing && !form.title)}
               className="px-6 py-2 bg-red-600 rounded-lg text-sm font-bold disabled:opacity-50"
             >
-              {saveMutation.isPending ? 'Đang lưu...' : 'Lưu'}
+              {saveMutation.isPending ? 'Đang lưu...' : 'Lưu phim'}
             </button>
           </div>
         </form>

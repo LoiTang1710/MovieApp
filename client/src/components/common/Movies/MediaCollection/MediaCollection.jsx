@@ -25,7 +25,7 @@ const MediaCollection = () => {
       id: 3,
       name: 'Mới nhất',
       data: mediasReleased,
-      isPremium: true,
+      released: true,
     },
     {
       id: 4,
@@ -38,16 +38,18 @@ const MediaCollection = () => {
       data: mediasAnime,
     },
   ]
+  
   return (
+    
     <div className="mt-5 pt-5 pl-10 pr-10 pb-5">
       {collections.map((collection) => {
-        const { id, name, isPremium } = collection
+        const { id, name, released } = collection
         return (
           <div key={id} className="mt-12">
             <h1 className="text-3xl">{name}</h1>
             <MovieLine />
             <div className="mt-8">
-              <MediaGrid items={collection.data} isPremium={isPremium} />
+              <MediaGrid items={collection.data} released={released} />
             </div>
           </div>
         )

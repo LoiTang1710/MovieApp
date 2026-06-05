@@ -20,7 +20,7 @@ const DetailProvider = ({ children }) => {
   const [activeEpisode, setActiveEpisode] = useState(1)
   const [ratingModalOpen, setRatingModalOpen] = useState(false)
   const commentsSectionRef = useRef(null)
-  const seasonList = mediaDetail?.seasons.filter((s) => s.season_number > 0)
+  const seasonList = (mediaDetail?.seasons || []).filter((s) => s.season_number > 0)
 
   const scrollToComments = () => {
     commentsSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -31,7 +31,7 @@ const DetailProvider = ({ children }) => {
       const timer = setTimeout(scrollToComments, 400)
       return () => clearTimeout(timer)
     }
-  }, [mediaDetail])
+  }, [mediaDetail, location.state?.scrollToCommunity])
 
   if (!mediaId || !type) {
     return <Navigate to="/" replace />
@@ -56,6 +56,7 @@ const DetailProvider = ({ children }) => {
         mediaId,
         type,
         isPremium,
+        mediaDetail,
         casts: mediaDetail.credits?.cast || [],
         genres: mediaDetail.genres || [],
         backdrop_path: mediaDetail.backdrop_path,

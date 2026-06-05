@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Plus, Pencil, Trash2, Search, TicketPercent } from 'lucide-react'
+import { Plus, Trash2, Search, TicketPercent } from 'lucide-react'
 import PageHeader from '../../components/common/PageHeader'
 import Modal from '../../components/common/Modal'
 import StatusBadge from '../../components/common/StatusBadge'

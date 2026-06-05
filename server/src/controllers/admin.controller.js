@@ -8,6 +8,9 @@ import {
   adminStatsService,
 } from '../services/admin.service.js'
 import * as commentService from '../services/comment.service.js'
+import { env } from '../config/environment.config.js'
+import axios from 'axios'
+
 
 const handleError = (res, error) => {
   const status = error.statusCode || StatusCodes.INTERNAL_SERVER_ERROR
@@ -23,16 +26,22 @@ const handleError = (res, error) => {
 export const manageMovies = {
   list: catchAsync(async (req, res) => {
     const data = await adminMovieService.list(req.query)
-    res.status(StatusCodes.OK).json({ message: 'Lấy danh sách phim thành công', data })
+    res
+      .status(StatusCodes.OK)
+      .json({ message: 'Lấy danh sách phim thành công', data })
   }),
   create: catchAsync(async (req, res) => {
     const movie = await adminMovieService.create(req.body)
-    res.status(StatusCodes.CREATED).json({ message: 'Thêm phim mới thành công', data: movie })
+    res
+      .status(StatusCodes.CREATED)
+      .json({ message: 'Thêm phim mới thành công', data: movie })
   }),
   update: catchAsync(async (req, res) => {
     try {
       const movie = await adminMovieService.update(req.params.id, req.body)
-      res.status(StatusCodes.OK).json({ message: 'Cập nhật phim thành công', data: movie })
+      res
+        .status(StatusCodes.OK)
+        .json({ message: 'Cập nhật phim thành công', data: movie })
     } catch (e) {
       handleError(res, e)
     }
@@ -44,6 +53,25 @@ export const manageMovies = {
     } catch (e) {
       handleError(res, e)
     }
+  }),
+  fetchTmdbInfo: catchAsync(async (req, res) => {
+    const { tmdbId, mediaType = 'movie' } = req.query
+    const response = await axios.get(
+      `${env.TMDB_BASE_URL}/${mediaType}/${tmdbId}`,
+      {
+        headers: { Authorization: `Bearer ${env.TMDB_ACCESS_TOKEN}` },
+        params: { language: 'vi-VN' },
+      },
+    )
+    res.status(StatusCodes.OK).json({
+      message: 'Lấy thông tin TMDB thành công',
+      data: {
+        title: response.data.title || response.data.name,
+        posterUrl: response.data.poster_path
+          ? `https://image.tmdb.org/t/p/w500${response.data.poster_path}`
+          : null,
+      },
+    })
   }),
 }
 

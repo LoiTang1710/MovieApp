@@ -21,7 +21,7 @@ export default function Login() {
         return
       }
       login(userData)
-      navigate('/admin/dashboard')
+      navigate('/dashboard')
     },
     onError: (error) => {
       alert(error.response?.data?.message || 'Đăng nhập thất bại')

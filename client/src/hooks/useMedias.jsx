@@ -41,7 +41,7 @@ export function useMedias() {
         mediasAnime: anime.slice(0, 12),
       }
     },
-    staleTime: 60 * 1000,
+    staleTime: 5*  60 * 1000,
   })
   const mediaBanner = MediasCollectionQuery.data?.mediaBanner || []
   const MediaTrailersQuery = useQuery({

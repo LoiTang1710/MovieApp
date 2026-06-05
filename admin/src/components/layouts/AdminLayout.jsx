@@ -21,11 +21,11 @@ const AdminLayout = () => {
   }
 
   const navItems = [
-    { path: '/admin/dashboard', icon: <LayoutDashboard size={20} />, label: 'Dashboard' },
-    { path: '/admin/movies', icon: <Film size={20} />, label: 'Quản lý Phim' },
-    { path: '/admin/users', icon: <Users size={20} />, label: 'Người dùng' },
-    { path: '/admin/promotions', icon: <TicketPercent size={20} />, label: 'Khuyến mãi' },
-    { path: '/admin/stats', icon: <BarChart3 size={20} />, label: 'Thống kê' },
+    { path: 'dashboard', icon: <LayoutDashboard size={20} />, label: 'Dashboard' },
+    { path: 'movies', icon: <Film size={20} />, label: 'Quản lý Phim' },
+    { path: 'users', icon: <Users size={20} />, label: 'Người dùng' },
+    { path: 'promotions', icon: <TicketPercent size={20} />, label: 'Khuyến mãi' },
+    { path: 'stats', icon: <BarChart3 size={20} />, label: 'Thống kê' },
   ]
 
   return (
