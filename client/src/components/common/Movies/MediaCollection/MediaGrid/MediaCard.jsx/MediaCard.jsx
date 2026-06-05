@@ -1,9 +1,11 @@
 import { Link } from 'react-router-dom'
 import { createSlug } from '../../../../../../utils/formatters' // Giữ nguyên đường dẫn của bạn
 import FavouriteButton from '../../../../ActionButton/FavouriteButton/FavouriteButton'
+import { useMediaDetails } from '../../../../../../hooks/useMediaDetail.jsx'
 
-const MediaCard = ({ item, isPremium }) => {
-  if (!item) return null
+const MediaCard = ({ item }) => {
+  const { data: MediaDetail } = useMediaDetails(item.id, item.type)
+  const isPremium = MediaDetail?.isPremium || item.vote_average >= 8.5 || false
 
   // Chuẩn hóa dữ liệu đầu vào
   const id = item.id
@@ -11,9 +13,10 @@ const MediaCard = ({ item, isPremium }) => {
   const type = item.type || (item.first_air_date ? 'tv' : 'movie') // Fallback an toàn
   const poster = item.poster_path
   const rating = item.vote_average
-
   const mediaUrl = `/movie/${createSlug(title)}`
-
+  if (!item) {
+    return null
+  }
   return (
     <Link
       to={mediaUrl}

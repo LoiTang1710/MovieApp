@@ -15,9 +15,11 @@ import Poster from '../../components/common/Movies/MediaInfo/Poster/Poster'
 import Casts from '../../components/common/Movies/MediaInfo/Casts/Casts'
 import { createSlug } from '../../utils/formatters'
 import PremiumContentGate from '../../components/common/PremiumContentGate/PremiumContentGate'
+import { useMediaDetails } from '../../hooks/useMediaDetail.jsx'
 
 const MediaPlayer = () => {
   const location = useLocation()
+  const stateData = location.state || {}
   const {
     type,
     mediaId,
@@ -29,9 +31,10 @@ const MediaPlayer = () => {
     genres = [],
     overview,
     release_date,
-    isPremium,
-  } = location.state || {}
-
+    isPremium
+  } = stateData
+  // const { data: movieDetail } = useMediaDetails(mediaId, type)
+  // const isPremium = movieDetail?.isPremium ?? stateData.isPremium
   useEffect(() => {
     window.scrollTo({
       top: 0,
@@ -89,7 +92,7 @@ const MediaPlayer = () => {
 
       {/* Player Section */}
       <div className="h-150">
-        <PremiumContentGate required={isPremium}>
+        <PremiumContentGate required={!!isPremium}>
           <iframe
             src={embeddedURL}
             key={`${season}-${episode}`}

@@ -2,7 +2,7 @@ import axios from 'axios'
 
 // Sử dụng đường dẫn tương đối để đồng bộ với server production
 const API_URL =
-  import.meta.env.MODE === 'production' ? '/api' : 'http://localhost:5000/api' 
+  import.meta.env.MODE === 'production' ? '/api' : 'http://localhost:3000/api' 
 
 const adminApi = axios.create({
   baseURL: API_URL,

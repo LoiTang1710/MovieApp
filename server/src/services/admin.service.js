@@ -35,23 +35,76 @@ const parsePagination = (query) => {
   return { page, limit, skip }
 }
 
-const connectGenres = async (genreNames = []) => {
-  if (!genreNames?.length) return undefined
-  const names = genreNames
-    .map((g) => (typeof g === 'string' ? g.trim() : ''))
-    .filter(Boolean)
-  if (!names.length) return undefined
+export const adminMovieService = {
+  async list(query) {
+    const { page, limit, skip } = parsePagination(query)
+    const search = query.search?.trim()
+    const status = query.status
 
-  const genres = await Promise.all(
-    names.map((name) =>
-      prisma.genre.upsert({
-        where: { name },
-        update: {},
-        create: { name },
+    const where = {
+      ...(status && { status }),
+      ...(search && {
+        title: { contains: search, mode: 'insensitive' },
       }),
-    ),
-  )
-  return { connect: genres.map((g) => ({ id: g.id })) }
+    }
+
+    const [items, total] = await Promise.all([
+      prisma.movie.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+      }),
+      prisma.movie.count({ where }),
+    ])
+
+    return { items, total, page, limit, totalPages: Math.ceil(total / limit) }
+  },
+
+  async create(body) {
+    const existing = await prisma.movie.findUnique({
+      where: {
+        tmdbId_mediaType: {
+          tmdbId: parseInt(body.tmdbId, 10),
+          mediaType: body.mediaType || 'movie',
+        },
+      },
+    })
+
+    if (existing) {
+      const err = new Error('Phim này đã tồn tại trong hệ thống!')
+      err.statusCode = 409
+      throw err
+    }
+
+    return prisma.movie.create({
+      data: {
+        tmdbId: parseInt(body.tmdbId, 10),
+        mediaType: body.mediaType || 'movie',
+        title: body.title,
+        posterUrl: body.posterUrl,
+        isPremium: String(body.isPremium) === 'true',
+        status: body.status || 'AVAILABLE',
+        views: 0,
+      },
+    })
+  },
+
+  async update(id, body) {
+    return prisma.movie.update({
+      where: { id },
+      data: {
+        ...(body.isPremium !== undefined && {
+          isPremium: String(body.isPremium) === 'true',
+        }),
+        ...(body.status !== undefined && { status: body.status }),
+      },
+    })
+  },
+
+  async remove(id) {
+    return prisma.movie.delete({ where: { id } })
+  },
 }
 
 const monthStart = (date = new Date()) =>
@@ -71,7 +124,10 @@ const VI_WEEKDAY = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7']
 
 const parsePeriod = (query) => {
   const now = new Date()
-  const month = Math.min(12, Math.max(1, parseInt(query.month, 10) || now.getMonth() + 1))
+  const month = Math.min(
+    12,
+    Math.max(1, parseInt(query.month, 10) || now.getMonth() + 1),
+  )
   const year = parseInt(query.year, 10) || now.getFullYear()
   const periodDate = new Date(year, month - 1, 1)
   const prevDate = new Date(year, month - 2, 1)
@@ -83,94 +139,8 @@ const parsePeriod = (query) => {
     prevStart: monthStart(prevDate),
     prevEnd: monthEnd(prevDate),
     periodLabel: `Tháng ${month}/${year}`,
-    isCurrentMonth:
-      month === now.getMonth() + 1 && year === now.getFullYear(),
+    isCurrentMonth: month === now.getMonth() + 1 && year === now.getFullYear(),
   }
-}
-
-export const adminMovieService = {
-  async list(query) {
-    const { page, limit, skip } = parsePagination(query)
-    const search = query.search?.trim()
-    const status = query.status
-
-    const where = {
-      ...(status && { status }),
-      ...(search && {
-        OR: [
-          { title: { contains: search, mode: 'insensitive' } },
-          { country: { contains: search, mode: 'insensitive' } },
-        ],
-      }),
-    }
-
-    const [items, total] = await Promise.all([
-      prisma.movie.findMany({
-        where,
-        skip,
-        take: limit,
-        orderBy: { createdAt: 'desc' },
-        include: { genres: true },
-      }),
-      prisma.movie.count({ where }),
-    ])
-
-    return { items, total, page, limit, totalPages: Math.ceil(total / limit) }
-  },
-
-  async create(body) {
-    const genres = await connectGenres(body.genres)
-    return prisma.movie.create({
-      data: {
-        title: body.title,
-        description: body.description || '',
-        releaseYear: parseInt(body.releaseYear, 10),
-        country: body.country || null,
-        duration: body.duration ? parseInt(body.duration, 10) : null,
-        posterUrl: body.posterUrl || null,
-        trailerUrl: body.trailerUrl || null,
-        videoUrl: body.videoUrl || null,
-        status: body.status || 'AVAILABLE',
-        rating: body.rating ? parseFloat(body.rating) : 0,
-        views: body.views ? parseInt(body.views, 10) : 0,
-        ...(genres && { genres }),
-      },
-      include: { genres: true },
-    })
-  },
-
-  async update(id, body) {
-    const genres = body.genres
-      ? { set: [], ...(await connectGenres(body.genres)) }
-      : undefined
-
-    return prisma.movie.update({
-      where: { id },
-      data: {
-        ...(body.title !== undefined && { title: body.title }),
-        ...(body.description !== undefined && { description: body.description }),
-        ...(body.releaseYear !== undefined && {
-          releaseYear: parseInt(body.releaseYear, 10),
-        }),
-        ...(body.country !== undefined && { country: body.country }),
-        ...(body.duration !== undefined && {
-          duration: body.duration ? parseInt(body.duration, 10) : null,
-        }),
-        ...(body.posterUrl !== undefined && { posterUrl: body.posterUrl }),
-        ...(body.trailerUrl !== undefined && { trailerUrl: body.trailerUrl }),
-        ...(body.videoUrl !== undefined && { videoUrl: body.videoUrl }),
-        ...(body.status !== undefined && { status: body.status }),
-        ...(body.rating !== undefined && { rating: parseFloat(body.rating) }),
-        ...(body.views !== undefined && { views: parseInt(body.views, 10) }),
-        ...(genres && { genres }),
-      },
-      include: { genres: true },
-    })
-  },
-
-  async remove(id) {
-    return prisma.movie.delete({ where: { id } })
-  },
 }
 
 export const adminUserService = {
@@ -205,7 +175,9 @@ export const adminUserService = {
   },
 
   async create(body, hashPassword) {
-    const existing = await prisma.user.findUnique({ where: { email: body.email } })
+    const existing = await prisma.user.findUnique({
+      where: { email: body.email },
+    })
     if (existing) {
       const err = new Error('Email đã được sử dụng')
       err.statusCode = StatusCodes.CONFLICT
@@ -288,7 +260,9 @@ export const adminPromotionService = {
       data: {
         ...(body.code !== undefined && { code: body.code }),
         ...(body.name !== undefined && { name: body.name }),
-        ...(body.description !== undefined && { description: body.description }),
+        ...(body.description !== undefined && {
+          description: body.description,
+        }),
         ...(body.discountPercent !== undefined && {
           discountPercent: parseInt(body.discountPercent, 10),
         }),
@@ -351,7 +325,9 @@ export const adminStatsService = {
         },
         _sum: { amount: true },
       }),
-      prisma.user.count({ where: { createdAt: { gte: periodStart, lte: periodEnd } } }),
+      prisma.user.count({
+        where: { createdAt: { gte: periodStart, lte: periodEnd } },
+      }),
       prisma.user.count({
         where: { createdAt: { gte: prevStart, lte: prevEnd } },
       }),
@@ -365,8 +341,6 @@ export const adminStatsService = {
           title: true,
           views: true,
           posterUrl: true,
-          rating: true,
-          releaseYear: true,
         },
       }),
       prisma.movie.findMany({
@@ -395,8 +369,6 @@ export const adminStatsService = {
           title: true,
           views: true,
           posterUrl: true,
-          rating: true,
-          releaseYear: true,
         },
       })
     }
@@ -486,7 +458,9 @@ export const adminStatsService = {
       dailyUsersData,
       totalUsers: await prisma.user.count(),
       totalMovies: await prisma.movie.count(),
-      activePromotions: await prisma.promotion.count({ where: { status: 'ACTIVE' } }),
+      activePromotions: await prisma.promotion.count({
+        where: { status: 'ACTIVE' },
+      }),
     }
   },
 
@@ -507,21 +481,38 @@ export const adminStatsService = {
     return prisma.movie.findMany({
       take: 15,
       orderBy: { views: 'desc' },
-      select: { id: true, title: true, views: true, status: true, rating: true },
+      select: {
+        id: true,
+        title: true,
+        views: true,
+        status: true,
+      },
     })
   },
 
   async exportReport() {
     const [movies, users, payments, promotions] = await Promise.all([
       prisma.movie.findMany({
-        select: { title: true, views: true, status: true, rating: true, releaseYear: true },
+        select: {
+          title: true,
+          views: true,
+          status: true,
+        },
       }),
-      prisma.user.findMany({ select: { email: true, role: true, createdAt: true } }),
+      prisma.user.findMany({
+        select: { email: true, role: true, createdAt: true },
+      }),
       prisma.payment.findMany({
         select: { amount: true, status: true, currency: true, paidAt: true },
       }),
       prisma.promotion.findMany({
-        select: { code: true, name: true, status: true, discountPercent: true, usedCount: true },
+        select: {
+          code: true,
+          name: true,
+          status: true,
+          discountPercent: true,
+          usedCount: true,
+        },
       }),
     ])
 
@@ -529,14 +520,15 @@ export const adminStatsService = {
       'BÁO CÁO TỔNG HỢP MOVIAPP',
       `Ngày xuất,${new Date().toISOString()}`,
       '',
-      'PHIM,Title,Views,Status,Rating,Year',
+      'PHIM,Title,Views,Status',
       ...movies.map(
-        (m) =>
-          `PHIM,"${m.title.replace(/"/g, '""')}",${m.views},${m.status},${m.rating},${m.releaseYear}`,
+        (m) => `PHIM,"${m.title.replace(/"/g, '""')}",${m.views},${m.status}`,
       ),
       '',
       'NGUOI_DUNG,Email,Role,CreatedAt',
-      ...users.map((u) => `NGUOI_DUNG,${u.email},${u.role},${u.createdAt.toISOString()}`),
+      ...users.map(
+        (u) => `NGUOI_DUNG,${u.email},${u.role},${u.createdAt.toISOString()}`,
+      ),
       '',
       'THANH_TOAN,Amount,Status,Currency,PaidAt',
       ...payments.map(
@@ -546,7 +538,8 @@ export const adminStatsService = {
       '',
       'KHUYEN_MAI,Code,Name,Status,Discount,Used',
       ...promotions.map(
-        (p) => `KHUYEN_MAI,${p.code},"${p.name}",${p.status},${p.discountPercent},${p.usedCount}`,
+        (p) =>
+          `KHUYEN_MAI,${p.code},"${p.name}",${p.status},${p.discountPercent},${p.usedCount}`,
       ),
     ]
 

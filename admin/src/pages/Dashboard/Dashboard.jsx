@@ -195,10 +195,10 @@ export default function Dashboard() {
           <h3 className="text-white font-bold mb-4">Lối tắt quản lý</h3>
           <div className="space-y-2">
             {[
-              { label: 'Quản lý phim', path: '/admin/movies', icon: Film },
-              { label: 'Người dùng', path: '/admin/users', icon: Users },
-              { label: 'Khuyến mãi', path: '/admin/promotions', icon: TicketPercent },
-              { label: 'Thống kê chi tiết', path: '/admin/stats', icon: BarChart3 },
+              { label: 'Quản lý phim', path: 'movies', icon: Film },
+              { label: 'Người dùng', path: 'users', icon: Users },
+              { label: 'Khuyến mãi', path: 'promotions', icon: TicketPercent },
+              { label: 'Thống kê chi tiết', path: 'stats', icon: BarChart3 },
             ].map((link) => (
               <Link
                 key={link.path}
