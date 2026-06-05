@@ -1,7 +1,6 @@
 import { Navigate, useLocation } from 'react-router-dom'
 import { useEffect, useRef, useState } from 'react'
 import { DetailContext } from '../contexts/DetailContext'
-import { DevAuthProvider } from '../contexts/DevAuthContext'
 import { useMediaDetails } from '../hooks/useMediaDetail'
 import MediaDetailSkeleton from '../pages/MediaDetails/MediaDetailSkeleton'
 // import { useState } from 'react'
@@ -52,7 +51,6 @@ const DetailProvider = ({ children }) => {
     )
   }
   return (
-    <DevAuthProvider>
     <DetailContext.Provider
       value={{
         mediaId,
@@ -84,7 +82,6 @@ const DetailProvider = ({ children }) => {
     >
       {children}
     </DetailContext.Provider>
-    </DevAuthProvider>
   )
 }
 

@@ -1,34 +1,30 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { X } from 'lucide-react'
 import { useDetail } from '../../../contexts/DetailContext'
-import { useDevAuth } from '../../../contexts/DevAuthContext'
+import { useAuth } from '../../../hooks/useAuth.jsx'
 import { useRatingSummary, useUpsertRating } from '../../../hooks/useReviews'
 import { getApiErrorMessage } from '../../../utils/apiError'
 import StarRating from './StarRating'
 
-const RatingModal = ({ open, onClose }) => {
+const RatingDialog = ({ onClose, summary }) => {
   const { mediaId, type } = useDetail()
-  const { data: summary } = useRatingSummary(mediaId, type)
-  const { isLoggedIn } = useDevAuth()
+  const { isAuthenticated, setIsLoginModalOpen } = useAuth()
   const upsert = useUpsertRating(mediaId, type)
-  const [stars, setStars] = useState(0)
+  const [stars, setStars] = useState(summary?.userRating ?? 0)
   const [error, setError] = useState('')
 
-  useEffect(() => {
-    if (!open) return
-    setStars(summary?.userRating ?? 0)
-    setError('')
-  }, [open, summary?.userRating])
-
   const handleSubmit = async () => {
-    if (!isLoggedIn) {
-      setError('Vui lòng bấm "Đăng nhập User" hoặc "Đăng nhập Admin" ở cột trái trước.')
+    if (!isAuthenticated) {
+      setIsLoginModalOpen(true)
+      setError('Vui lòng đăng nhập trước khi đánh giá.')
       return
     }
+
     if (stars < 1) {
       setError('Chọn từ 1 đến 5 sao.')
       return
     }
+
     setError('')
     try {
       await upsert.mutateAsync(stars)
@@ -37,8 +33,6 @@ const RatingModal = ({ open, onClose }) => {
       setError(getApiErrorMessage(err, 'Không thể gửi đánh giá.'))
     }
   }
-
-  if (!open) return null
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
@@ -68,6 +62,21 @@ const RatingModal = ({ open, onClose }) => {
         </button>
       </div>
     </div>
+  )
+}
+
+const RatingModal = ({ open, onClose }) => {
+  const { mediaId, type } = useDetail()
+  const { data: summary } = useRatingSummary(mediaId, type)
+
+  if (!open) return null
+
+  return (
+    <RatingDialog
+      key={`${mediaId}-${type}-${summary?.userRating ?? 'none'}`}
+      onClose={onClose}
+      summary={summary}
+    />
   )
 }
 

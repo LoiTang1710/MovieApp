@@ -23,7 +23,10 @@ authClient.interceptors.response.use(
       // thì KHÔNG đá văng ra trang login.
       if (
         originalRequest.url.includes('/auth/me') ||
-        originalRequest.url.includes('/profiles')
+        originalRequest.url.includes('/profiles') ||
+        originalRequest.url.includes('/comments') ||
+        originalRequest.url.includes('/reviews') ||
+        originalRequest.url.includes('/admin/comments')
       ) {
         // Chỉ đơn giản là trả về lỗi để UI tự xử lý (hiện nút Login)
         return Promise.reject(error)

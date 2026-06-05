@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Heart, MessageCircle, Trash2 } from 'lucide-react'
 import { useAdminDeleteComment, useCreateReply, useToggleLike } from '../../../hooks/useComments'
 import { useDetail } from '../../../contexts/DetailContext'
-import { useDevAuth } from '../../../contexts/DevAuthContext'
+import { useAuth } from '../../../hooks/useAuth.jsx'
 import { getApiErrorMessage } from '../../../utils/apiError'
 
 const formatDate = (iso) =>
@@ -16,21 +16,25 @@ const formatDate = (iso) =>
 
 const ReplyForm = ({ parentId }) => {
   const { mediaId, type } = useDetail()
-  const { isLoggedIn } = useDevAuth()
+  const { isAuthenticated, setIsLoginModalOpen } = useAuth()
   const reply = useCreateReply(mediaId, type)
   const [text, setText] = useState('')
   const [error, setError] = useState('')
 
   const submit = async (e) => {
     e.preventDefault()
-    if (!isLoggedIn) {
-      setError('Bấm "Đăng nhập User" hoặc "Admin" ở cột trái trước.')
+
+    if (!isAuthenticated) {
+      setIsLoginModalOpen(true)
+      setError('Vui lòng đăng nhập trước khi trả lời.')
       return
     }
+
     if (text.trim().length < 3) {
       setError('Trả lời phải có ít nhất 3 ký tự.')
       return
     }
+
     try {
       await reply.mutateAsync({ parentId, content: text.trim() })
       setText('')
@@ -63,14 +67,15 @@ const ReplyForm = ({ parentId }) => {
 
 const CommentItem = ({ comment, isReply = false }) => {
   const { mediaId, type } = useDetail()
-  const { isLoggedIn, isAdmin } = useDevAuth()
+  const { user, isAuthenticated, setIsLoginModalOpen } = useAuth()
+  const canModerate = user?.role?.toUpperCase() === 'ADMIN'
   const toggleLike = useToggleLike(mediaId, type)
   const adminDelete = useAdminDeleteComment(mediaId, type)
   const [showReply, setShowReply] = useState(false)
 
   const handleLike = () => {
-    if (!isLoggedIn) {
-      alert('Bấm "Đăng nhập User" hoặc "Admin" ở cột trái trước.')
+    if (!isAuthenticated) {
+      setIsLoginModalOpen(true)
       return
     }
     toggleLike.mutate(comment.id)
@@ -111,7 +116,7 @@ const CommentItem = ({ comment, isReply = false }) => {
             Trả lời
           </button>
         )}
-        {isAdmin && (
+        {canModerate && (
           <button
             type="button"
             onClick={handleAdminDelete}

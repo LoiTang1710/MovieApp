@@ -1,43 +1,68 @@
 import { StatusCodes } from 'http-status-codes'
+import jwt from 'jsonwebtoken'
+import { env } from '../config/environment.config.js'
 
-/**
- * [Authentication] Kiểm tra session hợp lệ – bắt buộc đăng nhập
- * Dùng cho các route yêu cầu người dùng đã đăng nhập (comment, review, premium...)
- */
+const resolveJwtUser = (req) => {
+  const authHeader = req.headers.authorization
+  let token = authHeader?.startsWith('Bearer ') ? authHeader.split(' ')[1] : null
+
+  if (!token && req.cookies?.token) {
+    token = req.cookies.token
+  }
+
+  if (!token) return null
+  return jwt.verify(token, env.JWT_SECRET)
+}
+
+const attachAuthenticatedUser = (req) => {
+  if (req.session?.user) {
+    req.user = req.session.user
+    return true
+  }
+
+  const jwtUser = resolveJwtUser(req)
+  if (jwtUser) {
+    req.user = jwtUser
+    return true
+  }
+
+  return false
+}
+
 export const verifyUserSession = (req, res, next) => {
-  if (!req.session?.user) {
+  try {
+    if (attachAuthenticatedUser(req)) {
+      return next()
+    }
+  } catch {
     return res.status(StatusCodes.UNAUTHORIZED).json({
       success: false,
-      message: 'Bạn chưa đăng nhập hoặc phiên làm việc đã hết hạn.',
+      message: 'Phiên đăng nhập đã hết hạn hoặc token không hợp lệ.',
     })
   }
 
-  // Đồng bộ req.user để các controller đọc cùng 1 nơi
-  req.user = req.session.user
-  next()
+  return res.status(StatusCodes.UNAUTHORIZED).json({
+    success: false,
+    message: 'Bạn chưa đăng nhập hoặc phiên làm việc đã hết hạn.',
+  })
 }
 
-/**
- * [Authentication – Optional] Gắn req.user nếu đã đăng nhập; không có session vẫn cho qua
- * Dùng cho các route công khai nhưng cần nhận diện user (listComments, getSummary...)
- */
 export const optionalVerifyUserSession = (req, res, next) => {
-  if (req.session?.user) {
-    req.user = req.session.user
+  try {
+    attachAuthenticatedUser(req)
+  } catch {
+    // Public routes still work when a stale dev token is present.
   }
   next()
 }
 
-/**
- * [Authorization] Kiểm tra vai trò (role) của user
- * Phải dùng sau verifyUserSession
- * Ví dụ: authorizeRoles('ADMIN') hoặc authorizeRoles('ADMIN', 'USER')
- */
 export const authorizeRoles = (...allowedRoles) => {
+  const normalizedAllowedRoles = allowedRoles.map((role) => role.toUpperCase())
+
   return (req, res, next) => {
     const user = req.user || req.session?.user
 
-    if (!user || !allowedRoles.includes(user.role)) {
+    if (!user || !normalizedAllowedRoles.includes(user.role?.toUpperCase())) {
       return res.status(StatusCodes.FORBIDDEN).json({
         success: false,
         message: 'Bạn không có quyền thực hiện hành động này.',
