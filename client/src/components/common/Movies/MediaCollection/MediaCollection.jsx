@@ -4,18 +4,18 @@ import MovieLine from './MediaLine'
 
 const MediaCollection = () => {
   const {
-    mediasWatching,
+    // mediasWatching,
     mediasPopular,
     mediasReleased,
     mediasTopRated,
     mediasAnime,
   } = useHome()
   const collections = [
-    {
-      id: 1,
-      name: 'Đang xem',
-      data: mediasWatching,
-    },
+    // {
+    //   id: 1,
+    //   name: 'Đang xem',
+    //   data: mediasWatching,
+    // },
     {
       id: 2,
       name: 'Phổ biến',
