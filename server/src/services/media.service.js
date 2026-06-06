@@ -132,3 +132,38 @@ export const getMovieGenres = async () => {
   return tmdbFetch('/genre/movie/list?language=vi-VN')
 }
 
+
+export const upsertMovieView = async (payload) => {
+  const { tmdbId, mediaType, title, posterUrl, userId } = payload
+
+  // 1. UPSERT Phim: Có thì cộng 1 view, chưa có thì tạo mới
+  const movie = await prisma.movie.upsert({
+    where: {
+      tmdbId_mediaType: {
+        tmdbId: parseInt(tmdbId, 10),
+        mediaType: mediaType,
+      },
+    },
+    update: {
+      views: { increment: 1 },
+    },
+    create: {
+      tmdbId: parseInt(tmdbId, 10),
+      mediaType: mediaType,
+      title: title,
+      posterUrl: posterUrl,
+      views: 1, // Khởi tạo với 1 lượt xem
+    },
+  })
+
+  // 2. Ghi Log vào bảng ViewLog để vẽ biểu đồ Dashboard
+  await prisma.viewLog.create({
+    data: {
+      tmdbId: parseInt(tmdbId, 10),
+      mediaType: mediaType,
+      userId: userId || null, // Nếu user chưa đăng nhập thì để null
+    },
+  })
+
+  return movie
+}

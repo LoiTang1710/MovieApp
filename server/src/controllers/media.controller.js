@@ -12,6 +12,7 @@ import {
   getTVShowsList,
   getTVGenres,
   getMovieGenres,
+  upsertMovieView,
 } from '../services/media.service.js'
 import { StatusCodes } from 'http-status-codes'
 import { catchAsync } from '../utils/catchAsync.js'
@@ -109,4 +110,20 @@ export const getGenresTv = catchAsync(async (req, res) => {
 export const getGenresMovie = catchAsync(async (req, res) => {
   const data = await getMovieGenres()
   res.status(StatusCodes.OK).json(data)
+})
+export const incrementView = catchAsync(async (req, res) => {
+  // Nếu hệ thống của bạn có middleware chứng thực (auth)
+  // thì lấy userId từ req.user, ngược lại thì để null
+  const userId = req.user?.id || null
+
+  // Truyền dữ liệu body từ Frontend xuống Service
+  const data = await upsertMovieView({
+    ...req.body,
+    userId,
+  })
+
+  res.status(StatusCodes.OK).json({
+    message: 'Ghi nhận lượt xem thành công',
+    data,
+  })
 })

@@ -80,12 +80,20 @@ const EpisodeList = () => {
           return (
             <Link
               onClick={async () => {
-                setActiveEpisode(episode.episode_number);
+                setActiveEpisode(episode.episode_number)
                 try {
-                  // Gọi API tăng view khi click vào tập phim
-                  await moviesApi.incrementView(mediaId);
+                  // Gửi toàn bộ cục data để Backend xử lý (Tạo mới nếu chưa có, cộng view)
+                  await moviesApi.incrementView({
+                    tmdbId: mediaId,
+                    mediaType: type, // 'tv' hoặc 'movie'
+                    title: name,
+                    // TMDB thường trả về poster_path là chuỗi bắt đầu bằng '/', cần ghép với base URL
+                    posterUrl: poster_path
+                      ? `https://image.tmdb.org/t/p/w500${poster_path}`
+                      : null,
+                  })
                 } catch (err) {
-                  console.error("Lỗi ghi nhận view:", err);
+                  console.error('Lỗi ghi nhận view:', err)
                 }
               }}
               key={episode.id}

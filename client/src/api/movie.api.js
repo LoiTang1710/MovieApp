@@ -1,10 +1,8 @@
-import { apiClient } from '../api/axiosClient'
+import { apiClient } from "./axiosClient.js"
 
 export const moviesApi = {
-  /**
-   * Gửi yêu cầu cập nhật lượt xem phim lên server
-   * @param {string|number} movieId - ID của phim hoặc TV show
-   */
-  incrementView: (movieId) =>
-    apiClient.patch(`/movies/${movieId}/view`).then((res) => res.data.data)
+  incrementView: async (payload) => {
+    // payload bao gồm: { tmdbId, mediaType, title, posterUrl }
+    return apiClient.post('/medias/view', payload)
+  },
 }

@@ -13,6 +13,7 @@ import {
   getTVShows,
   getGenresTv,
   getGenresMovie,
+  incrementView,
 } from '../controllers/media.controller.js'
 
 const Router = express.Router()
@@ -33,4 +34,6 @@ Router.route('/anime').get(getAnimes)
 
 Router.route('/detail/:id').get(getDetail)
 Router.route('/tv/:id/episodes').get(getEpisodes)
+
+Router.post('/view', incrementView)
 export default Router
