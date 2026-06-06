@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useDetail } from '../../../../contexts/DetailContext'
 import { createSlug } from '../../../../utils/formatters'
+import { moviesApi } from '../../../../api/movie.api.js'
 
 const WatchButton = () => {
   const {
@@ -14,11 +15,26 @@ const WatchButton = () => {
     isPremium,
   } = useDetail()
   const videoURL = `/video/${createSlug(name)}.${mediaId}`
+  const handleWatchClick = async () => {
+    try {
+      await moviesApi.incrementView({
+        tmdbId: mediaId,
+        mediaType: type, // 'tv' hoặc 'movie'
+        title: name,
+        posterUrl: poster_path
+          ? `https://image.tmdb.org/t/p/w500${poster_path}`
+          : null,
+      })
+    } catch (err) {
+      console.error('Lỗi ghi nhận view:', err)
+    }
+  }
 
   return (
     <div className="mr-0 lg:mr-10">
       <Link
         to={videoURL}
+        onClick={handleWatchClick}
         state={{
           type,
           name,

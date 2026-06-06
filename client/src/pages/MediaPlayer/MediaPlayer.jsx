@@ -93,12 +93,12 @@ const MediaPlayer = () => {
       {/* Player Section */}
       <div className="h-150">
         <PremiumContentGate required={!!isPremium}>
-          <iframe
+          {/* <iframe
             src={embeddedURL}
             key={`${season}-${episode}`}
             frameBorder="0"
             className="w-full h-full rounded-lg border border-white/10"
-          ></iframe>
+          ></iframe> */}
         </PremiumContentGate>
       </div>
 

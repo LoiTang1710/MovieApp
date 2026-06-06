@@ -284,12 +284,276 @@ export const adminPromotionService = {
   },
 }
 
+// export const adminStatsService = {
+//   async getOverview(query = {}) {
+//     const now = new Date()
+//     const period = parsePeriod(query)
+//     const { periodStart, periodEnd, prevStart, prevEnd, month, year } = period
+
+//     const [
+//       viewsInPeriod,
+//       viewsPrevPeriod,
+//       revenueAgg,
+//       revenuePrevAgg,
+//       newUsersInPeriod,
+//       newUsersPrevPeriod,
+//       activeMovies,
+//       popularMovies,
+//       allMovies,
+//       recentUsers,
+//       paymentsByMonth,
+//     ] = await Promise.all([
+//       prisma.movie.aggregate({
+//         where: { updatedAt: { gte: periodStart, lte: periodEnd } },
+//         _sum: { views: true },
+//       }),
+//       prisma.movie.aggregate({
+//         where: { updatedAt: { gte: prevStart, lte: prevEnd } },
+//         _sum: { views: true },
+//       }),
+//       prisma.payment.aggregate({
+//         where: {
+//           status: 'SUCCEEDED',
+//           paidAt: { gte: periodStart, lte: periodEnd },
+//         },
+//         _sum: { amount: true },
+//       }),
+//       prisma.payment.aggregate({
+//         where: {
+//           status: 'SUCCEEDED',
+//           paidAt: { gte: prevStart, lte: prevEnd },
+//         },
+//         _sum: { amount: true },
+//       }),
+//       prisma.user.count({
+//         where: { createdAt: { gte: periodStart, lte: periodEnd } },
+//       }),
+//       prisma.user.count({
+//         where: { createdAt: { gte: prevStart, lte: prevEnd } },
+//       }),
+//       prisma.movie.count({ where: { status: 'AVAILABLE' } }),
+//       prisma.movie.findMany({
+//         take: 10,
+//         orderBy: { views: 'desc' },
+//         where: { updatedAt: { gte: periodStart, lte: periodEnd } },
+//         select: {
+//           id: true,
+//           title: true,
+//           views: true,
+//           posterUrl: true,
+//         },
+//       }),
+//       prisma.movie.findMany({
+//         select: { views: true, updatedAt: true },
+//       }),
+//       prisma.user.findMany({
+//         take: 30,
+//         orderBy: { createdAt: 'desc' },
+//         select: { createdAt: true },
+//       }),
+//       prisma.payment.findMany({
+//         where: { status: 'SUCCEEDED' },
+//         select: { amount: true, paidAt: true, createdAt: true },
+//         orderBy: { createdAt: 'desc' },
+//         take: 300,
+//       }),
+//     ])
+
+//     let popularList = popularMovies
+//     if (!popularList.length) {
+//       popularList = await prisma.movie.findMany({
+//         take: 10,
+//         orderBy: { views: 'desc' },
+//         select: {
+//           id: true,
+//           title: true,
+          
+//           views: true,
+//           posterUrl: true,
+//         },
+//       })
+//     }
+
+//     const periodViews = viewsInPeriod._sum.views || 0
+//     const totalRevenue = Number(revenueAgg._sum.amount || 0)
+//     const revenuePrev = Number(revenuePrevAgg._sum.amount || 0)
+//     const viewsPrev = viewsPrevPeriod._sum.views || 0
+
+//     const monthlyChartData = []
+//     for (let i = 5; i >= 0; i--) {
+//       const d = new Date(year, month - 1 - i, 1)
+//       const label = `T${d.getMonth() + 1}`
+//       const start = monthStart(d)
+//       const end = monthEnd(d)
+//       const monthPayments = paymentsByMonth.filter((p) => {
+//         const date = p.paidAt || p.createdAt
+//         return date >= start && date <= end
+//       })
+//       const revenue = monthPayments.reduce((s, p) => s + Number(p.amount), 0)
+//       monthlyChartData.push({
+//         name: label,
+//         revenue: Math.round(revenue),
+//         views: Math.round(revenue / 1000) || 0,
+//       })
+//     }
+
+//     const dailyViewsData = []
+//     const totalMovieViews = allMovies.reduce((s, m) => s + m.views, 0)
+//     for (let i = 6; i >= 0; i--) {
+//       const day = new Date(now)
+//       day.setDate(day.getDate() - i)
+//       const start = new Date(day)
+//       start.setHours(0, 0, 0, 0)
+//       const end = new Date(day)
+//       end.setHours(23, 59, 59, 999)
+
+//       let views = allMovies
+//         .filter((m) => m.updatedAt >= start && m.updatedAt <= end)
+//         .reduce((s, m) => s + m.views, 0)
+
+//       if (!views && totalMovieViews > 0) {
+//         const factor = 0.85 + ((i + day.getDay()) % 5) * 0.06
+//         views = Math.round((totalMovieViews / 21) * factor)
+//       }
+
+//       dailyViewsData.push({
+//         name: VI_WEEKDAY[day.getDay()],
+//         views,
+//       })
+//     }
+
+//     const dailyUsersData = []
+//     for (let i = 6; i >= 0; i--) {
+//       const day = new Date(now)
+//       day.setDate(day.getDate() - i)
+//       const start = new Date(day)
+//       start.setHours(0, 0, 0, 0)
+//       const end = new Date(day)
+//       end.setHours(23, 59, 59, 999)
+//       const count = recentUsers.filter(
+//         (u) => u.createdAt >= start && u.createdAt <= end,
+//       ).length
+//       dailyUsersData.push({
+//         name: VI_WEEKDAY[day.getDay()],
+//         users: count,
+//       })
+//     }
+
+//     return {
+//       month,
+//       year,
+//       periodLabel: period.periodLabel,
+//       filterLabel: period.isCurrentMonth ? 'Tháng này' : period.periodLabel,
+//       monthlyViews: periodViews.toLocaleString('vi-VN'),
+//       totalRevenue,
+//       newUsersCount: newUsersInPeriod,
+//       activeMovies,
+//       trends: {
+//         views: percentChange(periodViews, viewsPrev),
+//         revenue: percentChange(totalRevenue, revenuePrev),
+//         users: percentChange(newUsersInPeriod, newUsersPrevPeriod),
+//       },
+//       monthlyChartData,
+//       popularMovies: popularList,
+//       dailyViewsData,
+//       dailyUsersData,
+//       totalUsers: await prisma.user.count(),
+//       totalMovies: await prisma.movie.count(),
+//       activePromotions: await prisma.promotion.count({
+//         where: { status: 'ACTIVE' },
+//       }),
+//     }
+//   },
+
+//   async getViewsReport(type) {
+//     if (type === 'by_day') {
+//       const movies = await prisma.movie.findMany({
+//         select: { views: true, updatedAt: true, title: true },
+//         orderBy: { updatedAt: 'desc' },
+//         take: 30,
+//       })
+//       return movies.map((m) => ({
+//         name: m.title.slice(0, 20),
+//         views: m.views,
+//         date: m.updatedAt,
+//       }))
+//     }
+
+//     return prisma.movie.findMany({
+//       take: 15,
+//       orderBy: { views: 'desc' },
+//       select: {
+//         id: true,
+//         title: true,
+//         views: true,
+//         status: true,
+//       },
+//     })
+//   },
+
+//   async exportReport() {
+//     const [movies, users, payments, promotions] = await Promise.all([
+//       prisma.movie.findMany({
+//         select: {
+//           title: true,
+//           views: true,
+//           status: true,
+//         },
+//       }),
+//       prisma.user.findMany({
+//         select: { email: true, role: true, createdAt: true },
+//       }),
+//       prisma.payment.findMany({
+//         select: { amount: true, status: true, currency: true, paidAt: true },
+//       }),
+//       prisma.promotion.findMany({
+//         select: {
+//           code: true,
+//           name: true,
+//           status: true,
+//           discountPercent: true,
+//           usedCount: true,
+//         },
+//       }),
+//     ])
+
+//     const lines = [
+//       'BÁO CÁO TỔNG HỢP MOVIAPP',
+//       `Ngày xuất,${new Date().toISOString()}`,
+//       '',
+//       'PHIM,Title,Views,Status',
+//       ...movies.map(
+//         (m) => `PHIM,"${m.title.replace(/"/g, '""')}",${m.views},${m.status}`,
+//       ),
+//       '',
+//       'NGUOI_DUNG,Email,Role,CreatedAt',
+//       ...users.map(
+//         (u) => `NGUOI_DUNG,${u.email},${u.role},${u.createdAt.toISOString()}`,
+//       ),
+//       '',
+//       'THANH_TOAN,Amount,Status,Currency,PaidAt',
+//       ...payments.map(
+//         (p) =>
+//           `THANH_TOAN,${Number(p.amount)},${p.status},${p.currency},${p.paidAt?.toISOString() || ''}`,
+//       ),
+//       '',
+//       'KHUYEN_MAI,Code,Name,Status,Discount,Used',
+//       ...promotions.map(
+//         (p) =>
+//           `KHUYEN_MAI,${p.code},"${p.name}",${p.status},${p.discountPercent},${p.usedCount}`,
+//       ),
+//     ]
+
+//     return lines.join('\n')
+//   },
+// }
 export const adminStatsService = {
   async getOverview(query = {}) {
     const now = new Date()
     const period = parsePeriod(query)
     const { periodStart, periodEnd, prevStart, prevEnd, month, year } = period
 
+    // Đã xóa query lấy popularMovies khỏi Promise.all để xử lý riêng
     const [
       viewsInPeriod,
       viewsPrevPeriod,
@@ -298,7 +562,6 @@ export const adminStatsService = {
       newUsersInPeriod,
       newUsersPrevPeriod,
       activeMovies,
-      popularMovies,
       allMovies,
       recentUsers,
       paymentsByMonth,
@@ -333,17 +596,6 @@ export const adminStatsService = {
       }),
       prisma.movie.count({ where: { status: 'AVAILABLE' } }),
       prisma.movie.findMany({
-        take: 10,
-        orderBy: { views: 'desc' },
-        where: { updatedAt: { gte: periodStart, lte: periodEnd } },
-        select: {
-          id: true,
-          title: true,
-          views: true,
-          posterUrl: true,
-        },
-      }),
-      prisma.movie.findMany({
         select: { views: true, updatedAt: true },
       }),
       prisma.user.findMany({
@@ -359,19 +611,60 @@ export const adminStatsService = {
       }),
     ])
 
-    let popularList = popularMovies
+    // ==========================================
+    // XỬ LÝ PHIM PHỔ BIẾN VÀ GẮN RATING
+    // ==========================================
+    let popularList = await prisma.movie.findMany({
+      take: 10,
+      orderBy: { views: 'desc' },
+      where: { updatedAt: { gte: periodStart, lte: periodEnd } },
+      select: {
+        id: true,
+        tmdbId: true,
+        mediaType: true,
+        title: true,
+        views: true,
+        posterUrl: true,
+      },
+    })
+
     if (!popularList.length) {
       popularList = await prisma.movie.findMany({
         take: 10,
         orderBy: { views: 'desc' },
         select: {
           id: true,
+          tmdbId: true,
+          mediaType: true,
           title: true,
           views: true,
           posterUrl: true,
         },
       })
     }
+
+    let popularMoviesWithRating = popularList
+    if (popularList.length > 0) {
+      const ratingStats = await prisma.mediaRatingStats.findMany({
+        where: {
+          OR: popularList.map((m) => ({
+            tmdbId: m.tmdbId,
+            mediaType: m.mediaType,
+          })),
+        },
+      })
+
+      popularMoviesWithRating = popularList.map((movie) => {
+        const stat = ratingStats.find(
+          (s) => s.tmdbId === movie.tmdbId && s.mediaType === movie.mediaType,
+        )
+        return {
+          ...movie,
+          rating: stat ? stat.averageStars : 0,
+        }
+      })
+    }
+    // ==========================================
 
     const periodViews = viewsInPeriod._sum.views || 0
     const totalRevenue = Number(revenueAgg._sum.amount || 0)
@@ -453,7 +746,7 @@ export const adminStatsService = {
         users: percentChange(newUsersInPeriod, newUsersPrevPeriod),
       },
       monthlyChartData,
-      popularMovies: popularList,
+      popularMovies: popularMoviesWithRating,
       dailyViewsData,
       dailyUsersData,
       totalUsers: await prisma.user.count(),
