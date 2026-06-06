@@ -206,6 +206,28 @@ export const adminUserService = {
   },
 
   async remove(id) {
+    // 1. Kiểm tra xem user có gói Premium đang hoạt động không
+    const activeSubscription = await prisma.subscription.findFirst({
+      where: {
+        userId: id,
+        status: 'ACTIVE',
+        endAt: { gt: new Date() }, // Ngày hết hạn phải lớn hơn hiện tại
+      },
+    })
+
+    // 2. Nếu cố tình xoá khi đang hoạt động Premium -> Log ra terminal và chặn
+    if (activeSubscription) {
+      // In log ra màn hình console của server
+      console.log(`[WARNING] Tài khoản premium không thể xoá. (User ID: ${id})`)
+
+      const err = new Error(
+        'Không thể xóa người dùng đang có gói Premium (VIP) đang hoạt động!',
+      )
+      err.statusCode = StatusCodes.BAD_REQUEST // Trả về lỗi 400 Bad Request
+      throw err
+    }
+
+    // 3. Nếu không có gói Premium, tiến hành xóa bình thường
     return prisma.user.delete({ where: { id } })
   },
 }
@@ -367,7 +389,7 @@ export const adminPromotionService = {
 //         select: {
 //           id: true,
 //           title: true,
-          
+
 //           views: true,
 //           posterUrl: true,
 //         },
