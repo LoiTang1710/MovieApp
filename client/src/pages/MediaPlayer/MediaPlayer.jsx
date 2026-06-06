@@ -51,10 +51,10 @@ const MediaPlayer = () => {
     )
   }
 
-  // const embeddedURL =
-  //   type === 'movie'
-  //     ? `https://vidsrc.to/embed/movie/${mediaId}`
-  //     : `https://vidsrc.to/embed/tv/${mediaId}/${season}/${episode}`
+  const embeddedURL =
+    type === 'movie'
+      ? `https://vidsrc.to/embed/movie/${mediaId}`
+      : `https://vidsrc.to/embed/tv/${mediaId}/${season}/${episode}`
 
   const movieObj = {
     id: mediaId,
@@ -93,12 +93,12 @@ const MediaPlayer = () => {
       {/* Player Section */}
       <div className="h-150">
         <PremiumContentGate required={!!isPremium}>
-          {/* <iframe
+          <iframe
             src={embeddedURL}
             key={`${season}-${episode}`}
             frameBorder="0"
             className="w-full h-full rounded-lg border border-white/10"
-          ></iframe> */}
+          ></iframe>
         </PremiumContentGate>
       </div>
 
