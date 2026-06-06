@@ -81,14 +81,14 @@ const router = createBrowserRouter(
                 </Suspense>
               ),
             },
-            {
-              path: 'promotions', // Thực tế: /admin/promotions
-              element: (
-                <Suspense fallback={<PageLoader />}>
-                  <Promotions />
-                </Suspense>
-              ),
-            },
+            // {
+            //   path: 'promotions', // Thực tế: /admin/promotions
+            //   element: (
+            //     <Suspense fallback={<PageLoader />}>
+            //       <Promotions />
+            //     </Suspense>
+            //   ),
+            // },
             {
               path: 'stats', // Thực tế: /admin/stats
               element: (
